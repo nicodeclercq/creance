@@ -36,6 +36,9 @@ type Colors = {
   BRAND: {
     BACKGROUND: string;
     COLOR: string;
+  },
+  NEGATIVE: {
+    DEFAULT: string;
   }
 };
 
