@@ -2,7 +2,7 @@ import { pipe } from "fp-ts/function";
 import * as Either from 'fp-ts/Either';
 import { Decoder } from "io-ts";
 import { formatValidationErrors } from 'io-ts-reporters';
-import { State } from './State';
+import { State, StateAccessor } from '../store/State';
 
 export function retrieveFromVersion<U>(
   version: string,

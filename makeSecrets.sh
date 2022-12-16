@@ -7,6 +7,5 @@ export const secrets = {
   firebaseStorageBucket: '$FIREBASE_STORAGE_BUCKET',
   firebaseMessagingSenderId: '$FIREBASE_MESSAGING_SENDER_ID',
   firebaseAppId: '$FIREBASE_APP_ID',
-  firebaseCollectionId: '$FIREBASE_COLLECTION_ID',
 };
 EOF

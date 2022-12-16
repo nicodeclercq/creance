@@ -1,11 +1,21 @@
-import { constVoid, constant } from 'fp-ts/function';
+import { decrypt, encrypt } from './../../infrastructure/crypto';
+import { pipe, constVoid, constant, identity } from 'fp-ts/function';
 import * as Option from 'fp-ts/Option';
+import * as Either from 'fp-ts/Either';
+import * as IO from 'io-ts';
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, setDoc } from 'firebase/firestore/lite';
 
 import { secrets } from "../../secrets";
-import { encryptStore } from "../encryptStore";
-import { CryptedExternalStore } from "../ExternalStore";
+import { ExternalStore } from "../ExternalStore";
+import { throws } from '../../infrastructure/exception';
+import { User, UserDecoder } from '../state/user/user';
+
+const COLLECTION = {
+  CLAIMS: 'creances',
+  USERS: 'users',
+}
+
 
 const firebaseConfig = {
   apiKey: secrets.firebaseApiKey,
@@ -19,8 +29,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const getCollection = () => Promise.resolve(collection(db, secrets.firebaseCollectionId));
-const getDoc = (name: string) => getCollection()
+const getCollection = (name: string) => Promise.resolve(collection(db, name));
+const getDoc = (collection: string, name: string) => getCollection(collection)
   .then(getDocs)
   .then(({docs}) => docs)
   .then(docs => docs.filter(d => d.data().name === name))
@@ -29,29 +39,59 @@ const getDoc = (name: string) => getCollection()
     : Option.none,
   );
 
-export const FirebaseStore: CryptedExternalStore = encryptStore({
-  getEntries: () => getCollection()
-    .then(getDocs)
-    .then(({docs}) => docs)
-    .then(docs => docs.map(d => d.get('name'))),
+const getUserCollection = () => getCollection(COLLECTION.USERS);
+const getClaimCollection = () => getCollection(COLLECTION.CLAIMS);
 
-  create: (name) => getCollection()
-    .then(collection => addDoc(collection, { name, value: ''}))
+const decode = <A extends IO.Decoder<any, any>>(decoder: A) => (value: string) => pipe(
+  value,
+  decoder.decode,
+  Either.fold(
+    throws,
+    identity,
+  )
+);
+
+const userStore = {
+  create: (user: User) => getUserCollection()
+    .then(collection => addDoc(collection, { id: user.id, value: encrypt(user.id)(JSON.stringify(user))}))
     .then(constVoid),
-
-  delete: (name) => getDoc(name)
-    .then(Option.fold(
-      constVoid,
-      (doc) => deleteDoc(doc.ref),
-    )),
-
-  read: (name) => getDoc(name)
+  read: (name: string) => getDoc(COLLECTION.USERS, name)
     .then(Option.map(doc => doc.get('value')))
-    .then(Option.getOrElse(constant(''))),
+    .then(Option.getOrElse(constant('')))
+    .then(decrypt(name))
+    .then(decode(UserDecoder)),
+  update: (user: User) => getDoc(COLLECTION.USERS, user.id)
+  .then(Option.fold(
+    () => throws(new Error('User not found')),
+    (doc) => setDoc(doc.ref, { name: COLLECTION.USERS, value: encrypt(user.id)(JSON.stringify(user))}),
+  )),
+  delete: (user: User) => getDoc(COLLECTION.USERS, user.id)
+  .then(Option.fold(
+    () => throws(new Error('User not found')),
+    (doc) => deleteDoc(doc.ref),
+  )),
+} as const;
 
-  update: (name, state: string) => getDoc(name)
-    .then(Option.fold(
-      constVoid,
-      (doc) => setDoc(doc.ref, { name, value: state}),
-    )),
+export const FirebaseStore: ExternalStore = (decoders) => ({
+  user: userStore,
+  claim: {
+    create: (claim) => getClaimCollection()
+      .then(collection => addDoc(collection, { id: claim.id, value: ''}))
+      .then(constVoid),
+    read: (name) => getDoc(COLLECTION.CLAIMS, name)
+      .then(Option.map(doc => doc.get('value')))
+      .then(Option.getOrElse(constant('')))
+      .then(decrypt(name))
+      .then(decode(decoders.claim)),
+    update: (claim) => getDoc(COLLECTION.CLAIMS, claim.id)
+      .then(Option.fold(
+        () => throws(new Error('Claim not found')),
+        (doc) => setDoc(doc.ref, { name: COLLECTION.CLAIMS, value: claim}),
+      )),
+    delete: (claim) => getDoc(COLLECTION.CLAIMS, claim.id)
+      .then(Option.fold(
+        () => throws(new Error('Claim not found')),
+        (doc) => deleteDoc(doc.ref),
+      ))
+  },
 });

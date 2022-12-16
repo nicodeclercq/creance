@@ -1,7 +1,7 @@
 import { AES, SHA256, enc } from 'crypto-js';
 import { secrets } from "../secrets";
 
-export const encode = (str: string) => btoa(decodeURI(encodeURIComponent(str)));
+export const encode = (str: string) => window.btoa(decodeURI(encodeURIComponent(str)));
 export const decode = (str: string) => decodeURIComponent(encodeURI(window.atob(str)));
 
 const getLockKey = (str: string) => SHA256(`${str}${secrets.salt}`).toString(); 

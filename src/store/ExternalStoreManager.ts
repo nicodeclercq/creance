@@ -1,13 +1,14 @@
 import { constVoid } from 'fp-ts/function';
 import { NonEmptyArray } from 'fp-ts/NonEmptyArray'
 import { FirebaseStore } from './providers/firebase';
-import { State } from './State';
-import { CryptedExternalStore } from './ExternalStore';
-
+import { StateAccessor } from './State';
+// import { CryptedExternalStore } from './ExternalStore';
+/*
 const stores: NonEmptyArray<CryptedExternalStore> = [
   FirebaseStore,
 ];
-
+*/
+/*
 export const ExternalStoreManager: CryptedExternalStore = {
   getEntries: () => Promise.allSettled(
       stores.map(({getEntries}) => getEntries())
@@ -46,3 +47,4 @@ export const ExternalStoreManager: CryptedExternalStore = {
   delete: (name: string)  => Promise.allSettled(stores.map(({delete: del}) => del(name)))
     .then(constVoid),
 }
+*/
