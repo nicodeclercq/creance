@@ -1,19 +1,29 @@
 import { useMemo } from "react";
-import { omit } from "../../infrastructure/object";
 import { __AlertIcon } from "./svg/__AlertIcon";
 import { __LoaderIcon } from "./svg/__LoaderIcon";
 import { __CheckIcon } from "./svg/__CheckIcon";
 import { __PigIcon } from "./svg/__PigIcon";
+import { __AddIcon } from "./svg/__AddIcon";
 
-export const ICONS = {
+export const DISPLAY_ICONS = {
+  pig: __PigIcon,
+} as const;
+
+export const FUNCTIONAL_ICONS = {
+  add: __AddIcon,
   alert: __AlertIcon,
   loader: __LoaderIcon,
   check: __CheckIcon,
-  pig: __PigIcon,
+};
+
+export const ICONS = {
+  ...FUNCTIONAL_ICONS,
+  ...DISPLAY_ICONS,
 } as const;
+
 export type IconName = keyof typeof ICONS;
 
-export const DISPLAY_ICONS = omit(ICONS, ["alert", "check", "loader"] as const);
+export type FunctionalIconName = keyof typeof FUNCTIONAL_ICONS;
 export type DisplayIconName = keyof typeof DISPLAY_ICONS;
 
 type Props = {

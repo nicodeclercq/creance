@@ -8,6 +8,7 @@ const style = css(`
   bottom: ${VAR.SIZE.GAP.M};
   right: ${VAR.SIZE.GAP.M};
   padding: ${VAR.SIZE.PADDING.M.HORIZONTAL};
+  font-size: ${VAR.SIZE.BASE.XL};
   display: flex;
   justify-content: center;
   align-items: center;

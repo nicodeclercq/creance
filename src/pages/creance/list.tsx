@@ -22,7 +22,7 @@ export function CreanceList({ user }: Props) {
           hasSeparators
           itemRenderer={(creance) => <span>{creance.name}</span>}
         />
-        <FloatingButton icon="check" onClick={() => console.log("[YOUPI]")} />
+        <FloatingButton icon="add" onClick={() => console.log("[YOUPI]")} />
       </Card>
     </MainLayout>
   );
