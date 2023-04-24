@@ -1,18 +1,20 @@
-import React from 'react';
-import { ThemeOverride } from './theme';
-import { ThemeContext } from './themeContext';
-import { HIGH_CONTRAST } from './themes/highcontrast/highcontrast';
-import { _Style as Styles } from './_style';
+import React from "react";
+import { _Style as Styles } from "./_style";
+import { ThemeOverride } from "./theme";
+import { ThemeContext } from "./themeContext";
 
 type Props<T extends ThemeOverride> = {
   defaultTheme?: T;
   children: React.ReactNode;
 };
 
-export function ThemeProvider<T extends ThemeOverride>({defaultTheme, children}: Props<T>) {
+export function ThemeProvider<T extends ThemeOverride>({
+  defaultTheme,
+  children,
+}: Props<T>) {
   return (
     <ThemeContext.Provider value={defaultTheme}>
-      <Styles highContrastTheme={HIGH_CONTRAST}/>
+      <Styles />
       {children}
     </ThemeContext.Provider>
   );

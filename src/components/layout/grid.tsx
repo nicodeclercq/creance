@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { css } from '@emotion/css';
-import * as IO from 'io-ts';
-import { BASE_DIRECTION, BaseDirection } from '../../styles/direction';
-import { ContainerTag, CONTAINER_TAG } from '../../styles/tag';
-import { Align, Justify } from '../../styles/flex';
-import { formatResponsiveSize, ResponsiveSize } from '../../styles/size';
-import { VAR } from '../../theme/style';
-import { getStyle, Responsive } from '../../styles/responsive';
+import React, { useMemo } from "react";
+import { css } from "@emotion/css";
+import * as IO from "io-ts";
+import { BASE_DIRECTION, BaseDirection } from "../../styles/direction";
+import { ContainerTag, CONTAINER_TAG } from "../../styles/tag";
+import { Align, Justify } from "../../styles/flex";
+import { formatResponsiveSize, ResponsiveSize } from "../../styles/size";
+import { VAR } from "../../theme/style";
+import { getStyle, Responsive } from "../../styles/responsive";
 
 type Columns = number | string | string[];
 
@@ -28,8 +28,8 @@ type Props = {
   minWidth?: ResponsiveSize;
   shadow?: string;
   width?: ResponsiveSize;
-  wraps?: boolean; 
-}
+  wraps?: boolean;
+};
 
 const createColumnsStyle = (columns: Columns): string => {
   if (IO.number.is(columns)) {
@@ -38,11 +38,11 @@ const createColumnsStyle = (columns: Columns): string => {
   if (IO.string.is(columns)) {
     return columns;
   }
-  if (columns instanceof Array && columns.every(IO.string.is)){
-    return columns.join(' ');
+  if (columns instanceof Array && columns.every(IO.string.is)) {
+    return columns.join(" ");
   }
-  return '';
-}
+  return "";
+};
 
 export function Grid({
   as = CONTAINER_TAG.DIV,
@@ -54,7 +54,7 @@ export function Grid({
   columns,
   wraps,
   direction = BASE_DIRECTION.VERTICAL,
-  width = '100%',
+  width = "100%",
   minWidth,
   maxWidth,
   height,
@@ -66,10 +66,12 @@ export function Grid({
 }: Props) {
   const Component = as;
 
-  const style = useMemo(() => css(`
-    display: ${isInline ? 'grid' : 'inline-grid'};
-    flex-wrap: ${wraps ? 'wrap' : 'nowrap'};
-    flex-direction: ${direction === BASE_DIRECTION.VERTICAL ? 'column' : 'row'};
+  const style = useMemo(
+    () =>
+      css(`
+    display: ${isInline ? "grid" : "inline-grid"};
+    flex-wrap: ${wraps ? "wrap" : "nowrap"};
+    flex-direction: ${direction === BASE_DIRECTION.VERTICAL ? "column" : "row"};
     justify-content: ${justify};
     align-items: ${align};
     background: ${background};
@@ -77,17 +79,15 @@ export function Grid({
     box-shadow: ${shadow};
     gap: ${gap};
     grid-template-columns: ${getStyle(columns, createColumnsStyle)};
-    ${formatResponsiveSize('width', width)}
-    ${formatResponsiveSize('min-width', minWidth)}
-    ${formatResponsiveSize('max-width', maxWidth)}
-    ${formatResponsiveSize('height', height)}
-    ${formatResponsiveSize('min-height', minHeight)}
-    ${formatResponsiveSize('max-height', maxHeight)}
-  `), []);
+    ${formatResponsiveSize("width", width)}
+    ${formatResponsiveSize("min-width", minWidth)}
+    ${formatResponsiveSize("max-width", maxWidth)}
+    ${formatResponsiveSize("height", height)}
+    ${formatResponsiveSize("min-height", minHeight)}
+    ${formatResponsiveSize("max-height", maxHeight)}
+  `),
+    []
+  );
 
-  return (
-    <Component className={style}>
-      {children}
-    </Component>
-  )
+  return <Component className={style}>{children}</Component>;
 }

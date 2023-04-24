@@ -1,5 +1,5 @@
 export const ROUTE = {
-  HOME: '/',
+  HOME: "/",
 } as const;
 
 export type RouteName = keyof typeof ROUTE;
