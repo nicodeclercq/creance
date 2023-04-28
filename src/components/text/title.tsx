@@ -1,13 +1,12 @@
 import React from "react";
 import { css } from "@emotion/css";
-
-import { FONTS } from "../../theme/theme";
 import { font } from "../../infrastructure/style";
 import { VAR } from "../../theme/style";
+import { TOKEN } from "../../theme/tokens/tokens";
 
 const styles = css({
-  ...font(FONTS.HEADING),
-  color: VAR.COLOR.BRAND.BACKGROUND,
+  ...TOKEN.FONT.HEADING,
+  color: VAR.COLOR.BRAND.MAIN.STRONGER,
   margin: 0,
 });
 

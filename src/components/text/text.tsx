@@ -1,21 +1,21 @@
-import React from 'react';
-import { css } from '@emotion/css';
+import React from "react";
+import { css } from "@emotion/css";
 
-import { FONTS } from '../../theme/theme';
-import { font } from '../../infrastructure/style';
-import { TextTag } from '../../styles/tag';
+import { font } from "../../infrastructure/style";
+import { TextTag } from "../../styles/tag";
+import { TOKEN } from "../../theme/tokens/tokens";
 
 const styles = {
   L: css({
-    ...font(FONTS.TEXT.L),
+    ...TOKEN.FONT.TEXT.L,
     margin: 0,
   }),
   M: css({
-    ...font(FONTS.TEXT.M),
+    ...TOKEN.FONT.TEXT.M,
     margin: 0,
   }),
   S: css({
-    ...font(FONTS.TEXT.S),
+    ...TOKEN.FONT.TEXT.S,
     margin: 0,
   }),
 } as const;
@@ -23,14 +23,14 @@ const styles = {
 type Props = {
   as?: TextTag;
   children: React.ReactNode;
-  size?: 'L' | 'M' | 'S';
+  size?: "L" | "M" | "S";
   color?: string;
-}
+};
 
-export function Text({as = 'p', children, size = 'M', color}: Props){
+export function Text({ as = "p", children, size = "M", color }: Props) {
   const Component = as;
   return (
-    <Component className={styles[size]} style={{color}}>
+    <Component className={styles[size]} style={{ color }}>
       {children}
     </Component>
   );

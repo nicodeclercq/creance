@@ -9,7 +9,7 @@ type Props<A> = {
   isOrdered?: boolean;
   hasSeparators?: boolean;
   noPadding?: boolean;
-  negativeMarginSize?: keyof typeof VAR.SIZE.PADDING;
+  negativeMarginSize?: keyof typeof VAR.SIZE.PADDING.HORIZONTAL;
 };
 
 const defaultRenderer = <A extends unknown>(a: A): React.ReactNode => (
@@ -38,7 +38,7 @@ export function List<A>({
     () =>
       css({
         margin: negativeMarginSize
-          ? `0 calc(${VAR.SIZE.PADDING[negativeMarginSize].HORIZONTAL} * -1)`
+          ? `0 calc(${VAR.SIZE.PADDING.HORIZONTAL[negativeMarginSize]} * -1)`
           : 0,
         padding: 0,
       }),
@@ -49,7 +49,7 @@ export function List<A>({
       css({
         margin: 0,
         padding: noPadding ? "none" : padding("M"),
-        borderBottom: hasSeparators && !isLast ? VAR.SEPARATOR.DEFAULT : "none",
+        borderBottom: hasSeparators && !isLast ? VAR.SEPARATOR.BASE : "none",
         listStyleType: "none",
       }),
     [hasSeparators, noPadding]

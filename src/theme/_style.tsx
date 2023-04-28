@@ -1,10 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { pipe } from "fp-ts/function";
-import { DEFAULT } from "./themes/default/default";
 import { usePortal } from "../application/usePortal";
 import { ThemeContext } from "./themeContext";
 import { deepMerge, isObject } from "../infrastructure/object";
-import { ThemeOverride } from "./theme";
+import { TOKEN } from "./tokens/tokens";
 
 const toCssVars = <T extends {}>(theme: T, rootName: string = ""): string => `
   ${Object.entries(theme)
@@ -22,7 +21,7 @@ export function _Style() {
 
   useEffect(() => {
     const themeStyles = pipe(
-      deepMerge(DEFAULT, theme ? theme : {}),
+      deepMerge(TOKEN, theme ? theme : {}),
       toCssVars,
       (a) => `:root {${a}}`
     );

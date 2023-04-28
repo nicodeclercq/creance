@@ -1,11 +1,9 @@
 import React from "react";
 import { css } from "@emotion/css";
-import { font } from "../../infrastructure/style";
-import { FONTS } from "../../theme/theme";
 import { VAR } from "../../theme/style";
 
 export const styles = css({
-  ...font(FONTS.TEXT.S),
+  ...VAR.FONT.TEXT.S,
   flexGrow: "1",
 });
 
@@ -23,7 +21,7 @@ export function Label({ htmlFor, children, asErrors, gridArea }: Props) {
       className={styles}
       style={{
         gridArea,
-        color: asErrors ? VAR.COLOR.NEGATIVE.COLOR : "inherit",
+        color: asErrors ? VAR.COLOR.NEGATIVE.MAIN.BASE : "inherit",
       }}
     >
       {children}

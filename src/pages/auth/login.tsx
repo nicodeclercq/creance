@@ -12,7 +12,7 @@ export function Login() {
   const { connect } = useAuth();
 
   return (
-    <Fill background={VAR.COLOR.BRAND.BACKGROUND}>
+    <Fill background={VAR.COLOR.BRAND.MAIN.BASE}>
       <Center>
         <PigCard width="auto" padding="L">
           <Flex padding={{ y: "M" }} gap="M">

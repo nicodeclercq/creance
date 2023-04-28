@@ -1,21 +1,23 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Icon, IconName } from "./icons/Icon";
 import { css } from "@emotion/css";
-import { VAR, colors, radius, shadow } from "../theme/style";
+import { VAR, radius, shadow } from "../theme/style";
+import classNames from "classnames";
+import { useActiveEffect } from "../application/useActiveEffect";
 
 const style = css(`
   position: fixed;
   bottom: ${VAR.SIZE.GAP.M};
   right: ${VAR.SIZE.GAP.M};
-  padding: ${VAR.SIZE.PADDING.M.HORIZONTAL};
-  font-size: ${VAR.SIZE.BASE.XL};
+  padding: ${VAR.SIZE.PADDING.HORIZONTAL.M};
   display: flex;
   justify-content: center;
   align-items: center;
   border: none;
-  ${radius("ROUNDED")}
-  ${shadow("DEFAULT")}
-  ${colors("BRAND")}
+  ${radius("ROUND")}
+  ${shadow(3)}
+  background: ${VAR.COLOR.ACCENT.MAIN.BASE};
+  color: ${VAR.COLOR.COMMON.SURFACE.BASE};
 `);
 
 type Props = {
@@ -24,9 +26,18 @@ type Props = {
 };
 
 export function FloatingButton({ icon, onClick }: Props) {
+  const ref = useRef(null);
+  const { beforeStyle } = useActiveEffect(ref, { position: "fixed" });
+
   return (
-    <button onClick={onClick} className={style}>
-      <Icon name={icon} />
+    <button
+      ref={ref}
+      onClick={onClick}
+      className={classNames(style, beforeStyle)}
+    >
+      <span style={{ zIndex: 1, display: "inline-flex" }}>
+        <Icon name={icon} />
+      </span>
     </button>
   );
 }

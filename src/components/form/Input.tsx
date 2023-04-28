@@ -1,7 +1,7 @@
 import { css } from "@emotion/css";
 import React, { InputHTMLAttributes } from "react";
 import { FieldError } from "react-hook-form";
-import { VAR } from "../../theme/style";
+import { VAR, padding, radius } from "../../theme/style";
 import { ErrorMessage } from "./ErrorMessage";
 
 type NumberInputProps = {
@@ -44,12 +44,14 @@ const wrapperStyle = css({
 });
 
 const style = css(`
-  padding: ${VAR.SIZE.PADDING.S.VERTICAL} ${VAR.SIZE.PADDING.S.HORIZONTAL};
-  border-radius: ${VAR.RADIUS.DEFAULT};
+  ${padding("M")}
+  ${radius("INTERACTIVE")}
+  background: ${VAR.COLOR.COMMON.SURFACE.BASE};
   border: 1px solid currentColor;
+  box-shadow: ${VAR.SHADOW.INPUT};
 
   &:focus {
-    outline: 2px solid ${VAR.COLOR.BRAND.BACKGROUND};
+    outline: 2px solid ${VAR.COLOR.ACCENT.MAIN.WEAK};
     outline-offset: 2px;
   }
 `);
@@ -85,7 +87,7 @@ export function Input({
         type={type}
         className={style}
         style={{
-          color: errors != null ? VAR.COLOR.NEGATIVE.COLOR : "inherit",
+          color: errors != null ? VAR.COLOR.NEGATIVE.MAIN.BASE : "inherit",
           minWidth: width != null ? width : "5rem",
         }}
         onChange={(e) => {

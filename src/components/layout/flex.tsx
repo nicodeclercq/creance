@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { css } from "@emotion/css";
 import { BASE_DIRECTION, BaseDirection } from "../../styles/direction";
 import { ContainerTag, CONTAINER_TAG } from "../../styles/tag";
-import { Align, Justify } from "../../styles/flex";
+import { ALIGN, Align, JUSTIFY, Justify } from "../../styles/flex";
 import {
   Padding,
   formatResponsiveSize,
@@ -41,7 +41,7 @@ export function Flex({
   color,
   wraps,
   direction = BASE_DIRECTION.VERTICAL,
-  width = "100%",
+  width = isInline ? "auto" : "100%",
   minWidth,
   maxWidth,
   height,
@@ -57,13 +57,13 @@ export function Flex({
   const style = useMemo(
     () =>
       css(`
-        display: ${isInline ? "flex" : "inline-flex"};
+        display: ${isInline ? "inline-flex" : "flex"};
         flex-wrap: ${wraps ? "wrap" : "nowrap"};
         flex-direction: ${
           direction === BASE_DIRECTION.VERTICAL ? "column" : "row"
         };
-        justify-content: ${justify};
-        align-items: ${align};
+        justify-content: ${justify ? JUSTIFY[justify] : undefined};
+        align-items: ${align ? ALIGN[align] : undefined};
         background: ${background};
         color: ${color};
         box-shadow: ${shadow};

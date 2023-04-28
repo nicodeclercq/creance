@@ -20,91 +20,37 @@ import { VAR } from "../../theme/style";
 import { Fn } from "../../../@types/function";
 import { fold } from "../../infrastructure/fold";
 import { Checkbox } from "./Checkbox";
-import { hasKey } from "../../infrastructure/object";
+import { Radio } from "./Radio";
+import {
+  BooleanValue,
+  Fields,
+  FormValue,
+  Key,
+  NumberValue,
+  PrimitiveValue,
+  StringValue,
+  Value,
+  Values,
+  ValueFromList,
+  isBooleanValue,
+  isNumberValue,
+  isStringValue,
+  isValueFromList,
+} from "./formField";
+
+const MAX_OPTIONS_BEFORE_SELECT = 5;
 
 const actionsStyle = css({
   display: "flex",
   width: "100%",
-  gap: VAR.SIZE.GAP.S,
+  gap: VAR.SIZE.GAP.XS,
 });
 const fieldStyle = css({
   display: "flex",
   flexDirection: "column",
-  gap: VAR.SIZE.GAP.XS,
+  gap: VAR.SIZE.GAP.XXS,
 });
 
-export type StringValue = {
-  defaultValue: string;
-  label: string;
-  isRequired?: boolean;
-  validate?: (a: string) => boolean;
-  kind?: "text" | "password";
-};
-export type BooleanValue = {
-  defaultValue: boolean;
-  label: string;
-  isRequired?: boolean;
-  validate?: (a: boolean) => boolean;
-  kind: "checkbox";
-};
-export type NumberValue = {
-  defaultValue: number;
-  isRequired?: boolean;
-  label: string;
-  min?: number;
-  max?: number;
-  validate?: (a: number) => boolean;
-};
-type PrimitiveValue = StringValue | NumberValue | BooleanValue;
-type FormValue =
-  | PrimitiveValue
-  | ValueFromList<PrimitiveValue>
-  | ValuesFromList<PrimitiveValue>;
-
-export type ValueFromList<T extends PrimitiveValue> = Omit<T, "validate"> & {
-  options: T extends StringValue
-    ? Array<{ label: string; value: string } | string>
-    : Array<{ label: string; value: number } | number>;
-  validate?: T extends StringValue
-    ? (a: string) => boolean
-    : (a: number) => boolean;
-};
-export type ValuesFromList<T extends PrimitiveValue> = Omit<
-  T,
-  "validate" | "defaultValue"
-> & {
-  defaultValue: T["defaultValue"][];
-  options: T extends StringValue
-    ? Array<{ label: string; value: string } | string>
-    : Array<{ label: string; value: number } | number>;
-  validate?: T extends StringValue
-    ? (a: string[]) => boolean
-    : (a: number[]) => boolean;
-};
-const isStringValue = (a: FormValue): a is StringValue =>
-  typeof a.defaultValue === "string" && !("options" in a);
-const isBooleanValue = (a: FormValue): a is BooleanValue =>
-  hasKey("kind", a) && a.kind === "checkbox";
-const isNumberValue = (a: FormValue): a is NumberValue =>
-  typeof a.defaultValue === "number" && !("options" in a);
-
-const isValueFromList = <P extends PrimitiveValue>(
-  a: FormValue
-): a is ValueFromList<P> => "options" in a;
-const isValuesFromList = <P extends PrimitiveValue>(
-  a: FormValue
-): a is ValuesFromList<P> => "options" in a && a["options"] instanceof Array;
-
-type Fields<T extends { [key in string]: FormValue }> = {
-  [key in keyof T]: T[key];
-};
-
-export type Values<T extends Fields<any>> = {
-  [key in keyof T]: T[key]["defaultValue"];
-};
-type Value<T extends Fields<any>, K extends keyof T> = Values<T>[K];
-
-type Key<T extends Fields<any>> = keyof T;
 type SubmitMode = "fullWidth" | "justifyEnd" | "submitOnBlur";
 
 type Props<F extends Fields<any>> = {
@@ -252,6 +198,7 @@ export function Form<T extends Fields<any>>({
               id={id}
               label={config.label}
               value={value}
+              name={name}
               errors={errors[name] as FieldError}
               onChange={onChange}
               onBlur={submitOnBlur ? submitHandler : undefined}
@@ -275,39 +222,77 @@ export function Form<T extends Fields<any>>({
       name: Name;
       isMulti?: boolean;
       isRequired?: boolean;
-    }) => (
-      <Controller<Values<T>, Name>
-        name={name}
-        defaultValue={defaultValues[name]}
-        control={control}
-        rules={{ required: isRequired }}
-        render={({
-          field: { value, onChange },
-        }: {
-          field: {
-            value: Value<T, Name>;
-            onChange: Fn<Value<T, Name>, void>;
-          };
-        }) => (
-          <>
-            <Select
-              id={`input-${name as string}`}
-              value={value}
-              onChange={onChange}
-              options={options}
-              multiple={isMulti}
-              width="100%"
-            />
-          </>
-        )}
-      />
-    ),
+    }) => {
+      const optionsNumber = options.length;
+
+      return (
+        <Controller<Values<T>, Name>
+          name={name}
+          defaultValue={defaultValues[name]}
+          control={control}
+          rules={{ required: isRequired }}
+          render={({
+            field: { value, onChange },
+          }: {
+            field: {
+              value: Value<T, Name>;
+              onChange: Fn<Value<T, Name>, void>;
+            };
+          }) => {
+            if (optionsNumber <= MAX_OPTIONS_BEFORE_SELECT) {
+              return isMulti ? (
+                <>
+                  {options.map(({ label, value }) => (
+                    <Checkbox
+                      id={`input-${name as string}-${value}`}
+                      name={name}
+                      value={value}
+                      onChange={onChange}
+                      label={label}
+                      multiple={isMulti}
+                      width="100%"
+                    />
+                  ))}
+                </>
+              ) : (
+                <>
+                  {options.map(({ label, value }) => (
+                    <Radio
+                      id={`input-${name as string}-${value}`}
+                      name={name}
+                      value={value}
+                      onChange={onChange}
+                      label={label}
+                      multiple={isMulti}
+                      width="100%"
+                    />
+                  ))}
+                </>
+              );
+            }
+
+            return (
+              <>
+                <Select
+                  id={`input-${name as string}`}
+                  value={value}
+                  onChange={onChange}
+                  options={options}
+                  multiple={isMulti}
+                  width="100%"
+                />
+              </>
+            );
+          }}
+        />
+      );
+    },
     [control, defaultValues]
   );
   const toOptions = useCallback(
     <T extends PrimitiveValue>({
       options,
-    }: ValueFromList<T> | ValuesFromList<T>): {
+    }: ValueFromList<T>): {
       label: string;
       value: string | number;
     }[] =>
@@ -425,14 +410,7 @@ export function Form<T extends Fields<any>>({
               </Label>
             )}
             <div style={{ gridArea: `input-${name as string}` }}>
-              {isValuesFromList(value) ? (
-                <ListInput
-                  name={name as Name}
-                  isMulti={true}
-                  options={toOptions(value)}
-                  isRequired={value.isRequired}
-                />
-              ) : isValueFromList(value) ? (
+              {isValueFromList(value) ? (
                 <ListInput
                   name={name as Name}
                   isMulti={false}

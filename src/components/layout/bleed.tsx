@@ -7,13 +7,13 @@ import {
   toDirection,
 } from "../../styles/direction";
 
-type Space = keyof Var["SIZE"]["BASE"] | "NONE";
+type Space = keyof Var["SIZE"]["GAP"] | "NONE";
 const isSpace = (a: unknown): a is Space =>
-  typeof a === "string" && (a in VAR.SIZE.BASE || a === "NONE");
+  typeof a === "string" && (a in VAR.SIZE.GAP || a === "NONE");
 type DirectionalSpace = DirectionalType<Space>;
 
 const spaceToValue = (space: Space) =>
-  space === "NONE" ? undefined : VAR.SIZE.BASE[space];
+  space === "NONE" ? undefined : VAR.SIZE.GAP[space];
 
 type Props = {
   space: DirectionalSpace;

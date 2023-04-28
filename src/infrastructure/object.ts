@@ -109,3 +109,6 @@ export const hasKey = <K extends string, T extends {}>(
   key: K,
   obj: T
 ): obj is T & { [k in K]: unknown } => Object.hasOwn(obj, key);
+
+export const removeUndefined = <A extends Record<string, unknown>>(a?: A) =>
+  Record.filter(isDefined)(a ?? {});

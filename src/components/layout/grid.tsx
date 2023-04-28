@@ -17,6 +17,7 @@ type Props = {
   background?: string;
   color?: string;
   columns: Responsive<Columns>;
+  rows?: Responsive<Columns>;
   direction?: BaseDirection;
   gap?: string;
   height?: ResponsiveSize;
@@ -52,6 +53,7 @@ export function Grid({
   background,
   color,
   columns,
+  rows,
   wraps,
   direction = BASE_DIRECTION.VERTICAL,
   width = "100%",
@@ -79,6 +81,7 @@ export function Grid({
     box-shadow: ${shadow};
     gap: ${gap};
     grid-template-columns: ${getStyle(columns, createColumnsStyle)};
+    grid-template-rows: ${getStyle(rows, createColumnsStyle)};
     ${formatResponsiveSize("width", width)}
     ${formatResponsiveSize("min-width", minWidth)}
     ${formatResponsiveSize("max-width", maxWidth)}

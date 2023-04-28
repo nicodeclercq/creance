@@ -4,7 +4,6 @@ import { FieldError } from "react-hook-form";
 import * as Record from "fp-ts/Record";
 import { VAR } from "../../theme/style";
 import { font } from "../../infrastructure/style";
-import { FONTS } from "../../theme/theme";
 import { Icon } from "../icons/Icon";
 
 type Props = {
@@ -19,9 +18,9 @@ const defaultMessages = {
 };
 
 const styles = css({
-  ...font(FONTS.TEXT.S),
-  color: VAR.COLOR.NEGATIVE.COLOR,
-  padding: `${VAR.SIZE.PADDING.S.VERTICAL} 0`,
+  ...VAR.FONT.TEXT.S,
+  color: VAR.COLOR.NEGATIVE.MAIN.BASE,
+  padding: `${VAR.SIZE.PADDING.VERTICAL.S} 0`,
 });
 
 export function ErrorMessage({ errors, messages = {} }: Props) {

@@ -1,16 +1,18 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import classnames from "classnames";
 import { css } from "@emotion/css";
-import { VAR } from "../theme/style";
+import { VAR, padding, radius } from "../theme/style";
 import { Icon } from "./icons/Icon";
+import { useActiveEffect } from "../application/useActiveEffect";
 
 const defaultStyles = css(`
   position: relative;
-  padding: ${VAR.SIZE.PADDING.S.VERTICAL} ${VAR.SIZE.PADDING.S.HORIZONTAL};
-  border-radius: ${VAR.RADIUS.DEFAULT};
+  ${padding("M")}
+  ${radius("INTERACTIVE")}
+  transition: background 0.1s ease-in;
 
   &:focus {
-    outline: 2px solid ${VAR.COLOR.BRAND.BACKGROUND};
+    outline: 2px solid ${VAR.COLOR.ACCENT.SURFACE.STRONG};
     outline-offset: 2px;
   }
   &:not(:disabled){
@@ -19,17 +21,30 @@ const defaultStyles = css(`
 `);
 const styles = {
   primary: css(`
-    border: 1px solid ${VAR.COLOR.BRAND.BACKGROUND};
-    background: ${VAR.COLOR.BRAND.BACKGROUND};
-    color: ${VAR.COLOR.BRAND.COLOR}
+    border: 1px solid ${VAR.COLOR.BRAND.MAIN.STRONGER};
+    color: ${VAR.COLOR.COMMON.SURFACE.BASE};
+    background: ${VAR.COLOR.BRAND.MAIN.BASE};
+
+    :hover{
+      background: ${VAR.COLOR.BRAND.MAIN.STRONG};
+    }
   `),
   secondary: css(`
-    background: none;
-    border: 1px solid currentColor
+    color: ${VAR.COLOR.BRAND.MAIN.STRONG};
+    border: 1px solid currentColor;
+    background: ${VAR.COLOR.COMMON.SURFACE.BASE};
+
+    :hover{
+      background: ${VAR.COLOR.BRAND.SURFACE.WEAKER};
+    }
   `),
   tertiary: css(`
-    background: none;
     border: none;
+    background: ${VAR.COLOR.COMMON.SURFACE.BASE};
+
+    :hover{
+      background: ${VAR.COLOR.NEUTRAL.SURFACE.WEAKER};
+    }
   `),
 };
 const getLoaderStyle = (isLoading: boolean) =>
@@ -75,22 +90,33 @@ export function Button({
   disabled = false,
   isLoading = false,
 }: Props) {
+  const ref = useRef(null);
+  const { beforeStyle } = useActiveEffect(ref, {
+    color: type === "secondary" ? VAR.COLOR.ACCENT.SURFACE.WEAKER : undefined,
+  });
   const isSubmit = onClick === "submit";
   const rest = (isSubmit ? {} : { onClick }) as { onClick?: () => void };
   const loaderStyle = useMemo(() => getLoaderStyle(isLoading), [isLoading]);
 
   return (
     <button
+      ref={ref}
       title={title}
       {...rest}
       type={isSubmit ? "submit" : "button"}
       disabled={disabled || isLoading}
-      className={classnames(defaultStyles, styles[type])}
+      className={classnames(defaultStyles, styles[type], beforeStyle)}
     >
       <span className={loaderStyle}>
         <Icon name="loader" />
       </span>
-      <span style={{ visibility: !isLoading ? "visible" : "hidden" }}>
+      <span
+        style={{
+          zIndex: 1,
+          position: "relative",
+          visibility: !isLoading ? "visible" : "hidden",
+        }}
+      >
         {children}
       </span>
     </button>

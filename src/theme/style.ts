@@ -1,6 +1,6 @@
 import { isObject } from "./../infrastructure/object";
 import * as Record from "fp-ts/Record";
-import { DEFAULT } from "./themes/default/default";
+import { ColorCategoryName, ColorForce, TOKEN } from "./tokens/tokens";
 
 type ToCssVar<T extends {}, U extends string, V extends string> = {} extends T
   ? {}
@@ -23,17 +23,24 @@ const toCssVar = <T extends {}, U extends string, V extends string>(
       : `var(--${root !== "" ? `${root}${separator}` : ""}${key})`
   )(obj) as ToCssVar<T, U, V>;
 
+export const VAR = toCssVar(TOKEN, "-", "");
+export type Var = typeof VAR;
+
 export const radius = (radius: keyof Var["RADIUS"]) =>
   `border-radius: ${VAR.RADIUS[radius]};`;
 
-export const shadow = (shadow: keyof Var["SHADOW"]) =>
-  `box-shadow: ${VAR.SHADOW[shadow]};`;
-export const colors = (color: keyof Var["COLOR"]) =>
-  `background: ${VAR.COLOR[color]["BACKGROUND"]};
-color: ${VAR.COLOR[color]["COLOR"]};
-`;
-export const padding = (size: keyof Var["SIZE"]["PADDING"]) =>
-  `padding: ${VAR.SIZE.PADDING[size].VERTICAL} ${VAR.SIZE.PADDING[size].HORIZONTAL};`;
+export const shadow = (shadow: keyof Var["SHADOW"]["OUTSET"]) =>
+  `box-shadow: ${VAR.SHADOW["OUTSET"][shadow]};`;
+export const colors = <K extends ColorCategoryName>(
+  color: K,
+  force?: ColorForce<K>
+) =>
+  // @ts-ignore
+  `background: ${VAR.COLOR[color]["SURFACE"][force ?? "WEAK"]};
+  color: ${
+    // @ts-ignore
+    VAR.COLOR[color]["MAIN"][force ?? "STRONGER"]
+  }`;
 
-export const VAR = toCssVar(DEFAULT, "-", "");
-export type Var = typeof VAR;
+export const padding = (size: keyof Var["SIZE"]["PADDING"]["HORIZONTAL"]) =>
+  `padding: ${VAR.SIZE.PADDING.VERTICAL[size]} ${VAR.SIZE.PADDING.HORIZONTAL[size]};`;

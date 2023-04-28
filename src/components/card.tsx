@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { css } from "@emotion/css";
-import { VAR } from "../theme/style";
+import { shadow, Var, VAR } from "../theme/style";
 import {
   formatResponsiveSize,
   getPaddingStyle,
@@ -14,12 +14,14 @@ export type Props = {
   children: React.ReactNode;
   width?: ResponsiveSize;
   padding?: Padding;
+  elevation?: keyof Var["SHADOW"]["OUTSET"];
 };
 
 export function Card({
   as = "section",
   width = "100%",
   padding = "M",
+  elevation = 1,
   children,
 }: Props) {
   const Component = as;
@@ -27,10 +29,10 @@ export function Card({
   const style = useMemo(
     () =>
       css(`
-      background: ${VAR.COLOR.DEFAULT.BACKGROUND};
-      border-radius: ${VAR.RADIUS.DEFAULT};
-      box-shadow: ${VAR.SHADOW.DEFAULT};
-      color: ${VAR.COLOR.DEFAULT.COLOR};
+      background: ${VAR.COLOR.COMMON.SURFACE.BASE};
+      border-radius: ${VAR.RADIUS.BASE};
+      color: ${VAR.COLOR.COMMON.MAIN.BASE};
+      ${shadow(elevation)}
       ${getPaddingStyle(padding)}
       ${formatResponsiveSize("width", width)}
     `),
