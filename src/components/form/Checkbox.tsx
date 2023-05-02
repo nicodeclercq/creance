@@ -12,7 +12,7 @@ const wrapperStyle = css(`
   display: inline-flex;
   align-items: flex-start;
   flex-direction: row;
-  gap: ${VAR.SIZE.GAP.XS};
+  gap: ${VAR.SIZE.GAP.XXS};
 `);
 
 const style = css(`

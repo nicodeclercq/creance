@@ -66,7 +66,7 @@ export const isNumberValue = (a: FormValue): a is NumberValue =>
 
 export const isValueFromList = <P extends PrimitiveValue>(
   a: FormValue
-): a is ValueFromList<P> => "options" in a && "isMulti" in a && a["isMulti"];
+): a is ValueFromList<P> => "options" in a;
 
 export type Fields<T extends { [key in string]: FormValue }> = {
   [key in keyof T]: T[key];

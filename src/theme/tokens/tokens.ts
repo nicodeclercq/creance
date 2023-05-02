@@ -123,9 +123,9 @@ export const TOKEN = {
     },
     PADDING: {
       VERTICAL: {
-        L: BASE_TOKENS.SPACES.S,
-        M: BASE_TOKENS.SPACES.XS,
-        S: BASE_TOKENS.SPACES.XXS,
+        L: BASE_TOKENS.SPACES.M,
+        M: BASE_TOKENS.SPACES.S,
+        S: BASE_TOKENS.SPACES.XS,
       },
       HORIZONTAL: {
         L: BASE_TOKENS.SPACES.L,

@@ -16,8 +16,10 @@ const style = css(`
   border: none;
   ${radius("ROUND")}
   ${shadow(3)}
+  z-index: 3;
   background: ${VAR.COLOR.ACCENT.MAIN.BASE};
   color: ${VAR.COLOR.COMMON.SURFACE.BASE};
+  font-size: 3rem;
 `);
 
 type Props = {

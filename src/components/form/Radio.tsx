@@ -4,18 +4,19 @@ import { FieldError } from "react-hook-form";
 import { css } from "@emotion/css";
 import { ErrorMessage } from "./ErrorMessage";
 import { styles as labelDefaultStyle } from "./Label";
-import { VAR, colors, radius } from "../../theme/style";
+import { VAR, radius } from "../../theme/style";
 import { Icon } from "../icons/Icon";
 
 const wrapperStyle = css(`
   position: relative;
   display: inline-flex;
-  align-items: baseline;
+  align-items: flex-start;
   flex-direction: row;
-  gap: ${VAR.SIZE.GAP.XS};
+  gap: ${VAR.SIZE.GAP.XXS};
 `);
 
 const style = css(`
+  flex:none;
   display: inline-grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
@@ -37,24 +38,39 @@ const style = css(`
     grid-row: 1;
   }
 
-  input[type=checkbox] {
+  input[type=radio] {
     margin: 0;
     opacity: 0;
     width: 0;
     height: 0;
   }
 
-  input[type=checkbox] + span {
+  input[type=radio] + span {
     display: flex;
     justify-content: center;
     align-items: center;
-    ${colors("BRAND")}
+    color: ${VAR.COLOR.COMMON.SURFACE.BASE};
+    background: ${VAR.COLOR.COMMON.SURFACE.BASE};
+    font-size: 1.5rem;
   }
 
-  input[type=checkbox]:checked + span {
-    ${colors("BRAND")}
+  input[type=radio]:checked + span {
+    background: ${VAR.COLOR.ACCENT.MAIN.STRONG};
+    color: ${VAR.COLOR.COMMON.SURFACE.BASE};
   }
 `);
+const labelStyleOverride = css`
+  margin-top: 2px;
+`;
+const checkStyle = css`
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 0.2s ease-in;
+
+  input[type="radio"]:checked + & {
+    transform: scale(1);
+  }
+`;
 
 type Props = {
   label: string;
@@ -86,13 +102,13 @@ export function Radio({
           type="radio"
           onChange={(e) => onChange(e.target.checked)}
         />
-        <span>
+        <span className={checkStyle}>
           <Icon name="check" />
         </span>
       </span>
       {/* @ts-ignore */}
       <span
-        className={classNames(labelDefaultStyle)}
+        className={classNames(labelDefaultStyle, labelStyleOverride)}
         style={{
           color: errors ? VAR.COLOR.NEGATIVE.MAIN.BASE : "inherit",
         }}

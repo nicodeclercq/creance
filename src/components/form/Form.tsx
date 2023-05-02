@@ -37,6 +37,7 @@ import {
   isStringValue,
   isValueFromList,
 } from "./formField";
+import { Flex } from "../layout/flex";
 
 const MAX_OPTIONS_BEFORE_SELECT = 5;
 
@@ -240,34 +241,30 @@ export function Form<T extends Fields<any>>({
             };
           }) => {
             if (optionsNumber <= MAX_OPTIONS_BEFORE_SELECT) {
-              return isMulti ? (
-                <>
-                  {options.map(({ label, value }) => (
-                    <Checkbox
-                      id={`input-${name as string}-${value}`}
-                      name={name}
-                      value={value}
-                      onChange={onChange}
-                      label={label}
-                      multiple={isMulti}
-                      width="100%"
-                    />
-                  ))}
-                </>
-              ) : (
-                <>
-                  {options.map(({ label, value }) => (
-                    <Radio
-                      id={`input-${name as string}-${value}`}
-                      name={name}
-                      value={value}
-                      onChange={onChange}
-                      label={label}
-                      multiple={isMulti}
-                      width="100%"
-                    />
-                  ))}
-                </>
+              return (
+                <Flex direction="HORIZONTAL" wraps gap="M">
+                  {options.map(({ label, value }) =>
+                    isMulti ? (
+                      <Checkbox
+                        id={`input-${name as string}-${value}`}
+                        name={name}
+                        value={value}
+                        onChange={onChange}
+                        label={label}
+                        width="100%"
+                      />
+                    ) : (
+                      <Radio
+                        id={`input-${name as string}-${value}`}
+                        name={name}
+                        value={value}
+                        onChange={onChange}
+                        label={label}
+                        width="100%"
+                      />
+                    )
+                  )}
+                </Flex>
               );
             }
 

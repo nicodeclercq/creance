@@ -21,7 +21,7 @@ type Props = {
   onChange: (newStep: number) => void;
 };
 
-const stepButtonStyle = (isActive: boolean) =>
+const stepButtonStyle = (isActive: boolean, isClickable: boolean) =>
   css(`
     padding: 0;
     flex: none;
@@ -29,20 +29,34 @@ const stepButtonStyle = (isActive: boolean) =>
     width: 1rem;
     ${radius("ROUND")}
     background: ${
-      isActive ? VAR.COLOR.BRAND.SURFACE.BASE : VAR.COLOR.NEUTRAL.SURFACE.BASE
+      isActive ? VAR.COLOR.BRAND.MAIN.WEAKER : VAR.COLOR.NEUTRAL.SURFACE.WEAKER
     };
     border: 1px solid ${
-      isActive
-        ? VAR.COLOR.BRAND.SURFACE.STRONG
-        : VAR.COLOR.NEUTRAL.SURFACE.STRONG
+      isActive ? VAR.COLOR.BRAND.MAIN.STRONG : VAR.COLOR.NEUTRAL.SURFACE.WEAK
     };
+    ${
+      isClickable &&
+      `
+      :hover {
+        background: ${isActive ? undefined : VAR.COLOR.NEUTRAL.SURFACE.BASE};
+      }
+      :active {
+        background: ${isActive ? undefined : VAR.COLOR.NEUTRAL.SURFACE.STRONG};
+      }
+    `
+    }
   `);
 type StepButtonProps = {
   isActive?: boolean;
   onClick?: () => void;
 };
 const StepButton = ({ onClick, isActive = false }: StepButtonProps) => {
-  return <button className={stepButtonStyle(isActive)} onClick={onClick} />;
+  return (
+    <button
+      className={stepButtonStyle(isActive, !!onClick)}
+      onClick={onClick}
+    />
+  );
 };
 
 const style = css(`
