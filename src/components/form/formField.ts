@@ -6,6 +6,7 @@ export type StringValue = {
   isRequired?: boolean;
   validate?: (a: string) => boolean;
   kind?: "text" | "password";
+  autocomplete?: string;
 };
 export const stringValue = (
   options: Partial<StringValue> & { label: StringValue["label"] }

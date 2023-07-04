@@ -163,6 +163,7 @@ export function Form<T extends Fields<any>>({
               type={config.kind ?? "text"}
               theme="neutral"
               onChange={onChange}
+              autoComplete={config.autocomplete}
               onBlur={submitOnBlur ? submitHandler : undefined}
               width="100%"
             />

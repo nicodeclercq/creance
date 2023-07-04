@@ -12,7 +12,7 @@ export function Login() {
   const { connect } = useAuth();
 
   return (
-    <Fill background={VAR.COLOR.BRAND.MAIN.BASE}>
+    <Fill background={VAR.COLOR.BRAND.MAIN.BASE} scroll>
       <Center>
         <PigCard width="auto" padding="L">
           <Flex padding={{ y: "M" }} gap="M">
@@ -23,12 +23,14 @@ export function Login() {
                   defaultValue: "",
                   label: "Email",
                   isRequired: true,
+                  autocomplete: "email",
                 },
                 password: {
                   defaultValue: "",
                   label: "Mot de passe",
                   isRequired: true,
                   kind: "password",
+                  autocomplete: "current-password",
                 },
                 keepLoggedIn: {
                   defaultValue: true,
