@@ -1,15 +1,20 @@
 import React from "react";
 import { css } from "@emotion/css";
-import { font } from "../../infrastructure/style";
-import { VAR } from "../../theme/style";
-import { TOKEN } from "../../theme/tokens/tokens";
+import { VAR, font } from "../../theme/style";
 
-const styles = css({
-  ...TOKEN.FONT.HEADING,
-  color: VAR.COLOR.BRAND.MAIN.STRONGER,
-  margin: 0,
-});
-
+const styles = css(`
+  ${font("HEADING", "M")}
+  color: ${VAR.COLOR.BRAND.MAIN.STRONGER};
+  margin: 0;
+`);
+console.log(
+  "[YOUPI]",
+  `
+${font("HEADING", "M")}
+color: ${VAR.COLOR.BRAND.MAIN.STRONGER};
+margin: 0;
+`
+);
 type Props = {
   children: string;
 };

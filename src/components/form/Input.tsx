@@ -1,7 +1,7 @@
 import { css } from "@emotion/css";
 import React, { InputHTMLAttributes } from "react";
 import { FieldError } from "react-hook-form";
-import { VAR, padding, radius } from "../../theme/style";
+import { VAR, padding, radius, font } from "../../theme/style";
 import { ErrorMessage } from "./ErrorMessage";
 
 type NumberInputProps = {
@@ -46,9 +46,11 @@ const wrapperStyle = css({
 const style = css(`
   ${padding("M")}
   ${radius("INTERACTIVE")}
+  ${font("TEXT", "M")}
   background: ${VAR.COLOR.COMMON.SURFACE.BASE};
   border: 1px solid currentColor;
   box-shadow: ${VAR.SHADOW.INPUT};
+  
 
   &:focus {
     outline: 2px solid ${VAR.COLOR.ACCENT.MAIN.WEAK};

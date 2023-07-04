@@ -4,7 +4,7 @@ import { stringValue } from "../../../components/form/formField";
 
 type Props = {
   defaultValue: string;
-  onSubmit: (values: { name: string }) => void;
+  onSubmit: (values: { name: string; mode: string }) => void;
 };
 
 export function NameForm({ defaultValue, onSubmit }: Props) {
@@ -23,7 +23,6 @@ export function NameForm({ defaultValue, onSubmit }: Props) {
             defaultValue: "calendar",
             isRequired: true,
           }),
-          isMulti: false,
           options: [
             {
               label: "Définir sur une période",

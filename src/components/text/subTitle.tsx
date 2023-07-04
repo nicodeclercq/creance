@@ -1,11 +1,11 @@
 import React from "react";
 import { css } from "@emotion/css";
-import { TOKEN } from "../../theme/tokens/tokens";
+import { font } from "../../theme/style";
 
-const styles = css({
-  ...TOKEN.FONT.SUB_HEADING,
-  margin: 0,
-});
+const styles = css(`
+  ${font("HEADING", "S")}
+  margin: 0;
+`);
 
 type Props = {
   children: string;

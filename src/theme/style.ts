@@ -26,6 +26,31 @@ const toCssVar = <T extends {}, U extends string, V extends string>(
 export const VAR = toCssVar(TOKEN, "-", "");
 export type Var = typeof VAR;
 
+export const font = <
+  Type extends keyof Var["FONT"],
+  Level extends keyof Var["FONT"][Type]
+>(
+  type: Type,
+  level: Level
+) => {
+  var font = VAR.FONT[type][level] as any;
+  return `
+    font: ${font.fontWeight} ${font.fontSize}/${font.lineHeight} ${font.fontFamily};
+
+    ::before {
+      content: ${font["::before"].content};
+      marginBottom: ${font["::before"].marginBottom};
+      display: ${font["::before"].display};
+    }
+
+    ::after {
+      content: ${font["::before"].content};
+      marginTop: ${font["::before"].marginTop};
+      display: ${font["::before"].display};
+    }
+  `;
+};
+
 export const radius = (radius: keyof Var["RADIUS"]) =>
   `border-radius: ${VAR.RADIUS[radius]};`;
 

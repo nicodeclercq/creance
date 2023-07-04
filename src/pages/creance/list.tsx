@@ -15,6 +15,13 @@ type Props = {
 export function CreanceList({ user }: Props) {
   const { list } = useCreance();
   const [name, setName] = useState("");
+  const [mode, setMode] = useState("");
+
+  const nameFormChange = ({ name }: { name: string; mode: string }) => {
+    console.log("[YOUPI]", name, mode);
+    setName(name);
+    setMode(mode);
+  };
 
   return (
     <MainLayout user={user}>
@@ -25,12 +32,7 @@ export function CreanceList({ user }: Props) {
         }}
         onChange={console.log}
         steps={[
-          () => (
-            <NameForm
-              defaultValue={name}
-              onSubmit={({ name }) => setName(name)}
-            />
-          ),
+          () => <NameForm defaultValue={name} onSubmit={nameFormChange} />,
           () => <div>2</div>,
           () => <div>3</div>,
           () => <div>4</div>,

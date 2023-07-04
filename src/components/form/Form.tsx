@@ -38,6 +38,7 @@ import {
   isValueFromList,
 } from "./formField";
 import { Flex } from "../layout/flex";
+import { delay } from "../../infrastructure/function";
 
 const MAX_OPTIONS_BEFORE_SELECT = 5;
 
@@ -250,6 +251,7 @@ export function Form<T extends Fields<any>>({
                         name={name}
                         value={value}
                         onChange={onChange}
+                        onBlur={submitOnBlur ? submitHandler : undefined}
                         label={label}
                         width="100%"
                       />
@@ -258,7 +260,13 @@ export function Form<T extends Fields<any>>({
                         id={`input-${name as string}-${value}`}
                         name={name}
                         value={value}
-                        onChange={onChange}
+                        onChange={(e) => {
+                          onChange(e);
+                          if (submitOnBlur) {
+                            delay().then(() => submitHandler());
+                          }
+                        }}
+                        onBlur={submitOnBlur ? submitHandler : undefined}
                         label={label}
                         width="100%"
                       />
@@ -284,7 +292,7 @@ export function Form<T extends Fields<any>>({
         />
       );
     },
-    [control, defaultValues]
+    [control, defaultValues, errors, submitHandler, submitOnBlur]
   );
   const toOptions = useCallback(
     <T extends PrimitiveValue>({
