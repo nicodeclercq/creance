@@ -6,12 +6,12 @@ import {
   logout,
   onAuthStateChanged,
 } from "../../services/backend/auth";
-import { User } from "./User";
-import { fromFirebase } from "./user.adapter.in.firebase";
+import { CurrentUser } from "./User";
+import { fromFirebase } from "./user.adapter.firebase";
 
 export const useAuth = () => {
   const [isLogged, setIsLogged] = useStorage("IS_SIGNED_IN", false);
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<CurrentUser>();
 
   useEffect(() => {
     onAuthStateChanged((user) => {
@@ -24,8 +24,6 @@ export const useAuth = () => {
       }
     });
   }, []);
-
-  console.log("[YOUPI]", isLogged);
 
   return useMemo(
     () =>

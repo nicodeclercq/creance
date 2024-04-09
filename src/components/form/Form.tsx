@@ -32,10 +32,12 @@ import {
   Value,
   Values,
   ValueFromList,
+  ValuesFromList,
   isBooleanValue,
   isNumberValue,
   isStringValue,
   isValueFromList,
+  isValuesFromList,
 } from "./formField";
 import { Flex } from "../layout/flex";
 import { delay } from "../../infrastructure/function";
@@ -117,7 +119,7 @@ export function Form<T extends Fields<any>>({
         }: {
           field: {
             value: Value<T, Name>;
-            onChange: Fn<Value<T, Name>, void>;
+            onChange: Fn<[Value<T, Name>], void>;
           };
         }) => (
           <>
@@ -152,7 +154,7 @@ export function Form<T extends Fields<any>>({
         }: {
           field: {
             value: Value<T, Name>;
-            onChange: Fn<Value<T, Name>, void>;
+            onChange: Fn<[Value<T, Name>], void>;
           };
         }) => (
           <>
@@ -193,7 +195,7 @@ export function Form<T extends Fields<any>>({
         }: {
           field: {
             value: Value<T, Name>;
-            onChange: Fn<Value<T, Name>, void>;
+            onChange: Fn<[Value<T, Name>], void>;
           };
         }) => (
           <>
@@ -221,7 +223,7 @@ export function Form<T extends Fields<any>>({
       isRequired = false,
       isMulti = false,
     }: {
-      options: { label: string; value: string | number }[];
+      options: { label: string; value: string | number | boolean }[];
       name: Name;
       isMulti?: boolean;
       isRequired?: boolean;
@@ -239,7 +241,7 @@ export function Form<T extends Fields<any>>({
           }: {
             field: {
               value: Value<T, Name>;
-              onChange: Fn<Value<T, Name>, void>;
+              onChange: Fn<[Value<T, Name>], void>;
             };
           }) => {
             if (optionsNumber <= MAX_OPTIONS_BEFORE_SELECT) {
@@ -250,7 +252,7 @@ export function Form<T extends Fields<any>>({
                       <Checkbox
                         id={`input-${name as string}-${value}`}
                         name={name}
-                        value={value}
+                        value={`${value}`}
                         onChange={onChange}
                         onBlur={submitOnBlur ? submitHandler : undefined}
                         label={label}
@@ -260,7 +262,7 @@ export function Form<T extends Fields<any>>({
                       <Radio
                         id={`input-${name as string}-${value}`}
                         name={name}
-                        value={value}
+                        value={`${value}`}
                         onChange={(e) => {
                           onChange(e);
                           if (submitOnBlur) {
@@ -298,9 +300,9 @@ export function Form<T extends Fields<any>>({
   const toOptions = useCallback(
     <T extends PrimitiveValue>({
       options,
-    }: ValueFromList<T>): {
+    }: ValueFromList<T> | ValuesFromList<T>): {
       label: string;
-      value: string | number;
+      value: string | number | boolean;
     }[] =>
       options.map((option) =>
         typeof option === "object"
@@ -397,6 +399,71 @@ export function Form<T extends Fields<any>>({
     [submitMode, hasError, onCancel]
   );
 
+  const getValueInput = (name: Name, value: FormValue) => {
+    if (
+      isValuesFromList(value, "StringValue") ||
+      isValuesFromList(value, "NumberValue") ||
+      isValuesFromList(value, "BooleanValue")
+    ) {
+      return (
+        <ListInput
+          name={name}
+          isMulti
+          options={toOptions(value)}
+          isRequired={value.isRequired}
+        />
+      );
+    }
+    if (
+      isValueFromList(value, "StringValue") ||
+      isValueFromList(value, "NumberValue") ||
+      isValueFromList(value, "BooleanValue")
+    ) {
+      return (
+        <ListInput
+          name={name}
+          options={toOptions(value)}
+          isRequired={value.isRequired}
+        />
+      );
+    }
+    if (isStringValue(value)) {
+      return (
+        <StringInput
+          id={`input-${name as string}-${formId}`}
+          name={name}
+          config={value}
+        />
+      );
+    }
+    if (isNumberValue(value)) {
+      return (
+        <NumberInput
+          id={`input-${name as string}-${formId}`}
+          name={name}
+          config={value}
+        />
+      );
+    }
+    if (isBooleanValue(value)) {
+      return (
+        <CheckboxInput
+          id={`input-${name as string}-${formId}`}
+          name={name}
+          config={value}
+        />
+      );
+    }
+    return (
+      <div>
+        <p>Missing Input type in Form</p>
+        <pre style={{ padding: "1rem", color: "white", background: "#2A2A2A" }}>
+          <code>{JSON.stringify(value, undefined, 2)}</code>
+        </pre>
+      </div>
+    );
+  };
+
   return (
     <form onSubmit={submitHandler}>
       <div className={styles}>
@@ -416,34 +483,7 @@ export function Form<T extends Fields<any>>({
               </Label>
             )}
             <div style={{ gridArea: `input-${name as string}` }}>
-              {isValueFromList(value) ? (
-                <ListInput
-                  name={name as Name}
-                  isMulti={false}
-                  options={toOptions(value)}
-                  isRequired={value.isRequired}
-                />
-              ) : isStringValue(value) ? (
-                <StringInput
-                  id={`input-${name as string}-${formId}`}
-                  name={name as Name}
-                  config={value}
-                />
-              ) : isNumberValue(value) ? (
-                <NumberInput
-                  id={`input-${name as string}-${formId}`}
-                  name={name as Name}
-                  config={value}
-                />
-              ) : isBooleanValue(value) ? (
-                <CheckboxInput
-                  id={`input-${name as string}-${formId}`}
-                  name={name as Name}
-                  config={value}
-                />
-              ) : (
-                /* default */ <></>
-              )}
+              {getValueInput(name as Name, value)}
             </div>
           </div>
         ))}

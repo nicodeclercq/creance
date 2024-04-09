@@ -1,3 +1,4 @@
+import { notEmpty } from "../infrastructure/string";
 import { Expense } from "./Expense";
 import { User } from "./auth/User";
 import { v4 as uid } from "uuid";
@@ -5,18 +6,15 @@ import { v4 as uid } from "uuid";
 export type Creance = {
   id: string;
   name: string;
-  users: User[];
-  startDate?: Date;
-  endDate?: Date;
-  userGroup?: Record<
-    User["uid"],
-    {
+  participants: {
+    user: User;
+    defaultDistribution: {
       adult: number;
       child: number;
-    }
-  >;
-  userPresence?: Record<User["uid"], { [d in string]: boolean }>;
-  defaultDistribution: Record<User["uid"], number>;
+    };
+  }[];
+  startDate?: Date;
+  endDate?: Date;
   expenses: Expense[];
 };
 
@@ -27,9 +25,8 @@ export const createDraftCreance = (
 ): DraftCreance => {
   const defaultValues: DraftCreance = {
     name: "",
-    users: [],
+    participants: [],
     startDate: new Date(),
-    defaultDistribution: {},
   };
 
   return {
@@ -38,7 +35,11 @@ export const createDraftCreance = (
   };
 };
 
-export const toCreance = (draft: DraftCreance): Creance => ({
+export const isReady = (draft: DraftCreance) => {
+  return notEmpty(draft.name);
+};
+
+export const draftToCreance = (draft: DraftCreance): Creance => ({
   ...draft,
   id: uid(),
   expenses: [],

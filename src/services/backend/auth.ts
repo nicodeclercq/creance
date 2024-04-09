@@ -40,7 +40,7 @@ export const login = ({
     auth,
     keepLoggedIn
       ? Firebase.browserLocalPersistence
-      : Firebase.inMemoryPersistence
+      : Firebase.browserSessionPersistence
   ).then(() => Firebase.signInWithEmailAndPassword(auth, email, password));
 
 export const logout = Firebase.signOut(auth);

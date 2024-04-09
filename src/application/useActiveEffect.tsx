@@ -33,7 +33,7 @@ export const useActiveEffect = (ref: RefObject<Element>, option?: Props) => {
       width: 1px;
       height: 1px;
       background: ${usedOptions.color};
-      transition: transform 0.15s ease-in;
+      transition: transform 0.1s ease-in;
       transform-origin: center;
       border-radius: 9999px;
       mix-blend-mode: multiply;

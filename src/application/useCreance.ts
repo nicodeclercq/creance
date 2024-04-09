@@ -3,16 +3,15 @@ import {
   Creance,
   DraftCreance,
   createDraftCreance,
-  toCreance,
-} from "./Creance";
+  draftToCreance,
+} from "../domain/Creance";
+import { useSyncState } from "./useSyncState";
 
 export const useCreance = () => {
-  const [list, setList] = useState<Creance[]>([
-    toCreance(createDraftCreance({ name: "toto" })),
-  ]);
+  const [list, setList] = useSyncState("creanceList");
 
   const addCreance = (creance: DraftCreance) => {
-    setList([...list, toCreance(creance)]);
+    setList([...list, draftToCreance(creance)]);
   };
 
   const removeCreance = (id: Creance["id"]) => {

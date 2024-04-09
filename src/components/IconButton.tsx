@@ -2,14 +2,28 @@ import React, { useMemo, useRef } from "react";
 import classnames from "classnames";
 import { css } from "@emotion/css";
 import { VAR, padding, radius } from "../theme/style";
-import { Icon } from "./icons/Icon";
+import { Icon, IconName } from "./icons/Icon";
 import { useActiveEffect } from "../application/useActiveEffect";
+
+const SIZE = {
+  M: css`
+    width: 3em;
+    height: 3em;
+  `,
+  L: css`
+    width: 4rem;
+    height: 4rem;
+    font-size: 2rem;
+  `,
+};
 
 const defaultStyles = css(`
   position: relative;
+  line-height: 0;
   display: inline-flex;
-  ${padding("M")}
-  ${radius("INTERACTIVE")}
+  align-items: center;
+  justify-content: center;
+  ${radius("ROUND")}
   transition: background 0.1s ease-in;
 
   &:focus {
@@ -77,19 +91,21 @@ const getLoaderStyle = (isLoading: boolean) =>
 type Props = {
   type: "primary" | "secondary" | "tertiary";
   onClick: "submit" | (() => void);
-  children: React.ReactNode;
+  icon: IconName;
   disabled?: boolean;
   isLoading?: boolean;
   title?: string;
+  size?: keyof typeof SIZE;
 };
 
-export function Button({
+export function IconButton({
   type,
   onClick,
   title,
-  children,
+  icon,
   disabled = false,
   isLoading = false,
+  size = "M",
 }: Props) {
   const ref = useRef(null);
   const { beforeStyle } = useActiveEffect(ref, {
@@ -106,7 +122,12 @@ export function Button({
       {...rest}
       type={isSubmit ? "submit" : "button"}
       disabled={disabled || isLoading}
-      className={classnames(defaultStyles, styles[type], beforeStyle)}
+      className={classnames(
+        defaultStyles,
+        styles[type],
+        SIZE[size],
+        beforeStyle
+      )}
     >
       <span className={loaderStyle}>
         <Icon name="loader" />
@@ -118,7 +139,7 @@ export function Button({
           visibility: !isLoading ? "visible" : "hidden",
         }}
       >
-        {children}
+        <Icon name={icon} />
       </span>
     </button>
   );

@@ -2,8 +2,9 @@ import React, { useMemo, useRef } from "react";
 import classnames from "classnames";
 import { css } from "@emotion/css";
 import { VAR, padding, radius } from "../theme/style";
-import { Icon } from "./icons/Icon";
 import { useActiveEffect } from "../application/useActiveEffect";
+import { ROUTE, RouteName } from "../router";
+import { Link } from "react-router-dom";
 
 const defaultStyles = css(`
   position: relative;
@@ -76,50 +77,32 @@ const getLoaderStyle = (isLoading: boolean) =>
 
 type Props = {
   type: "primary" | "secondary" | "tertiary";
-  onClick: "submit" | (() => void);
+  to: RouteName;
   children: React.ReactNode;
-  disabled?: boolean;
-  isLoading?: boolean;
   title?: string;
 };
 
-export function Button({
-  type,
-  onClick,
-  title,
-  children,
-  disabled = false,
-  isLoading = false,
-}: Props) {
+export function LinkAsButton({ type, to, title, children }: Props) {
   const ref = useRef(null);
   const { beforeStyle } = useActiveEffect(ref, {
     color: type === "secondary" ? VAR.COLOR.ACCENT.SURFACE.WEAKER : undefined,
   });
-  const isSubmit = onClick === "submit";
-  const rest = (isSubmit ? {} : { onClick }) as { onClick?: () => void };
-  const loaderStyle = useMemo(() => getLoaderStyle(isLoading), [isLoading]);
 
   return (
-    <button
+    <Link
       ref={ref}
       title={title}
-      {...rest}
-      type={isSubmit ? "submit" : "button"}
-      disabled={disabled || isLoading}
+      to={ROUTE[to]}
       className={classnames(defaultStyles, styles[type], beforeStyle)}
     >
-      <span className={loaderStyle}>
-        <Icon name="loader" />
-      </span>
       <span
         style={{
           zIndex: 1,
           position: "relative",
-          visibility: !isLoading ? "visible" : "hidden",
         }}
       >
         {children}
       </span>
-    </button>
+    </Link>
   );
 }

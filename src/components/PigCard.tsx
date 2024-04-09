@@ -26,13 +26,13 @@ const style = {
   `),
 } as const;
 
-export function PigCard({ children, elevation = 5, ...cardProps }: Props) {
+export function PigCard({ children, ...cardProps }: Props) {
   return (
     <div className={style.wrapper}>
       <div className={style.illustrationWrapper}>
         <Illustration name="pig" height="8rem" width="100%" />
       </div>
-      <Card elevation={elevation} {...cardProps}>
+      <Card {...cardProps}>
         <div className={style.contentWrapper}>{children}</div>
       </Card>
     </div>

@@ -14,7 +14,7 @@ export function Login() {
   return (
     <Fill background={VAR.COLOR.BRAND.MAIN.BASE} scroll>
       <Center>
-        <PigCard width="auto" padding="L">
+        <PigCard>
           <Flex padding={{ y: "M" }} gap="M">
             <Title>Bienvenue</Title>
             <Form

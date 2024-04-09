@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { redirect } from "react-router-dom";
 import { useAuth } from "../../domain/auth/useAuth";
-import { User } from "../../domain/auth/User";
+import { CurrentUser } from "../../domain/auth/User";
 
 export type PrivateRouteProps = {
-  user: User;
+  user: CurrentUser;
 };
 
 export const PrivateRoute = ({

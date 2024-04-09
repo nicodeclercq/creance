@@ -3,7 +3,7 @@ import React from "react";
 type MultiOnchange = <T>(value: T[]) => void;
 type SingleOnchange = <T>(value: T) => void;
 
-type BaseProps<T extends string | number> = {
+type BaseProps<T extends string | number | boolean> = {
   id?: string;
   options: { label: string; value: T }[];
   value?: T;
@@ -17,14 +17,14 @@ type SingleValueProps = {
   multiple?: false;
   onChange: SingleOnchange;
 };
-type Props<T extends string | number> = BaseProps<T> &
+type Props<T extends string | number | boolean> = BaseProps<T> &
   (MultipleValuesProps | SingleValueProps);
 
-const isMulti = <T extends string | number>(
+const isMulti = <T extends string | number | boolean>(
   props: Props<T>
 ): props is BaseProps<T> & MultipleValuesProps => props.multiple === true;
 
-export function Select<T extends string | number>(props: Props<T>) {
+export function Select<T extends string | number | boolean>(props: Props<T>) {
   const { id, onChange, options, value, width, multiple = false } = props;
 
   return (
@@ -41,12 +41,12 @@ export function Select<T extends string | number>(props: Props<T>) {
         ).map((option) => (option as HTMLOptionElement).value as T);
         (onChange as MultiOnchange)(values);
       }}
-      value={value}
+      value={`${value}`}
       multiple={multiple}
       style={width ? { width } : {}}
     >
       {options.map(({ value, label }) => (
-        <option key={`${label}_${value}`} value={value}>
+        <option key={`${label}_${value}`} value={`${value}`}>
           {label}
         </option>
       ))}

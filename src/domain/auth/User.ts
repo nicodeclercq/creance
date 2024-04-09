@@ -45,13 +45,14 @@ export const completeUser = ({
   uid: string;
 }) => new CompleteUser(displayName, email, photoURL, uid);
 
-export type User = SignedInUser | PartialUser | CompleteUser;
+export type User = CompleteUser;
+export type CurrentUser = SignedInUser | PartialUser | CompleteUser;
 
-export const isSignedInUser = (user: User): user is SignedInUser =>
+export const isSignedInUser = (user: CurrentUser): user is SignedInUser =>
   user instanceof SignedInUser;
-export const isPartialUser = (user: User): user is PartialUser =>
+export const isPartialUser = (user: CurrentUser): user is PartialUser =>
   user instanceof PartialUser;
-export const isCompleteUser = (user: User): user is CompleteUser =>
+export const isCompleteUser = (user: CurrentUser): user is CompleteUser =>
   user instanceof CompleteUser;
 
 export const fold =
@@ -64,7 +65,7 @@ export const fold =
     onPartial: (user: PartialUser) => A;
     onComplete: (user: CompleteUser) => A;
   }) =>
-  (user: User): A => {
+  (user: CurrentUser): A => {
     if (isSignedInUser(user)) {
       return onSignedIn(user);
     }

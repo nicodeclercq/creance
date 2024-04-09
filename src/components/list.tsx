@@ -2,6 +2,8 @@ import React, { useCallback, useMemo } from "react";
 import { css } from "@emotion/css";
 import { VAR, padding } from "../theme/style";
 import { Text } from "./text/text";
+import { Card } from "./Card";
+import { Title } from "./text/title";
 
 type Props<A> = {
   items: A[] | Record<string, A>;
@@ -10,6 +12,8 @@ type Props<A> = {
   hasSeparators?: boolean;
   noPadding?: boolean;
   negativeMarginSize?: keyof typeof VAR.SIZE.PADDING.HORIZONTAL;
+  onEmpty: React.ReactNode;
+  header?: React.ReactNode;
 };
 
 const defaultRenderer = <A extends unknown>(a: A): React.ReactNode => (
@@ -25,6 +29,8 @@ export function List<A>({
   hasSeparators,
   noPadding,
   negativeMarginSize,
+  onEmpty,
+  header,
 }: Props<A>) {
   const Component = isOrdered ? "ol" : "ul";
   const listItems = useMemo(
@@ -36,12 +42,15 @@ export function List<A>({
   );
   const listStyle = useMemo(
     () =>
-      css({
-        margin: negativeMarginSize
-          ? `0 calc(${VAR.SIZE.PADDING.HORIZONTAL[negativeMarginSize]} * -1)`
-          : 0,
-        padding: 0,
-      }),
+      css(`
+        list-style-type: none;
+        margin: ${
+          negativeMarginSize
+            ? `0 calc(${VAR.SIZE.PADDING.HORIZONTAL[negativeMarginSize]} * -1)`
+            : 0
+        };
+        padding: 0;
+      `),
     []
   );
   const itemStyle = useCallback(
@@ -56,12 +65,20 @@ export function List<A>({
   );
 
   return (
-    <Component className={listStyle}>
-      {listItems.map(([key, value], index) => (
-        <li key={key} className={itemStyle(listItems.length - 1 === index)}>
-          {itemRenderer(value)}
-        </li>
-      ))}
-    </Component>
+    <Card>
+      <h1>{header}</h1>
+      <Component className={listStyle}>
+        {listItems.length === 0
+          ? onEmpty
+          : listItems.map(([key, value], index) => (
+              <li
+                key={key}
+                className={itemStyle(listItems.length - 1 === index)}
+              >
+                {itemRenderer(value)}
+              </li>
+            ))}
+      </Component>
+    </Card>
   );
 }

@@ -106,7 +106,6 @@ export function Radio({
           <Icon name="check" />
         </span>
       </span>
-      {/* @ts-ignore */}
       <span
         className={classNames(labelDefaultStyle, labelStyleOverride)}
         style={{

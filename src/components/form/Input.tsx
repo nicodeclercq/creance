@@ -1,6 +1,11 @@
 import { css } from "@emotion/css";
-import React, { InputHTMLAttributes } from "react";
+import React, { ChangeEvent, InputHTMLAttributes } from "react";
 import { FieldError } from "react-hook-form";
+import { InputText as BaseInputText } from "primereact/inputtext";
+import {
+  InputNumber as BaseInputNumber,
+  InputNumberChangeEvent,
+} from "primereact/inputnumber";
 import { VAR, padding, radius, font } from "../../theme/style";
 import { ErrorMessage } from "./ErrorMessage";
 
@@ -36,6 +41,9 @@ type Props = (NumberInputProps | OtherInputProps) & {
   errors?: FieldError;
   messages?: Record<string, string>;
   width?: string;
+  step?: number;
+  min?: number;
+  max?: number;
 };
 
 const wrapperStyle = css({
@@ -71,8 +79,14 @@ export function Input({
 }: Props &
   Omit<
     InputHTMLAttributes<HTMLInputElement>,
-    "className" | "style" | "onChange"
+    "className" | "style" | "onChange" | "step" | "min" | "max"
   >) {
+  const Component = isNumberInputProps({ onChange, type } as
+    | NumberInputProps
+    | OtherInputProps)
+    ? BaseInputNumber
+    : BaseInputText;
+
   return (
     <div
       className={wrapperStyle}
@@ -82,28 +96,28 @@ export function Input({
           : { width: "min-content", minWidth: "10rem", maxWidth: "100%" }
       }
     >
-      <input
+      <Component
         {...rest}
         defaultValue={value}
         disabled={disabled}
         type={type}
-        className={style}
         style={{
           color: errors != null ? VAR.COLOR.NEGATIVE.MAIN.BASE : "inherit",
           minWidth: width != null ? width : "5rem",
         }}
         onChange={(e) => {
-          const value = e.target.value;
           const props = { onChange, type } as
             | NumberInputProps
             | OtherInputProps;
           if (isNumberInputProps(props)) {
             try {
-              props.onChange(parseInt(value, 10));
+              const value = (e as InputNumberChangeEvent).value ?? undefined;
+              props.onChange(value);
             } catch {
               props.onChange(undefined);
             }
           } else {
+            const value = (e as ChangeEvent<HTMLInputElement>).target.value;
             props.onChange(value);
           }
         }}

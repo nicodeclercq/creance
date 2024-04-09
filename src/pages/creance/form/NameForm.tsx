@@ -4,7 +4,7 @@ import { stringValue } from "../../../components/form/formField";
 
 type Props = {
   defaultValue: string;
-  onSubmit: (values: { name: string; mode: string }) => void;
+  onSubmit: (values: { name: string }) => void;
 };
 
 export function NameForm({ defaultValue, onSubmit }: Props) {
@@ -17,23 +17,6 @@ export function NameForm({ defaultValue, onSubmit }: Props) {
           label: "Nom de la liste de créances",
           isRequired: true,
         }),
-        mode: {
-          ...stringValue({
-            label: "Répartition par défaut",
-            defaultValue: "calendar",
-            isRequired: true,
-          }),
-          options: [
-            {
-              label: "Définir sur une période",
-              value: "calendar",
-            },
-            {
-              label: "Définir par présence",
-              value: "distribution",
-            },
-          ],
-        },
       }}
       onSubmit={onSubmit}
     />
