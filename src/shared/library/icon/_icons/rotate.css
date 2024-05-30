@@ -1,0 +1,19 @@
+.rotate{
+  transform-origin: 50% 50%;
+  animation: rotating 2s linear infinite;
+}
+
+.rotate-on-hover:hover,
+.rotate-on-hover:active,
+.rotate-on-hover:focus{
+  transform-origin: 50% 50%;
+  animation: rotating 2s linear infinite;
+}
+@keyframes rotating {
+  from{
+      transform: rotate(0deg);
+  }
+  to{
+      transform: rotate(360deg);
+  }
+}

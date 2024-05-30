@@ -1,0 +1,116 @@
+import React from "react";
+import { useForm } from "react-hook-form";
+
+import { uid } from "../../../uid";
+import { Label } from "../../../shared/library/text/label/label";
+import { Translate } from "../../../shared/translate/translate";
+import { Form } from "../../../shared/library/form/form";
+import { Registered } from "../../../models/Registerable";
+import { Creance, defaultCreance } from "../../../models/State";
+import { useCreanceState } from "../../../hooks/useCreanceState";
+import { sort } from "../../../utils/date";
+import { useTranslations } from "../../../hooks/useTranslation";
+
+type Props = {
+  onSubmit: () => void;
+  onCancel: () => void;
+  creance?: Registered<Creance>;
+};
+
+type Value = string | undefined;
+export type Option = {
+  label: string | React.ReactNode;
+  value: Value;
+};
+
+export function CreanceForm({ creance, onSubmit, onCancel }: Props) {
+  const id = uid();
+  const { of, add, update, getAll } = useCreanceState();
+  const translations = useTranslations();
+  const { register, handleSubmit } = useForm();
+
+  const creanceList = getAll();
+  const options: Option[] = [
+    {
+      label: translations["creance.form.fromConfig.none"],
+      value: undefined,
+    } as Option,
+  ].concat(
+    creanceList
+      .sort((a, b) => sort(b.date, a.date))
+      .map((creance) => ({ label: creance.name, value: creance.id }))
+  );
+
+  const submit = (data) => {
+    const otherCreanceConfig =
+      data.fromConfig == null
+        ? {}
+        : creanceList.reduce(
+            (acc, { id, categories, users }) =>
+              id === data.fromConfig
+                ? {
+                    categories,
+                    users,
+                    initialization: "INITIALIZED",
+                  }
+                : acc,
+            {}
+          );
+
+    const newCreance = of({
+      ...defaultCreance,
+      ...otherCreanceConfig,
+      name: data.name,
+      ...creance,
+    });
+    if (creance) {
+      update(newCreance);
+    } else {
+      add(newCreance);
+    }
+    onSubmit();
+  };
+
+  return (
+    <Form
+      onSubmit={handleSubmit(submit)}
+      onCancel={onCancel}
+      submitLabel={
+        creance ? "creance.form.submit.update" : "creance.form.submit.add"
+      }
+    >
+      <div>
+        <Label htmlFor={`${id}-name`}>
+          <Translate name="creance.form.name" />
+        </Label>
+        <input
+          defaultValue={creance?.name}
+          name="name"
+          id={`${id}-name`}
+          ref={register}
+        />
+      </div>
+      {creance == null ? (
+        <div>
+          <Label htmlFor={`${id}-from-config`}>
+            <Translate name="creance.form.fromConfig" />
+          </Label>
+          <select
+            defaultValue={undefined}
+            name="fromConfig"
+            id={`${id}-from-config`}
+            ref={register}
+          >
+            {options.map(({ value, label }) => (
+              <option key={`${label}-${value}`} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <></>
+      )}
+    </Form>
+  );
+}

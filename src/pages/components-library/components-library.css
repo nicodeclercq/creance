@@ -1,0 +1,16 @@
+.container{
+  margin: 4rem 0 10rem;
+}
+.container > h2{
+  margin-top:3rem;
+  padding: 1rem 2rem;
+  border-top: 1px solid;
+}
+.container > h3{
+  margin-top:1rem;
+  padding: 1rem 2rem;
+}
+
+.space-content > *:not(:first-child){
+   margin-top:1rem;
+}
