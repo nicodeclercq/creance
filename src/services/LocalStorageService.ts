@@ -5,14 +5,17 @@ const KEY = "state";
 
 export const saveState = ({ state }: { state: State }) => {
   try {
-    Promise.resolve(localStorage.setItem(KEY, JSON.stringify(state)));
+    Promise.resolve(state)
+      .then(JSON.stringify)
+      .then((state) => localStorage.setItem(KEY, state));
   } catch (e) {
     return Promise.reject(e);
   }
 };
 
 export const getState = () =>
-  Promise.resolve(localStorage.getItem(KEY))
+  Promise.resolve(KEY)
+    .then(localStorage.getItem)
     .then((state) => JSON.parse(state ?? ""))
     .then((s) => (isState(s) ? s : defaultState));
 

@@ -27,15 +27,7 @@ type Props = {
 };
 export function I18nProvider({ children }: Props) {
   const [translations, setTranslations] =
-    useState<Record<Translation, string>>();
-
-  useEffect(() => {
-    const newTranslations = I18nService.setTranslations(
-      DEFAULT_LANG,
-      defaultLanguage
-    );
-    setTranslations(newTranslations);
-  }, []);
+    useState<Record<Translation, string>>(defaultLanguage);
 
   return (
     <I18nContext.Provider value={{ ...context, translations, setTranslations }}>

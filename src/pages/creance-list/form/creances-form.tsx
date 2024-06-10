@@ -84,10 +84,9 @@ export function CreanceForm({ creance, onSubmit, onCancel }: Props) {
           <Translate name="creance.form.name" />
         </Label>
         <input
+          {...register("name")}
           defaultValue={creance?.name}
-          name="name"
           id={`${id}-name`}
-          ref={register}
         />
       </div>
       {creance == null ? (
@@ -96,10 +95,9 @@ export function CreanceForm({ creance, onSubmit, onCancel }: Props) {
             <Translate name="creance.form.fromConfig" />
           </Label>
           <select
+            {...register("fromConfig")}
             defaultValue={undefined}
-            name="fromConfig"
             id={`${id}-from-config`}
-            ref={register}
           >
             {options.map(({ value, label }) => (
               <option key={`${label}-${value}`} value={value}>

@@ -7,7 +7,7 @@ import { useInitializationState } from "../../../hooks/useInitializationState";
 
 export function ExpenseList() {
   const { needInitialization } = useInitializationState();
-
+  console.log(needInitialization());
   return needInitialization() ? (
     <Initialize />
   ) : (

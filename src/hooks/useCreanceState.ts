@@ -16,7 +16,6 @@ import {
 
 export function useCreanceState(id?: string) {
   const { state, setState } = useStore();
-  console.log("state", state);
   const { creanceId: routeId } = useParams();
 
   const creanceId = id != null ? id : (routeId as string);

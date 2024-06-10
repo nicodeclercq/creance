@@ -45,8 +45,6 @@ export const StoreProvider = ({
     [load, store]
   );
 
-  console.log("store", store);
-
   return (
     <StoreContext.Provider value={store}>
       {isReady ? children : <Loader />}

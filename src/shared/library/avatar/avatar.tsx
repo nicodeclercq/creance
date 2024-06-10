@@ -1,11 +1,11 @@
+import { useCss } from "react-use";
 import { Text } from "../text/text/text";
 import { Icon, IconName } from "../icon/icon";
-import { Spacing, toCssValue as toCssSize } from "../../../entities/spacing";
+import { toCssValue as toCssSize } from "../../../entities/spacing";
 import { toCssValue } from "../../../entities/color";
 import { INNER_SHADOW } from "../../../entities/shadow";
 import { generateColor } from "../../../utils/color";
 import { Inline } from "../../../shared/layout/inline/inline";
-import { useCss } from "react-use";
 
 const SIZES = {
   S: { s: "L", f: "S", m: "XS" },
@@ -53,7 +53,7 @@ export function Avatar({
 
   const NoAvatar = () => {
     return (
-      <div style={style}>
+      <div className={style}>
         <Icon name={icon} />
       </div>
     );
@@ -61,7 +61,7 @@ export function Avatar({
 
   return (
     <Inline align="CENTER" justify="START" spacing="S">
-      {image ? <div style={style} /> : <NoAvatar />}
+      {image ? <div className={style} /> : <NoAvatar />}
       {!hideName && name && <Text>{name}</Text>}
     </Inline>
   );
