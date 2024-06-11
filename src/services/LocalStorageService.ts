@@ -14,8 +14,8 @@ export const saveState = ({ state }: { state: State }) => {
 };
 
 export const getState = () =>
-  Promise.resolve(KEY)
-    .then(localStorage.getItem)
+  Promise.resolve()
+    .then(() => localStorage.getItem(KEY))
     .then((state) => JSON.parse(state ?? ""))
     .then((s) => (isState(s) ? s : defaultState));
 

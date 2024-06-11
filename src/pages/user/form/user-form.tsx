@@ -50,11 +50,10 @@ export function UserForm({ user, onSubmit, onCancel, isMain = true }: Props) {
           <Translate name="user.form.avatar" />
         </Label>
         <input
-          name="avatar"
+          {...register("avatar")}
           defaultValue={user?.avatar}
           id={`${id}-user-avatar`}
           type="text"
-          ref={register}
         />
       </div>
       <div>
@@ -62,12 +61,11 @@ export function UserForm({ user, onSubmit, onCancel, isMain = true }: Props) {
           <Translate name="user.form.name" />
         </Label>
         <input
-          name="name"
+          {...register("name")}
           required
           defaultValue={user?.name}
           id={`${id}-user-name`}
           type="text"
-          ref={register}
         />
       </div>
       <div>
@@ -75,12 +73,11 @@ export function UserForm({ user, onSubmit, onCancel, isMain = true }: Props) {
           <Translate name="user.form.repartition" />
         </Label>
         <input
-          name="defaultDistribution"
+          {...register("defaultDistribution")}
           defaultValue={user?.defaultDistribution || 1}
           min={0}
           id={`${id}-user-repartition`}
           type="number"
-          ref={register}
         />
       </div>
     </Form>

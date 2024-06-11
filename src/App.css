@@ -38,3 +38,11 @@ select {
     transform: "scale(0.75)";
   }
 }
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

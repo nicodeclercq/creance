@@ -96,10 +96,9 @@ export function CategoryForm({
           <Translate name="category.form.icon" />
         </Label>
         <select
-          name="icon"
+          {...register("icon")}
           defaultValue={category?.icon}
           id={`${id}-category-icon`}
-          ref={register}
         >
           {icons.map((icon) => (
             <option key={icon.label} value={icon.value}>
@@ -113,12 +112,11 @@ export function CategoryForm({
           <Translate name="category.form.name" />
         </Label>
         <input
-          name="name"
+          {...register("name")}
           required
           defaultValue={category?.name}
           id={`${id}-category-name`}
           type="text"
-          ref={register}
         />
       </div>
     </Form>

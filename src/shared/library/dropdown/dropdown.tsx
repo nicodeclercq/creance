@@ -31,14 +31,6 @@ export function Dropdown({
   const wrapperStyle = useCss({
     display: "inline-block",
     position: "relative",
-    "@keyframes dropdownAppear": {
-      from: {
-        opacity: 0,
-      },
-      to: {
-        opacity: 1,
-      },
-    },
   });
   const dropdownWrapperStyle = useCss({
     position: "absolute",

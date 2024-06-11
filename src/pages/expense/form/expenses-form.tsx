@@ -60,10 +60,9 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
           <Translate name="expense.form.from" />
         </Label>
         <select
-          name="from"
+          {...register("from")}
           id={`${id}-from`}
           defaultValue={expense?.from}
-          ref={register}
         >
           {users.map((user) => (
             <option key={user.id} value={user.id}>
@@ -77,11 +76,10 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
           <Translate name="expense.form.amount" />
         </Label>
         <input
-          name="amount"
           defaultValue={expense?.amount || 0}
           id={`${id}-amount`}
           type="text"
-          ref={register({
+          {...register("amount", {
             pattern: {
               value: /^[-()\d/*+. ]+$/i,
               message: "invalid format",
@@ -94,10 +92,9 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
           <Translate name="expense.form.category" />
         </Label>
         <select
-          name="category"
+          {...register("category")}
           id={`${id}-category`}
           defaultValue={expense?.category}
-          ref={register}
         >
           {getAllCategories().map((category) => (
             <option key={category.id} value={category.id}>
@@ -124,14 +121,13 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
               </ColumnRigid>
               <ColumnFlexible>
                 <input
-                  name={`distribution[${user.id}]`}
+                  {...register(`distribution[${user.id}]`)}
                   defaultValue={
                     expense?.distribution[user.id] ?? user.defaultDistribution
                   }
                   id={`${id}-distribution-${user.id}`}
                   min={0}
                   type="number"
-                  ref={register}
                 />
               </ColumnFlexible>
             </Columns>
@@ -145,9 +141,8 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
         <textarea
           style={{ minWidth: "100%", maxWidth: "100%" }}
           defaultValue={expense?.description}
-          name="description"
           id={`${id}-description`}
-          ref={register}
+          {...register("description")}
         />
       </div>
     </Form>
