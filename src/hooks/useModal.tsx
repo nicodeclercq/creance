@@ -18,10 +18,12 @@ type Props = {
 const handleBlurEffect = (isOpen: boolean) => {
   const root = document.getElementById("root");
 
-  if (isOpen) {
-    root.style.filter = `blur(2px)`;
-  } else {
-    root.style.filter = "";
+  if (root) {
+    if (isOpen) {
+      root.style.filter = `blur(2px)`;
+    } else {
+      root.style.filter = "";
+    }
   }
 };
 

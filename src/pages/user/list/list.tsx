@@ -14,6 +14,8 @@ import { Translate } from "../../../shared/translate/translate";
 import { Card } from "../../../shared/library/card/card";
 import { Text } from "../../../shared/library/text/text/text";
 import { ButtonAccent } from "../../../shared/library/button/buttonAccent";
+import { useParams } from "react-router-dom";
+import { Either } from "../../../components/Either";
 
 type Add = { tag: "ADD" };
 type Edit = { tag: "EDIT"; value: string };
@@ -27,7 +29,9 @@ const isEdit = (obj: Add | Edit | undefined, value: string) =>
 
 export function List() {
   const [editId, setEditId] = useState<Add | Edit | undefined>(undefined);
-  const { getAll, remove } = useUserState();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { getAll, remove } = useUserState(creanceId);
   const users = getAll();
 
   const reset = () => {
@@ -36,52 +40,58 @@ export function List() {
 
   return (
     <Stack spacing="XL">
-      {users.map((user) =>
-        isEdit(editId, user.id) ? (
-          <Card isFlat>
-            <UserForm
-              key={user.id}
-              user={user}
-              isMain={false}
-              onCancel={reset}
-              onSubmit={reset}
-            />
-          </Card>
-        ) : (
-          <Inline key={user.id} spacing="M">
-            <ColumnFlexible>
-              <Avatar
-                size="L"
-                color={user.color}
-                name={user.name}
-                image={user.avatar}
-              />
-            </ColumnFlexible>
-            <ColumnRigid>
-              <Confirm
-                trigger={(open) => (
-                  <ButtonGhost onClick={open}>
-                    <Icon name={ICONS.TRASH} />
-                  </ButtonGhost>
-                )}
-                action="user.delete"
-                onConfirm={() => {
-                  remove(user.id);
-                }}
-              >
-                <Text>
-                  <Translate name="user.delete.confirm" />
-                </Text>
-              </Confirm>
-            </ColumnRigid>
-            <ColumnRigid>
-              <ButtonAccent onClick={() => setEditId(edit(user.id))}>
-                <Icon name={ICONS.PENCIL} />
-              </ButtonAccent>
-            </ColumnRigid>
-          </Inline>
-        )
-      )}
+      <Either
+        data={users}
+        onLeft={() => <Text>No user</Text>}
+        onRight={(users) =>
+          users.map((user) =>
+            isEdit(editId, user.id) ? (
+              <Card isFlat>
+                <UserForm
+                  key={user.id}
+                  user={user}
+                  isMain={false}
+                  onCancel={reset}
+                  onSubmit={reset}
+                />
+              </Card>
+            ) : (
+              <Inline key={user.id} spacing="M">
+                <ColumnFlexible>
+                  <Avatar
+                    size="L"
+                    color={user.color}
+                    name={user.name}
+                    image={user.avatar}
+                  />
+                </ColumnFlexible>
+                <ColumnRigid>
+                  <Confirm
+                    trigger={(open) => (
+                      <ButtonGhost onClick={open}>
+                        <Icon name={ICONS.TRASH} />
+                      </ButtonGhost>
+                    )}
+                    action="user.delete"
+                    onConfirm={() => {
+                      remove(user.id);
+                    }}
+                  >
+                    <Text>
+                      <Translate name="user.delete.confirm" />
+                    </Text>
+                  </Confirm>
+                </ColumnRigid>
+                <ColumnRigid>
+                  <ButtonAccent onClick={() => setEditId(edit(user.id))}>
+                    <Icon name={ICONS.PENCIL} />
+                  </ButtonAccent>
+                </ColumnRigid>
+              </Inline>
+            )
+          )
+        }
+      />
       {isAdd(editId) ? (
         <Card isFlat>
           <UserForm isMain={false} onCancel={reset} onSubmit={reset} />

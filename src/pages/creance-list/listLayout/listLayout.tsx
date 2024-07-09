@@ -47,7 +47,7 @@ export function ListLayout({ children }: Props) {
         zIndex="main"
       >
         <div
-          className={{
+          style={{
             marginBottom: SPACING.XL,
           }}
         >

@@ -8,9 +8,12 @@ import { Translate } from "../../../../shared/translate/translate";
 import { Container } from "../../../../shared/layout/container/container";
 import { Currency } from "../../../../components/currency/currency";
 import { useCalculation } from "../../../../hooks/useCalculation";
+import { useParams } from "react-router-dom";
 
 export function TotalCount() {
-  const { getTotalExpense } = useCalculation();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { getTotalExpense } = useCalculation(creanceId);
 
   const total = getTotalExpense();
 

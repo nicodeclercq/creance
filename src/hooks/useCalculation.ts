@@ -1,11 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { getUsersExpenses } from './../services/CalculationService';
-import { getTotalExpense, getUserCost, getUsersCosts, getUsersRepartition } from '../services/CalculationService';
-import { useCreanceState } from './useCreanceState';
+import { getUsersExpenses } from "./../services/CalculationService";
+import {
+  getTotalExpense,
+  getUserCost,
+  getUsersCosts,
+  getUsersRepartition,
+} from "../services/CalculationService";
+import { useCreanceState } from "./useCreanceState";
 
-export const useCalculation = (id?: string) => {
-  const { state } = useCreanceState(id);
+export const useCalculation = (id: string) => {
+  const { getState } = useCreanceState(id);
+  const state = getState();
   const total = useMemo(() => getTotalExpense(state), [state]);
   const userCost = useMemo(() => getUserCost(state), [state]);
   const usersCosts = useMemo(() => getUsersCosts(state), [state]);
@@ -18,5 +24,5 @@ export const useCalculation = (id?: string) => {
     getUsersCosts: usersCosts,
     getUsersRepartition: usersRepartition,
     getUsersExpense: usersExpense,
-  }
-}
+  };
+};

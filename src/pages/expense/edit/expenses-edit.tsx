@@ -13,8 +13,9 @@ import { Page404 } from "../../../pages/404";
 
 export function EditExpense() {
   const params = useParams();
+  const creanceId = params.creanceId as string;
   const { back, goTo } = useRoute();
-  const { get } = useExpenseState();
+  const { get } = useExpenseState(creanceId);
 
   const onSubmit = () => {
     goTo(ROUTES.EXPENSE_LIST, params);

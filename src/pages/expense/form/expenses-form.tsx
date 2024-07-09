@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-
+import { Either } from "../../../components/Either";
 import { uid } from "../../../uid";
 import { Label } from "../../../shared/library/text/label/label";
 import { Translate } from "../../../shared/translate/translate";
@@ -14,6 +14,7 @@ import { useCategoryState } from "../../../hooks/useCategoryState";
 import { useExpenseState } from "../../../hooks/useExpenseState";
 import { Expense } from "../../../models/Expense";
 import { Registered } from "../../../models/Registerable";
+import { useParams } from "react-router-dom";
 
 type Props = {
   onSubmit: () => void;
@@ -23,9 +24,11 @@ type Props = {
 
 export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
   const id = uid();
-  const { getAll } = useUserState();
-  const { getAll: getAllCategories } = useCategoryState();
-  const { of, add, update } = useExpenseState();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { getAll } = useUserState(creanceId);
+  const { getAll: getAllCategories } = useCategoryState(creanceId);
+  const { of, add, update } = useExpenseState(creanceId);
   const { register, handleSubmit } = useForm();
 
   const users = getAll();
@@ -64,11 +67,17 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
           id={`${id}-from`}
           defaultValue={expense?.from}
         >
-          {users.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.name}
-            </option>
-          ))}
+          <Either
+            onLeft={(e) => e}
+            data={users}
+            onRight={(users) =>
+              users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))
+            }
+          />
         </select>
       </div>
       <div>
@@ -96,11 +105,17 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
           id={`${id}-category`}
           defaultValue={expense?.category}
         >
-          {getAllCategories().map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
+          <Either
+            data={getAllCategories()}
+            onLeft={(e) => e}
+            onRight={(categories) =>
+              categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))
+            }
+          />
         </select>
       </div>
       <div>
@@ -108,30 +123,37 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
           <Translate name="expense.form.distribution" />
         </Label>
         <Stack spacing="M">
-          {users.map((user) => (
-            <Columns key={user.id} spacing="M">
-              <ColumnRigid>
-                <Label>
-                  <Avatar
-                    color={user.color}
-                    image={user.avatar}
-                    name={user.name}
-                  />
-                </Label>
-              </ColumnRigid>
-              <ColumnFlexible>
-                <input
-                  {...register(`distribution[${user.id}]`)}
-                  defaultValue={
-                    expense?.distribution[user.id] ?? user.defaultDistribution
-                  }
-                  id={`${id}-distribution-${user.id}`}
-                  min={0}
-                  type="number"
-                />
-              </ColumnFlexible>
-            </Columns>
-          ))}
+          <Either
+            onLeft={(e) => e}
+            data={users}
+            onRight={(users) =>
+              users.map((user) => (
+                <Columns key={user.id} spacing="M">
+                  <ColumnRigid>
+                    <Label>
+                      <Avatar
+                        color={user.color}
+                        image={user.avatar}
+                        name={user.name}
+                      />
+                    </Label>
+                  </ColumnRigid>
+                  <ColumnFlexible>
+                    <input
+                      {...register(`distribution[${user.id}]`)}
+                      defaultValue={
+                        expense?.distribution[user.id] ??
+                        user.defaultDistribution
+                      }
+                      id={`${id}-distribution-${user.id}`}
+                      min={0}
+                      type="number"
+                    />
+                  </ColumnFlexible>
+                </Columns>
+              ))
+            }
+          />
         </Stack>
       </div>
       <div>

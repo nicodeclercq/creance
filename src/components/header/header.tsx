@@ -40,7 +40,11 @@ function DropdownContent() {
 }
 
 export function Header({ title }: Props) {
-  const { state, isLocked } = useCreanceState();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { getState, isLocked } = useCreanceState(creanceId);
+  const state = getState();
+
   return (
     <Container
       position="fixed"

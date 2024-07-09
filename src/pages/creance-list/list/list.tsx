@@ -17,14 +17,18 @@ import { pipe } from "../../../utils/functions";
 import { groupBy } from "../../../utils/array";
 import { Line } from "../../../components/line";
 import { Fragment } from "react/jsx-runtime";
+import { useParams } from "react-router-dom";
 
 export function List() {
-  const { getAll } = useCreanceState();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { getAll } = useCreanceState(creanceId);
   const creanceList = getAll();
   const { goTo } = useRoute();
 
   const listGroups = pipe(
-    creanceList.sort((a, b) => sort(b.date, a.date)),
+    creanceList ?? [],
+    (creanceList) => creanceList.sort((a, b) => sort(b.date, a.date)),
     groupBy((creance) => creance.endDate == null)
   );
   const activeCount = listGroups[0].length;

@@ -1,28 +1,39 @@
 import { useForm } from "react-hook-form";
 
 import { uid } from "../../../uid";
+import { pipe } from "fp-ts/function";
+import * as Either from "fp-ts/Either";
 import { Label } from "../../../shared/library/text/label/label";
 import { Form } from "../../../shared/library/form/form";
 import { User } from "../../../models/User";
 import { useUserState } from "../../../hooks/useUserState";
 import { Translate } from "../../../shared/translate/translate";
-import { Registered } from "../../../models/Registerable";
+import * as Registerable from "../../../models/Registerable";
 import { getColor } from "../../../utils/color";
+import { useParams } from "react-router-dom";
 
 type Props = {
   onSubmit: (data: User) => void;
   onCancel: () => void;
   isMain?: boolean;
-  user?: Registered<User>;
+  user?: Registerable.Registered<User>;
 };
 
 export function UserForm({ user, onSubmit, onCancel, isMain = true }: Props) {
   const id = uid();
-  const { add, of, update, getAll } = useUserState();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { add, of, update, getAll } = useUserState(creanceId);
   const { register, handleSubmit } = useForm();
 
   const submit = (data) => {
-    const count = getAll().length;
+    const count = pipe(
+      getAll(),
+      Either.fold(
+        () => 0,
+        (users) => users.length
+      )
+    );
     const newUser = of({
       id: user?.id,
       name: data.name,
@@ -31,9 +42,9 @@ export function UserForm({ user, onSubmit, onCancel, isMain = true }: Props) {
       defaultDistribution: data.defaultDistribution,
     });
     if (user) {
-      update(newUser);
+      update(newUser as Registerable.Registered<User>);
     } else {
-      add(newUser);
+      add(newUser as Registerable.Unregistered<User>);
     }
     onSubmit(newUser);
   };

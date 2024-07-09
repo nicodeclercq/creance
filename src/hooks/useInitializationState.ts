@@ -1,15 +1,19 @@
-import { needInitialization, initializationFold, getStepNb, getStepsCount, next, previous } from '../services/InitializationService';
-import { useCreanceState } from './useCreanceState';
+import {
+  needInitialization,
+  initializationFold,
+  getStepNb,
+  getStepsCount,
+  next,
+  previous,
+} from "../services/InitializationService";
 
-export const useInitializationState = (id?: string) => {
-  const { state, setState } = useCreanceState(id);
-
+export const useInitializationState = (id: string) => {
   return {
-    needInitialization: needInitialization(state),
-    initializationFold: initializationFold(state),
-    getStepNb: getStepNb(state),
-    getStepsCount: getStepsCount(state),
-    next: setState(next),
-    previous: setState(previous),
-  }
-}
+    needInitialization: needInitialization(id),
+    initializationFold: initializationFold(id),
+    getStepNb: getStepNb(id),
+    getStepsCount,
+    next: next(id),
+    previous: previous(id),
+  };
+};

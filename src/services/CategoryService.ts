@@ -1,6 +1,7 @@
 import { IconName } from "./../shared/library/icon/icon";
-import { Either, fromNullable } from "fp-ts/es6/Either";
-
+import { pipe } from "fp-ts/function";
+import * as Either from "fp-ts/Either";
+import * as CreanceService from "../services/CreanceService";
 import { Category } from "../models/Category";
 import { Creance } from "../models/State";
 import * as Registerable from "../models/Registerable";
@@ -13,39 +14,84 @@ export const of = (category: {
 }): Registerable.Registerable<Category> => Registerable.of(category);
 
 export const add =
-  (state: Registerable.Registered<Creance>) =>
-  (
-    category: Registerable.Unregistered<Category>
-  ): Registerable.Registered<Creance> => ({
-    ...state,
-    categories: [...state.categories, Registerable.register(category)],
-  });
-
-export const update =
-  (state: Registerable.Registered<Creance>) =>
-  (category: Registerable.Registered<Category>): Creance => ({
-    ...state,
-    categories: state.categories.map((cat) =>
-      Registerable.equals(cat, category) ? category : cat
-    ),
-  });
-
-export const remove =
-  (state: Registerable.Registered<Creance>) =>
-  (id: string): Registerable.Registered<Creance> => ({
-    ...state,
-    categories: state.categories.filter((category) => category.id !== id),
-  });
-
-export const get =
-  (state: Registerable.Registered<Creance>) =>
-  (id: string): Either<Error, Registerable.Registered<Category>> =>
-    fromNullable(new Error(`Category with id ${id} has not been found`))(
-      state.categories.find((category) => category.id === id)
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (category: Registerable.Unregistered<Category>) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        categories: [...creance.categories, Registerable.register(category)],
+      })),
+      Either.map(CreanceService.update)
     );
 
-export const getAll = (state: Registerable.Registered<Creance>) => () =>
-  state.categories;
+export const update =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (category: Registerable.Registered<Category>) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        categories: creance.categories.map((cat) =>
+          Registerable.equals(cat, category) ? category : cat
+        ),
+      })),
+      Either.map(CreanceService.update)
+    );
 
-export const isEmpty = (state: Registerable.Registered<Creance>) => () =>
-  state.categories.length === 0;
+export const remove =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (id: string) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        categories: creance.categories.filter((category) => category.id !== id),
+      })),
+      Either.map(CreanceService.update)
+    );
+
+export const get =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (id: string): Either.Either<Error, Registerable.Registered<Category>> =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) =>
+        creance.categories.find((category) => category.id === id)
+      ),
+      Either.chain(
+        Either.fromNullable(`Category with id ${id} has not been found`)
+      ),
+      Either.mapLeft((e) => new Error(e))
+    );
+
+export const getAll =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => creance.categories)
+    );
+
+export const count =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      getAll(creanceId)(),
+      Either.map((categories) => categories.length)
+    );
+
+export const isEmpty =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      count(creanceId)(),
+      Either.map((length) => length === 0)
+    );

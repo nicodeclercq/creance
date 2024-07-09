@@ -32,6 +32,7 @@ import { useCreanceState } from "../../../../hooks/useCreanceState";
 import { Creance } from "../../../../models/State";
 import { Title } from "../../../../shared/library/text/title/title";
 import { Inline } from "../../../../shared/layout/inline/inline";
+import { Either } from "../../../../components/Either";
 
 function ExpenseItem({
   expense,
@@ -42,10 +43,11 @@ function ExpenseItem({
 }) {
   const { goTo } = useRoute();
   const params = useParams();
-  const { get: getCategory } = useCategoryState();
-  const { get: getUser } = useUserState();
-  const { remove } = useExpenseState();
-  const { isLocked } = useCreanceState();
+  const creanceId = params.creanceId as string;
+  const { get: getCategory } = useCategoryState(creanceId);
+  const { get: getUser } = useUserState(creanceId);
+  const { remove } = useExpenseState(creanceId);
+  const { isLocked } = useCreanceState(creanceId);
   const userEither = getUser(expense.from);
   const categoryEither = getCategory(expense.category);
 
@@ -135,59 +137,70 @@ function ExpenseItem({
 }
 
 export function List() {
-  const { getAll } = useExpenseState();
-  const { isLocked, state } = useCreanceState();
-  const { goTo } = useRoute();
   const params = useParams();
-
+  const creanceId = params.creanceId as string;
+  const { getAll } = useExpenseState(creanceId);
+  const { isLocked, getState } = useCreanceState(creanceId);
+  const { goTo } = useRoute();
+  const state = getState();
   const expenses = getAll();
 
   return (
-    <Card
-      header={
-        !isLocked(state) ? (
-          <Container background="PRIMARY_LIGHT" padding={CARD_PADDING}>
-            <Columns spacing="M" justify="SPACE_BETWEEN">
-              <Title>
-                <Translate
-                  name={
-                    expenses.length === 1
-                      ? "page.expenses.count.singular"
-                      : "page.expenses.count.plural"
-                  }
-                  parameters={{ count: expenses.length }}
+    <Either
+      data={expenses}
+      onLeft={(e) => e}
+      onRight={(expenses) => (
+        <Card
+          header={
+            !isLocked(state) ? (
+              <Container background="PRIMARY_LIGHT" padding={CARD_PADDING}>
+                <Columns spacing="M" justify="SPACE_BETWEEN">
+                  <Title>
+                    <Translate
+                      name={
+                        expenses.length === 1
+                          ? "page.expenses.count.singular"
+                          : "page.expenses.count.plural"
+                      }
+                      parameters={{ count: expenses.length }}
+                    />
+                  </Title>
+                  {!isLocked(state) && (
+                    <ColumnRigid contentFit>
+                      <ButtonGhost
+                        withBackground
+                        onClick={() => goTo(ROUTES.EXPENSE_ADD, params)}
+                      >
+                        <Icon name="ADD" />
+                      </ButtonGhost>
+                    </ColumnRigid>
+                  )}
+                </Columns>
+              </Container>
+            ) : undefined
+          }
+        >
+          <Stack spacing="M">
+            {expenses
+              .sort((a, b) => sort(b.date, a.date))
+              .map((expense) => (
+                <ExpenseItem
+                  key={expense.id}
+                  expense={expense}
+                  creance={state}
                 />
-              </Title>
-              {!isLocked(state) && (
-                <ColumnRigid contentFit>
-                  <ButtonGhost
-                    withBackground
-                    onClick={() => goTo(ROUTES.EXPENSE_ADD, params)}
-                  >
-                    <Icon name="ADD" />
-                  </ButtonGhost>
-                </ColumnRigid>
-              )}
-            </Columns>
-          </Container>
-        ) : undefined
-      }
-    >
-      <Stack spacing="M">
-        {expenses
-          .sort((a, b) => sort(b.date, a.date))
-          .map((expense) => (
-            <ExpenseItem key={expense.id} expense={expense} creance={state} />
-          ))}
-        {expenses.length === 0 && (
-          <Container foreground="GREY" padding="M">
-            <Stack align="CENTER" justify="CENTER">
-              <Icon name="CART" size="XXL" />
-              <Translate name="page.expenses.list.empty" />
-            </Stack>
-          </Container>
-        )}
-      </Stack>
-    </Card>
+              ))}
+            {expenses.length === 0 && (
+              <Container foreground="GREY" padding="M">
+                <Stack align="CENTER" justify="CENTER">
+                  <Icon name="CART" size="XXL" />
+                  <Translate name="page.expenses.list.empty" />
+                </Stack>
+              </Container>
+            )}
+          </Stack>
+        </Card>
+      )}
+    />
   );
 }

@@ -1,14 +1,14 @@
+import * as Either from "fp-ts/Either";
 import { isBefore } from "../utils/date";
 import { Registered } from "../models/Registerable";
-import { InitializationSteps, State } from "../models/State";
+import { InitializationSteps } from "../models/State";
 import { User } from "../models/User";
 import { Category } from "../models/Category";
 import { register } from "../models/Registerable";
-import { fromNullable } from "fp-ts/es6/Either";
-
 import { Creance } from "../models/State";
 import { Expense } from "../models/Expense";
 import * as Registerable from "../models/Registerable";
+import { Store } from "./StoreService";
 
 export const of = (creance: {
   id?: string;
@@ -19,44 +19,51 @@ export const of = (creance: {
   initialization: InitializationSteps;
 }): Registerable.Registerable<Creance> => Registerable.of(creance);
 
-export const add =
-  (state: State) =>
-  (creance: Registerable.Unregistered<Creance>): State => ({
-    ...state,
-    creances: [...state.creances, register(creance)],
-  });
-
-export const update =
-  (state: State) =>
-  (creance: Registerable.Registered<Creance>): State => ({
-    ...state,
-    creances: state.creances.map((c) =>
-      Registerable.equals(c, creance) ? creance : c
-    ),
-  });
-
-export const remove =
-  (state: State) =>
-  (id: string): State => {
-    const result = {
-      ...state,
-      creances: state.creances.filter((creance) => creance.id !== id),
-    };
-    return result;
+export const add = (creance: Registerable.Unregistered<Creance>) => {
+  const createdCreance = register(creance);
+  const newState = {
+    ...Store.value,
+    creances: [...Store.value.creances, createdCreance],
   };
 
-export const get = (state: State) => (id: string) =>
-  fromNullable(`Unknown créance id ${id}`)(
-    state.creances.find((creance) => creance.id === id)
-  );
-export const getAll = (state: State) => () => state.creances;
+  Store.next(newState);
+};
 
-export const isLocked = (state: Registered<Creance>) => {
-  if (!state.endDate) {
+export const update = (creance: Registerable.Registered<Creance>) => {
+  const newState = {
+    ...Store.value,
+    creances: Store.value.creances.map((c) =>
+      Registerable.equals(c, creance) ? creance : c
+    ),
+  };
+
+  Store.next(newState);
+};
+
+export const remove = (id: string) => {
+  const newState = {
+    ...Store.value,
+    creances: Store.value.creances.filter((creance) => creance.id !== id),
+  };
+
+  Store.next(newState);
+};
+
+export const get = (id: string) =>
+  Either.fromNullable(`Unknown créance id ${id}`)(
+    Store.value.creances.find((creance) => creance.id === id)
+  );
+
+export const getAll = () => Store.value.creances;
+
+export const isLocked = (creance: Registered<Creance>) => {
+  if (!creance.endDate) {
     return false;
   }
   const date =
-    typeof state.endDate === "string" ? new Date(state.endDate) : state.endDate;
+    typeof creance.endDate === "string"
+      ? new Date(creance.endDate)
+      : creance.endDate;
 
   return isBefore(new Date())(date);
 };

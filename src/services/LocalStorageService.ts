@@ -20,11 +20,11 @@ export const getState = () =>
     .then((s) => (isState(s) ? s : defaultState));
 
 export const connect = (state: Observable<State>) => {
-  const subcription = state.subscribe({
+  const subscription = state.subscribe({
     next: (state) => {
       saveState({ state });
     },
   });
 
-  return () => subcription.unsubscribe();
+  return () => subscription.unsubscribe();
 };

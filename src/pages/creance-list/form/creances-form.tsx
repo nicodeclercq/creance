@@ -10,6 +10,7 @@ import { Creance, defaultCreance } from "../../../models/State";
 import { useCreanceState } from "../../../hooks/useCreanceState";
 import { sort } from "../../../utils/date";
 import { useTranslations } from "../../../hooks/useTranslation";
+import { useParams } from "react-router-dom";
 
 type Props = {
   onSubmit: () => void;
@@ -25,7 +26,9 @@ export type Option = {
 
 export function CreanceForm({ creance, onSubmit, onCancel }: Props) {
   const id = uid();
-  const { of, add, update, getAll } = useCreanceState();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { of, add, update, getAll } = useCreanceState(creanceId);
   const translations = useTranslations();
   const { register, handleSubmit } = useForm();
 

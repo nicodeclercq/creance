@@ -1,8 +1,10 @@
-import { Either, fromNullable } from "fp-ts/es6/Either";
+import { pipe } from "fp-ts/function";
+import * as Either from "fp-ts/Either";
 
 import { Creance } from "../models/State";
 import { User } from "../models/User";
 import * as Registerable from "../models/Registerable";
+import * as CreanceService from "../services/CreanceService";
 
 export const of = (user: {
   id?: string;
@@ -13,35 +15,85 @@ export const of = (user: {
 }): Registerable.Registerable<User> => Registerable.of(user);
 
 export const add =
-  (state: Creance) =>
-  (user: Registerable.Unregistered<User>): Creance => ({
-    ...state,
-    users: [...state.users, Registerable.register(user)],
-  });
-
-export const update =
-  (state: Creance) =>
-  (user: Registerable.Registered<User>): Creance => ({
-    ...state,
-    users: Registerable.isRegistered(user)
-      ? state.users.map((usr) => (Registerable.equals(usr, user) ? user : usr))
-      : state.users,
-  });
-
-export const remove =
-  (state: Creance) =>
-  (id: string): Creance => ({
-    ...state,
-    users: state.users.filter((user) => user.id !== id),
-  });
-
-export const get =
-  (state: Creance) =>
-  (id: string): Either<Error, Registerable.Registered<User>> =>
-    fromNullable(new Error(`User with id ${id} has not been found`))(
-      state.users.find((user) => user.id === id)
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (user: Registerable.Unregistered<User>) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        users: [...creance.users, Registerable.register(user)],
+      })),
+      Either.map(CreanceService.update)
     );
 
-export const getAll = (state: Creance) => () => state.users;
+export const update =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (user: Registerable.Registered<User>) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        users: Registerable.isRegistered(user)
+          ? creance.users.map((usr) =>
+              Registerable.equals(usr, user) ? user : usr
+            )
+          : creance.users,
+      })),
+      Either.map(CreanceService.update)
+    );
 
-export const isEmpty = (state: Creance) => () => state.users.length === 0;
+export const remove =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (id: string) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        users: creance.users.filter((user) => user.id !== id),
+      })),
+      Either.map(CreanceService.update)
+    );
+
+export const get =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (id: string): Either.Either<Error, Registerable.Registered<User>> =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => creance.users),
+      Either.map((users) => users.find((user) => user.id === id)),
+      Either.chain(
+        Either.fromNullable(`User with id ${id} has not been found`)
+      ),
+      Either.mapLeft((e) => new Error(e))
+    );
+
+export const getAll =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => creance.users)
+    );
+
+export const count =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      getAll(creanceId)(),
+      Either.map((users) => users.length)
+    );
+
+export const isEmpty =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      count(creanceId)(),
+      Either.map((length) => length === 0)
+    );

@@ -1,8 +1,9 @@
 import { UID } from "./../@types/uid.d";
 import { register } from "../models/Registerable";
-import { fromNullable } from "fp-ts/es6/Either";
+import { pipe } from "fp-ts/function";
+import * as Either from "fp-ts/Either";
 import * as Record from "fp-ts/Record";
-
+import * as CreanceService from "../services/CreanceService";
 import { Creance } from "../models/State";
 import { Expense } from "../models/Expense";
 import * as Registerable from "../models/Registerable";
@@ -24,34 +25,63 @@ export const of = (expense: {
   });
 
 export const add =
-  (state: Registerable.Registered<Creance>) =>
-  (expense: Registerable.Unregistered<Expense>): Creance => ({
-    ...state,
-    expenses: [...state.expenses, register(expense)],
-  });
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (expense: Registerable.Unregistered<Expense>) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        expenses: [...creance.expenses, register(expense)],
+      })),
+      Either.map(CreanceService.update)
+    );
 
 export const update =
-  (state: Registerable.Registered<Creance>) =>
-  (expense: Registerable.Registered<Expense>): Creance => ({
-    ...state,
-    expenses: state.expenses.map((exp) =>
-      Registerable.equals(exp, expense) ? expense : exp
-    ),
-  });
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (expense: Registerable.Registered<Expense>) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        expenses: creance.expenses.map((exp) =>
+          Registerable.equals(exp, expense) ? expense : exp
+        ),
+      })),
+      Either.map(CreanceService.update)
+    );
 
 export const remove =
-  (state: Registerable.Registered<Creance>) =>
-  (id: string): Creance => {
-    const result = {
-      ...state,
-      expenses: state.expenses.filter((expense) => expense.id !== id),
-    };
-    return result;
-  };
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (id: string) =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => ({
+        ...creance,
+        expenses: creance.expenses.filter((expense) => expense.id !== id),
+      })),
+      Either.map(CreanceService.update)
+    );
 
-export const get = (state: Registerable.Registered<Creance>) => (id: string) =>
-  fromNullable(`Unknown expense id ${id}`)(
-    state.expenses.find((expense) => expense.id === id)
-  );
-export const getAll = (state: Registerable.Registered<Creance>) => () =>
-  state.expenses;
+export const get =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (id?: string) =>
+    pipe(
+      getAll(creanceId)(),
+      Either.map((expenses) => expenses.find((expense) => expense.id === id)),
+      Either.chain(Either.fromNullable(`Unknown expense id ${id}`))
+    );
+
+export const getAll =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      creanceId,
+      Either.fromNullable("Creance id is not defined"),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => creance.expenses)
+    );

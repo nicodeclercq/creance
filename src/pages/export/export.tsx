@@ -12,7 +12,6 @@ import { Translate } from "../../shared/translate/translate";
 import { useExpenseState } from "../../hooks/useExpenseState";
 import { useCalculation } from "../../hooks/useCalculation";
 import { useCreanceState } from "../../hooks/useCreanceState";
-import { CreditDistribution } from "../../services/CalculationService";
 import { useUserState } from "../../hooks/useUserState";
 import { useCategoryState } from "../../hooks/useCategoryState";
 import { toCSV } from "../../services/CSVService";
@@ -25,10 +24,7 @@ type ExportType = "csv" | "html";
 const WAIT_TIME = 1000;
 
 const eitherToPromise = <B, A>(c: Either<B, A>): Promise<A> =>
-  fold(
-    (e: B) => Promise.reject(e),
-    (a: A) => Promise.resolve(a)
-  )(c);
+  fold(Promise.reject, (a: A) => Promise.resolve(a))(c);
 
 const wait = (time: number) =>
   new Promise((resolve) => {
@@ -36,13 +32,13 @@ const wait = (time: number) =>
   });
 
 export function Export() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { getAll: getUsers } = useUserState();
-  const { getAll: getCategories } = useCategoryState();
-  const { getAll } = useExpenseState();
-  const { getUsersRepartition } = useCalculation();
-  const { get } = useCreanceState();
   const { creanceId: routeId } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const { getAll: getUsers } = useUserState(routeId as string);
+  const { getAll: getCategories } = useCategoryState(routeId as string);
+  const { getAll } = useExpenseState(routeId as string);
+  const { getUsersRepartition } = useCalculation(routeId as string);
+  const { get } = useCreanceState(routeId);
   const [settings] = useSettings();
   const { back } = useRoute();
   const { currency } = settings;
@@ -55,17 +51,15 @@ export function Export() {
     const categories = getCategories();
 
     const exportCreance = () =>
-      eitherToPromise(creance)
-        .then((c) =>
-          eitherToPromise(repartition)
-            .then(
-              (
-                distribution: Pick<
-                  CreditDistribution,
-                  "distribution" | "user"
-                >[]
-              ) => Promise.resolve(distribution)
-            )
+      Promise.all([
+        eitherToPromise(creance),
+        eitherToPromise(expenses),
+        eitherToPromise(users),
+        eitherToPromise(categories),
+        eitherToPromise(repartition),
+      ])
+        .then(([c, expenses, users, categories, distribution]) =>
+          Promise.resolve(distribution)
             .then((distribution) =>
               foldUnion({
                 csv: () =>

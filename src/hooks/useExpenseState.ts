@@ -1,15 +1,19 @@
-import { get, getAll, add, remove, update, of } from './../services/ExpenseService';
-import { useCreanceState } from './useCreanceState';
+import {
+  get,
+  getAll,
+  add,
+  remove,
+  update,
+  of,
+} from "./../services/ExpenseService";
 
-export const useExpenseState = (id?: string) => {
-  const { state, setState } = useCreanceState(id);
-
+export const useExpenseState = (id: string) => {
   return {
-    get: get(state),
-    getAll: getAll(state),
-    add: setState(add),
-    remove: setState(remove),
-    update: setState(update),
+    get: get(id),
+    getAll: getAll(id),
+    add: add(id),
+    remove: remove(id),
+    update: update(id),
     of,
-  }
-}
+  };
+};

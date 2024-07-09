@@ -2,7 +2,8 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 import { BehaviorSubject, Observable } from "rxjs";
 
 import { Loader } from "./pages/loader/loader";
-import { State, defaultState } from "./models/State";
+import { State } from "./models/State";
+import { Store } from "./services/StoreService";
 
 export type Connection = { connect: (obs: Observable<State>) => () => void };
 
@@ -13,9 +14,7 @@ type Props = {
   children: ReactNode;
 };
 
-export const StoreContext = createContext<BehaviorSubject<State>>(
-  new BehaviorSubject(defaultState)
-);
+export const StoreContext = createContext(Store);
 
 export const StoreProvider = ({
   store,

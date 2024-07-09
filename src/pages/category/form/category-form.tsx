@@ -1,6 +1,10 @@
 import { useForm } from "react-hook-form";
-
+import * as IO from "io-ts";
+import { pipe } from "fp-ts/function";
+import * as Either from "fp-ts/Either";
+import * as Apply from "fp-ts/lib/Apply";
 import { uid } from "../../../uid";
+import * as Registerable from "../../../models/Registerable";
 import { Label } from "../../../shared/library/text/label/label";
 import { Form } from "../../../shared/library/form/form";
 import { Category } from "../../../models/Category";
@@ -8,14 +12,25 @@ import { useCategoryState } from "../../../hooks/useCategoryState";
 import { ICONS, IconName } from "../../../shared/library/icon/icon";
 import { Translate } from "../../../shared/translate/translate";
 import { getColor } from "../../../utils/color";
-import { SHADE_COLORS } from "../../../entities/color";
+import { useParams } from "react-router-dom";
 
 type Props = {
   onSubmit: (data: Category) => void;
   onCancel: () => void;
   isMain?: boolean;
-  category?: Registered<Category>;
+  category?: Registerable.Registered<Category>;
 };
+
+const formDecoder = IO.type({
+  name: IO.string,
+  icon: IO.union(
+    (Object.values(ICONS) as IconName[]).map((name) => IO.literal(name)) as [
+      IO.LiteralC<IconName>,
+      IO.LiteralC<IconName>,
+      ...IO.LiteralC<IconName>[]
+    ]
+  ),
+});
 
 export function CategoryForm({
   category,
@@ -23,24 +38,43 @@ export function CategoryForm({
   onCancel,
   isMain = true,
 }: Props) {
+  const params = useParams();
+  const creanceId = params.creanceId as string;
   const id = uid();
-  const { add, of, update, getAll } = useCategoryState();
+  const { add, of, update, count } = useCategoryState(creanceId);
   const { register, handleSubmit } = useForm();
 
-  const submit = (data) => {
-    const count = Math.abs(SHADE_COLORS.length - getAll().length);
-    const newCategory = of({
-      id: category?.id,
-      name: data.name,
-      icon: data.icon,
-      color: category?.color != null ? category.color : getColor(count),
-    });
-    if (category) {
-      update(newCategory);
-    } else {
-      add(newCategory);
-    }
-    onSubmit(category);
+  const submit = (data: unknown) => {
+    pipe(
+      {
+        count: pipe(
+          count(),
+          Either.mapLeft((e) => new Error(e))
+        ),
+        data: pipe(
+          data,
+          formDecoder.decode,
+          Either.mapLeft((e) => new Error(e.toLocaleString()))
+        ),
+      },
+      Apply.sequenceS(Either.Applicative),
+      Either.map(({ count, data }) => {
+        const newCategory = of({
+          id: category?.id,
+          name: data.name,
+          icon: data.icon,
+          color: category?.color != null ? category.color : getColor(count),
+        });
+
+        if (category) {
+          update(newCategory as Registerable.Registered<Category>);
+        } else {
+          add(newCategory as Registerable.Unregistered<Category>);
+        }
+
+        onSubmit(newCategory);
+      })
+    );
   };
 
   const icons: { label: string; value: IconName }[] = [

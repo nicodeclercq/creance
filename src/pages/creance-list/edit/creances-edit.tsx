@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import { fold } from "fp-ts/es6/Either";
-import { pipe } from "fp-ts/es6/pipeable";
+import * as Either from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 
 import { FormLayout } from "../../../components/formLayout/formLayout";
 import { CreanceForm } from "../form/creances-form";
@@ -21,11 +21,20 @@ import { Stack } from "../../../shared/layout/stack/stack";
 export function EditCreance() {
   const { creanceId } = useParams();
   const { back, goTo } = useRoute();
-  const { get, isLocked, update } = useCreanceState();
+  const { get, isLocked, update } = useCreanceState(creanceId);
 
-  const creance = get(creanceId);
+  const creance = pipe(
+    creanceId,
+    Either.fromNullable("Creance not found"),
+    Either.chain(get)
+  );
+
   const onSubmit = () => {
-    goTo(ROUTES.EXPENSE_LIST, { creanceId });
+    pipe(
+      creanceId,
+      Either.fromNullable("Creance not found"),
+      Either.map((creanceId) => goTo(ROUTES.EXPENSE_LIST, { creanceId }))
+    );
   };
 
   const lock = (creance: Registered<Creance>) => {
@@ -44,7 +53,7 @@ export function EditCreance() {
 
   return pipe(
     creance,
-    fold(
+    Either.fold(
       () => <Page404 />,
       (creance: Registered<Creance>) => (
         <FormLayout title="page.creance.update">

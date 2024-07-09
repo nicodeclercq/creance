@@ -1,6 +1,6 @@
 import { pipe } from "fp-ts/function";
-import { fold, left } from "fp-ts/Either";
-
+import * as Either from "fp-ts/Either";
+import { Either as EitherComponent } from "../../components/Either";
 import { DefaultLayout } from "../../components/defaultLayout/defaultLayout";
 import { Card, CARD_PADDING } from "../../shared/library/card/card";
 import { useUserState } from "../../hooks/useUserState";
@@ -22,11 +22,15 @@ import { Registered } from "../../models/Registerable";
 import { LabelSmall } from "../../shared/library/text/label-small/label-small";
 import { Label } from "../../shared/library/text/label/label";
 import { SubTitle } from "../../shared/library/text/sub-title/sub-title";
+import { useParams } from "react-router-dom";
 
 export function Distribution() {
-  const { getAll } = useUserState();
-  const { getUsersCosts, getTotalExpense, getUsersExpense } = useCalculation();
-  const { get } = useCategoryState();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { getAll } = useUserState(creanceId);
+  const { getUsersCosts, getTotalExpense, getUsersExpense } =
+    useCalculation(creanceId);
+  const { get } = useCategoryState(creanceId);
 
   const usersCost = getUsersCosts();
   const usersExpense = getUsersExpense();
@@ -55,104 +59,114 @@ export function Distribution() {
       >
         <Container paddingY="M">
           <Stack spacing="M">
-            {getAll().map((user) => (
-              <Accordion
-                title={
-                  <Columns spacing="M" justify="SPACE_BETWEEN" grow>
-                    <ColumnFlexible>
-                      <Columns spacing="S">
-                        <Avatar
-                          color={user.color}
-                          name={user.name}
-                          image={user.avatar}
-                          size="L"
-                          hideName
-                        />
-                        <Label>{user.name}</Label>
-                        <LabelSmall>
-                          <Translate
-                            name="page.distribution.expense"
-                            parameters={{
-                              amount: (
-                                <Currency value={usersExpense[user.id]} />
-                              ),
-                            }}
-                          />
-                        </LabelSmall>
+            <EitherComponent
+              data={getAll()}
+              onLeft={(e) => e}
+              onRight={(data) =>
+                data.map((user) => (
+                  <Accordion
+                    title={
+                      <Columns spacing="M" justify="SPACE_BETWEEN" grow>
+                        <ColumnFlexible>
+                          <Columns spacing="S">
+                            <Avatar
+                              color={user.color}
+                              name={user.name}
+                              image={user.avatar}
+                              size="L"
+                              hideName
+                            />
+                            <Label>{user.name}</Label>
+                            <LabelSmall>
+                              <Translate
+                                name="page.distribution.expense"
+                                parameters={{
+                                  amount: (
+                                    <Currency value={usersExpense[user.id]} />
+                                  ),
+                                }}
+                              />
+                            </LabelSmall>
+                          </Columns>
+                        </ColumnFlexible>
+                        <ColumnRigid>
+                          <Stack align="END">
+                            {pipe(
+                              usersCost[user.id]
+                                ? usersCost[user.id]
+                                : Either.left(new Error("Unknown user")),
+                              Either.fold(
+                                (e) => <Text>{e.message}</Text>,
+                                (value: UserDistribution) => (
+                                  <Label color="GREY_DARK">
+                                    <Translate
+                                      name="page.distribution.credit"
+                                      parameters={{
+                                        amount: (
+                                          <Text color="BLACK">
+                                            <Currency value={value.total} />
+                                          </Text>
+                                        ),
+                                      }}
+                                    />
+                                  </Label>
+                                )
+                              )
+                            )}
+                          </Stack>
+                        </ColumnRigid>
                       </Columns>
-                    </ColumnFlexible>
-                    <ColumnRigid>
-                      <Stack align="END">
+                    }
+                  >
+                    <Container marginX="M">
+                      <Stack spacing="M">
                         {pipe(
                           usersCost[user.id]
                             ? usersCost[user.id]
-                            : left("Unknown user"),
-                          fold(
-                            (e) => <Text>{e}</Text>,
-                            (value: UserDistribution) => (
-                              <Label color="GREY_DARK">
-                                <Translate
-                                  name="page.distribution.credit"
-                                  parameters={{
-                                    amount: (
-                                      <Text color="BLACK">
-                                        <Currency value={value.total} />
-                                      </Text>
-                                    ),
-                                  }}
-                                />
-                              </Label>
-                            )
+                            : Either.left(new Error("Unknown user")),
+                          Either.fold(
+                            (e) => [<Text>{e.message}</Text>],
+                            (value: UserDistribution) =>
+                              value.distribution.map(
+                                ({ amount, expense }, index) => (
+                                  <Columns key={index} grow>
+                                    <ColumnFlexible>
+                                      {pipe(
+                                        get(expense.category),
+                                        Either.fold(
+                                          () => <>-</>,
+                                          (category: Registered<Category>) => (
+                                            <Avatar
+                                              color={category.color}
+                                              name={category.name}
+                                              icon={category.icon}
+                                            />
+                                          )
+                                        )
+                                      )}
+                                    </ColumnFlexible>
+                                    <ColumnRigid>
+                                      <Container
+                                        isFlex
+                                        isInline
+                                        foreground="GREY"
+                                      >
+                                        <span style={{ marginRight: "2rem" }}>
+                                          <Currency value={amount} />
+                                        </span>
+                                      </Container>
+                                    </ColumnRigid>
+                                  </Columns>
+                                )
+                              )
                           )
                         )}
                       </Stack>
-                    </ColumnRigid>
-                  </Columns>
-                }
-              >
-                <Container marginX="M">
-                  <Stack spacing="M">
-                    {pipe(
-                      usersCost[user.id]
-                        ? usersCost[user.id]
-                        : left("Unknown user"),
-                      fold(
-                        (e) => [<Text>{e}</Text>],
-                        (value: UserDistribution) =>
-                          value.distribution.map(
-                            ({ amount, expense }, index) => (
-                              <Columns key={index} grow>
-                                <ColumnFlexible>
-                                  {pipe(
-                                    get(expense.category),
-                                    fold(
-                                      () => <>-</>,
-                                      (category: Registered<Category>) => (
-                                        <Avatar
-                                          color={category.color}
-                                          name={category.name}
-                                          icon={category.icon}
-                                        />
-                                      )
-                                    )
-                                  )}
-                                </ColumnFlexible>
-                                <ColumnRigid>
-                                  <Container isFlex isInline foreground="GREY">
-                                    <span style={{ marginRight: "2rem" }}>
-                                      <Currency value={amount} />
-                                    </span>
-                                  </Container>
-                                </ColumnRigid>
-                              </Columns>
-                            )
-                          )
-                      )
-                    )}
-                  </Stack>
-                </Container>
-              </Accordion>
-            ))}
+                    </Container>
+                  </Accordion>
+                ))
+              }
+            />
           </Stack>
         </Container>
       </Card>

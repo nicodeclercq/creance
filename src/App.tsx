@@ -4,21 +4,25 @@ import "./App.css";
 import { Router } from "./router";
 import { Connection, StoreProvider } from "./StoreProvider";
 import * as LocalStorage from "./services/LocalStorageService";
+import * as Supabase from "./services/SupabaseService";
 import { Store } from "./services/StoreService";
+import { Authenticated } from "./pages/auth/Authenticated";
 
-const connections: Connection[] = [LocalStorage];
+const connections: Connection[] = [LocalStorage, Supabase];
 
 const load = () => LocalStorage.getState();
 
 function App() {
   return (
-    <StoreProvider store={Store} load={load} connections={connections}>
-      <I18nProvider>
-        <Theme>
-          <Router />
-        </Theme>
-      </I18nProvider>
-    </StoreProvider>
+    <Authenticated>
+      <StoreProvider store={Store} load={load} connections={connections}>
+        <I18nProvider>
+          <Theme>
+            <Router />
+          </Theme>
+        </I18nProvider>
+      </StoreProvider>
+    </Authenticated>
   );
 }
 

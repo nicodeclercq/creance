@@ -1,17 +1,21 @@
-import { get, getAll, add, remove, update, of, isEmpty } from './../services/CategoryService';
-import { useCreanceState } from './useCreanceState';
+import {
+  get,
+  getAll,
+  add,
+  remove,
+  update,
+  of,
+  isEmpty,
+  count,
+} from "./../services/CategoryService";
 
-export const useCategoryState = (id?: string) => {
-  const {state, setState } = useCreanceState(id);
-
-  return {
-    isEmpty: isEmpty(state),
-    get: get(state),
-    getAll: getAll(state),
-    add: setState(add),
-    remove: setState(remove),
-    update: setState(update),
-    of,
-    count: () => getAll(state).length,
-  }
-}
+export const useCategoryState = (id: string) => ({
+  isEmpty: isEmpty(id),
+  get: get(id),
+  getAll: getAll(id),
+  add: add(id),
+  remove: remove(id),
+  update: update(id),
+  of,
+  count: count(id),
+});
