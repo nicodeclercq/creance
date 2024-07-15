@@ -5,11 +5,9 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Container } from "../../shared/layout/container/container";
 import { Card } from "../../shared/library/card/card";
 import { Stack } from "../../shared/layout/stack/stack";
+import { secrets } from "../../secrets";
 
-const supabase = createClient(
-  "https://pcvdgvtbkejownacrqjo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjdmRndnRia2Vqb3duYWNycWpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTgxMTU1MDUsImV4cCI6MjAzMzY5MTUwNX0.STNtFS-enfSDOVaOhZFrQQw9PwGAH_HhMN-0D_-cThQ"
-);
+const supabase = createClient(secrets.supabaseUrl, secrets.supabaseKey);
 
 type Props = {
   children: ReactNode;
@@ -36,7 +34,11 @@ export function Authenticated({ children }: Props) {
     <Container background="GREY_LIGHT" height="100vh">
       <Stack spacing="XL" align="CENTER" justify="CENTER">
         <Card>
-          <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            showLinks={false}
+          />
         </Card>
       </Stack>
     </Container>
