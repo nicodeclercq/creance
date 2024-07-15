@@ -31,11 +31,11 @@ function DropdownContent() {
         <Translate name="page.category.list" />
       </Link>
     ),
-    export: (
+    /*export: (
       <Link to={ROUTES.EXPORT} parameters={params}>
         <Translate name="page.export" />
       </Link>
-    ),
+    ),*/
   };
 }
 

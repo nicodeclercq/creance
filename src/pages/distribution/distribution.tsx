@@ -83,6 +83,7 @@ export function Distribution() {
                             />
                             <ColumnFlexible>
                               <Label>{user.name}</Label>
+                              &nbsp;
                               <LabelSmall>
                                 <EitherComponent
                                   data={usersExpense}
@@ -108,17 +109,11 @@ export function Distribution() {
                           <Stack align="END">
                             <EitherComponent
                               data={usersCost}
-                              onLeft={(e) => {
-                                console.log(usersCost, user.id);
-                                return e;
-                              }}
+                              onLeft={(e) => e}
                               onRight={(usersCost) => (
                                 <EitherComponent
                                   data={usersCost[user.id]}
-                                  onLeft={(e) => {
-                                    console.log(usersCost, user.id);
-                                    return e.message;
-                                  }}
+                                  onLeft={(e) => e.message}
                                   onRight={(userCost) => (
                                     <Label color="GREY_DARK">
                                       <Translate
