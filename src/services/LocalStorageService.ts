@@ -16,7 +16,7 @@ export const saveState = ({ state }: { state: State }) => {
 export const getState = () =>
   Promise.resolve()
     .then(() => localStorage.getItem(KEY))
-    .then((state) => JSON.parse(state ?? ""))
+    .then((state) => JSON.parse(state ?? "{}"))
     .then((s) => (isState(s) ? s : defaultState));
 
 export const connect = (state: Observable<State>) => {
