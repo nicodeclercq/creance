@@ -265,23 +265,30 @@ const getUsersDistribution = (
 
 export const getUsersRepartition =
   (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
-  (): Either.Either<Error, Omit<CreditDistribution, "notDistributed">[]> => {
+  (): Either.Either<string, Omit<CreditDistribution, "notDistributed">[]> => {
     const usersCost = getUsersCosts(creanceId)();
     const usersExpense = getUsersExpenses(creanceId)();
 
-    if (Object.keys(usersCost).length && Object.keys(usersExpense).length) {
-      return pipe(
-        sequenceS(Either.either)(usersCost),
-        Either.map((c) =>
-          Object.entries(c).map(
-            ([userId, userCost]: [string, UserDistribution]) => ({
-              user: userId,
-              amount: Math.floor((userCost.total - usersExpense[userId]) * 100),
-            })
-          )
-        ),
-        Either.map(getUsersDistribution)
-      );
-    }
-    return Either.right([]);
+    return pipe(
+      sequenceS(Either.either)({ usersCost, usersExpense }),
+      Either.chain(({ usersCost, usersExpense }) => {
+        if (Object.keys(usersCost).length && Object.keys(usersExpense).length) {
+          return pipe(
+            sequenceS(Either.either)(usersCost),
+            Either.map((c) =>
+              Object.entries(c).map(
+                ([userId, userCost]: [string, UserDistribution]) => ({
+                  user: userId,
+                  amount: Math.floor(
+                    (userCost.total - usersExpense[userId]) * 100
+                  ),
+                })
+              )
+            ),
+            Either.map(getUsersDistribution)
+          );
+        }
+        return Either.right([]);
+      })
+    );
   };
