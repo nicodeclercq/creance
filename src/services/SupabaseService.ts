@@ -68,6 +68,7 @@ const isEqual = (
 
 export const saveState = ({ state }: { state: State }) => {
   state.creances.forEach((creance) => {
+    /*
     if (creances[creance.id]) {
       if (!isEqual(creances[creance.id].value, creance)) {
         supabase
@@ -85,6 +86,7 @@ export const saveState = ({ state }: { state: State }) => {
           console.log("insert", data, error);
         });
     }
+  */
   });
 };
 

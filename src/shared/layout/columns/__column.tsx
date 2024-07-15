@@ -14,6 +14,7 @@ export type Props = {
   grow?: boolean;
   shrink?: boolean;
   contentFit?: boolean;
+  disableWrap?: boolean;
 };
 export function __Column({
   children,
@@ -21,6 +22,7 @@ export function __Column({
   grow = false,
   shrink = true,
   contentFit = false,
+  disableWrap = false,
 }: Props) {
   return (
     <div
@@ -31,6 +33,7 @@ export function __Column({
         display: "inline-flex",
         alignItems: "center",
         alignSelf: align ? ALIGN[align] : undefined,
+        flexWrap: disableWrap ? "nowrap" : "wrap",
       }}
     >
       {children}

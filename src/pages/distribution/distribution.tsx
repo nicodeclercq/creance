@@ -34,6 +34,7 @@ export function Distribution() {
 
   const usersCost = getUsersCosts();
   const usersExpense = getUsersExpense();
+  const totalExpense = getTotalExpense();
 
   return (
     <DefaultLayout title="page.distribution.title">
@@ -48,7 +49,11 @@ export function Distribution() {
                 <ColumnRigid>
                   <Container isFlex isInline foreground="PRIMARY_DARK">
                     <span style={{ marginRight: "3rem" }}>
-                      <Currency value={getTotalExpense()} />
+                      <EitherComponent
+                        data={totalExpense}
+                        onRight={(total) => <Currency value={total} />}
+                        onLeft={(e) => e}
+                      />
                     </span>
                   </Container>
                 </ColumnRigid>
@@ -76,43 +81,59 @@ export function Distribution() {
                               size="L"
                               hideName
                             />
-                            <Label>{user.name}</Label>
-                            <LabelSmall>
-                              <Translate
-                                name="page.distribution.expense"
-                                parameters={{
-                                  amount: (
-                                    <Currency value={usersExpense[user.id]} />
-                                  ),
-                                }}
-                              />
-                            </LabelSmall>
+                            <ColumnFlexible>
+                              <Label>{user.name}</Label>
+                              <LabelSmall>
+                                <EitherComponent
+                                  data={usersExpense}
+                                  onLeft={(e) => e}
+                                  onRight={(usersExpense) => (
+                                    <Translate
+                                      name="page.distribution.expense"
+                                      parameters={{
+                                        amount: (
+                                          <Currency
+                                            value={usersExpense[user.id]}
+                                          />
+                                        ),
+                                      }}
+                                    />
+                                  )}
+                                />
+                              </LabelSmall>
+                            </ColumnFlexible>
                           </Columns>
                         </ColumnFlexible>
                         <ColumnRigid>
                           <Stack align="END">
-                            {pipe(
-                              usersCost[user.id]
-                                ? usersCost[user.id]
-                                : Either.left(new Error("Unknown user")),
-                              Either.fold(
-                                (e) => <Text>{e.message}</Text>,
-                                (value: UserDistribution) => (
-                                  <Label color="GREY_DARK">
-                                    <Translate
-                                      name="page.distribution.credit"
-                                      parameters={{
-                                        amount: (
-                                          <Text color="BLACK">
-                                            <Currency value={value.total} />
-                                          </Text>
-                                        ),
-                                      }}
-                                    />
-                                  </Label>
-                                )
-                              )
-                            )}
+                            <EitherComponent
+                              data={usersCost}
+                              onLeft={(e) => {
+                                console.log(usersCost, user.id);
+                                return e;
+                              }}
+                              onRight={(usersCost) => (
+                                <EitherComponent
+                                  data={usersCost[user.id]}
+                                  onLeft={(e) => {
+                                    console.log(usersCost, user.id);
+                                    return e.message;
+                                  }}
+                                  onRight={(userCost) => (
+                                    <Label color="GREY_DARK">
+                                      <Translate
+                                        name="page.distribution.credit"
+                                        parameters={{
+                                          amount: (
+                                            <Currency value={userCost.total} />
+                                          ),
+                                        }}
+                                      />
+                                    </Label>
+                                  )}
+                                />
+                              )}
+                            />
                           </Stack>
                         </ColumnRigid>
                       </Columns>
@@ -121,9 +142,13 @@ export function Distribution() {
                     <Container marginX="M">
                       <Stack spacing="M">
                         {pipe(
-                          usersCost[user.id]
-                            ? usersCost[user.id]
-                            : Either.left(new Error("Unknown user")),
+                          usersCost,
+                          Either.mapLeft((e) => new Error(e)),
+                          Either.chain((usersCost) =>
+                            usersCost[user.id]
+                              ? usersCost[user.id]
+                              : Either.left(new Error("Unknown user"))
+                          ),
                           Either.fold(
                             (e) => [<Text>{e.message}</Text>],
                             (value: UserDistribution) =>
@@ -131,19 +156,19 @@ export function Distribution() {
                                 ({ amount, expense }, index) => (
                                   <Columns key={index} grow>
                                     <ColumnFlexible>
-                                      {pipe(
-                                        get(expense.category),
-                                        Either.fold(
-                                          () => <>-</>,
-                                          (category: Registered<Category>) => (
-                                            <Avatar
-                                              color={category.color}
-                                              name={category.name}
-                                              icon={category.icon}
-                                            />
-                                          )
-                                        )
-                                      )}
+                                      <EitherComponent
+                                        data={get(expense.category)}
+                                        onLeft={() => <>-</>}
+                                        onRight={(
+                                          category: Registered<Category>
+                                        ) => (
+                                          <Avatar
+                                            color={category.color}
+                                            name={category.name}
+                                            icon={category.icon}
+                                          />
+                                        )}
+                                      />
                                     </ColumnFlexible>
                                     <ColumnRigid>
                                       <Container

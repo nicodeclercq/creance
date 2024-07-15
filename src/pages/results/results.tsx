@@ -87,8 +87,10 @@ function UserCredits({ credits }: { credits: Credit[] }) {
 }
 
 export function Results() {
-  const { getAll } = useUserState();
-  const { getUsersRepartition } = useCalculation();
+  const params = useParams();
+  const creanceId = params.creanceId as string;
+  const { getAll } = useUserState(creanceId);
+  const { getUsersRepartition } = useCalculation(creanceId);
 
   const users = getAll();
   const distributions = getUsersRepartition();
@@ -107,6 +109,7 @@ export function Results() {
         >
           {pipe(
             distributions,
+            Either.mapLeft((e) => e.message),
             Either.chain((distributions) =>
               pipe(
                 users,

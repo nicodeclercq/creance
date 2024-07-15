@@ -9,6 +9,7 @@ import { Container } from "../../../../shared/layout/container/container";
 import { Currency } from "../../../../components/currency/currency";
 import { useCalculation } from "../../../../hooks/useCalculation";
 import { useParams } from "react-router-dom";
+import { Either } from "../../../../components/Either";
 
 export function TotalCount() {
   const params = useParams();
@@ -30,7 +31,11 @@ export function TotalCount() {
               parameters={{
                 total: (
                   <Container isFlex isInline foreground="ACCENT_DARK">
-                    <Currency value={total} />
+                    <Either
+                      data={total}
+                      onLeft={() => "invalid value"}
+                      onRight={(total) => <Currency value={total} />}
+                    />
                   </Container>
                 ),
               }}

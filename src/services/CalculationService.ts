@@ -1,14 +1,16 @@
-import { pipe } from "fp-ts/es6/pipeable";
-import { map, Either, either, right } from "fp-ts/es6/Either";
-import { sequenceS } from "fp-ts/es6/Apply";
+import { pipe } from "fp-ts/function";
+import * as Either from "fp-ts/Either";
+import { sequenceS } from "fp-ts/Apply";
 
 import { sort } from "../utils/number";
 import { Distribution, Expense } from "../models/Expense";
 import { Creance } from "../models/State";
 import { User } from "../models/User";
 import { Registered } from "../models/Registerable";
-import * as Users from "./UserService";
+import * as UserService from "./UserService";
 import * as Sum from "../models/Sum";
+import * as Registerable from "../models/Registerable";
+import * as CreanceService from "../services/CreanceService";
 
 const getDistributionSliceCount = (distribution: Distribution) => {
   return Object.values(distribution).map(Sum.of).reduce(Sum.concat, Sum.empty())
@@ -43,8 +45,15 @@ export const getTotalAmount = (expenses: Expense[]) =>
     .map((expense) => Sum.of(expense.amount))
     .reduce(Sum.concat, Sum.empty()).value;
 
-export const getTotalExpense = (state: Creance) => () =>
-  getTotalAmount(state.expenses);
+export const getTotalExpense =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => creance.expenses),
+      Either.map(getTotalAmount)
+    );
 
 export type UserDistribution = {
   distribution: {
@@ -76,56 +85,82 @@ export const expensesDistribution = (expenses: Expense[]) =>
   );
 
 export const getUserCost =
-  (state: Creance) =>
-  (id: string): Either<Error, UserDistribution> =>
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (id: string): Either.Either<Error, UserDistribution> =>
     pipe(
-      Users.get(state)(id),
-      map((user: Registered<User>) => {
-        const distribution = state.expenses
-          .filter((expense) => user.id in expense.distribution)
-          .map((expense) => {
-            const userDistribution = expense.distribution[user.id];
-            return {
-              amount: userDistribution
-                ? (expense.amount * userDistribution) /
-                  getDistributionSliceCount(expense.distribution)
-                : 0,
-              expense,
-            };
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.mapLeft((e) => new Error(e)),
+      Either.chain((creance) =>
+        pipe(
+          id,
+          UserService.get(creanceId),
+          Either.map((user: Registered<User>) => {
+            console.log("creance", creance);
+            const distribution = creance.expenses
+              .filter((expense) => user.id in expense.distribution)
+              .map((expense) => {
+                const userDistribution = expense.distribution[user.id];
+                return {
+                  amount: userDistribution
+                    ? (expense.amount * userDistribution) /
+                      getDistributionSliceCount(expense.distribution)
+                    : 0,
+                  expense,
+                };
+              })
+              .filter((a) => a.amount !== 0);
+
+            const total = distribution
+              .map((a) => Sum.of(a.amount))
+              .reduce(Sum.concat, Sum.empty()).value;
+
+            return { distribution, total };
           })
-          .filter((a) => a.amount !== 0);
-
-        const total = distribution
-          .map((a) => Sum.of(a.amount))
-          .reduce(Sum.concat, Sum.empty()).value;
-
-        return { distribution, total };
-      })
+        )
+      )
     );
 
-export const getUsersCosts = (state: Creance) => () =>
-  pipe(state.users, (users) =>
-    users.reduce(
-      (acc, user) => ({ ...acc, [user.id]: getUserCost(state)(user.id) }),
-      {} as { [key: string]: Either<Error, UserDistribution> }
-    )
-  );
-
-export const getUsersExpenses = (state: Creance) => () =>
-  pipe(state.users, (users) =>
-    users
-      .map((user) => ({
-        user,
-        expense: state.expenses
-          .filter((expense) => expense.from === user.id)
-          .map((expense) => Sum.of(expense.amount))
-          .reduce(Sum.concat, Sum.empty()),
-      }))
-      .reduce(
-        (acc, { user, expense }) => ({ ...acc, [user.id]: expense.value }),
-        {} as { [userId: string]: number }
+export const getUsersCosts =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) => creance.users),
+      Either.map((users) =>
+        users.reduce(
+          (acc, user) => ({
+            ...acc,
+            [user.id]: getUserCost(creanceId)(user.id),
+          }),
+          {} as { [key: string]: Either.Either<Error, UserDistribution> }
+        )
       )
-  );
+    );
+
+export const getUsersExpenses =
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) => () =>
+    pipe(
+      creanceId,
+      Either.fromNullable(`Creance ${creanceId} is not defined`),
+      Either.chain(CreanceService.get),
+      Either.map((creance) =>
+        creance.users
+          .map((user) => ({
+            user,
+            expense: creance.expenses
+              .filter((expense) => expense.from === user.id)
+              .map((expense) => Sum.of(expense.amount))
+              .reduce(Sum.concat, Sum.empty()),
+          }))
+          .reduce(
+            (acc, { user, expense }) => ({ ...acc, [user.id]: expense.value }),
+            {} as { [userId: string]: number }
+          )
+      )
+    );
 
 export type Credit = {
   user: string;
@@ -153,10 +188,8 @@ const getUsersDistribution = (
   const getDiff = (credit: number, debt: number) => {
     const creditAbs = Math.abs(credit);
     const debtAbs = Math.abs(debt);
-    if (creditAbs > debtAbs) {
-      return debtAbs;
-    }
-    return creditAbs;
+
+    return creditAbs > debtAbs ? debtAbs : creditAbs;
   };
   const isDistributionDone = (credit: CreditDistribution) =>
     Math.floor(credit.notDistributed * 100) / 100 === 0;
@@ -231,15 +264,15 @@ const getUsersDistribution = (
 };
 
 export const getUsersRepartition =
-  (state: Creance) =>
-  (): Either<Error, Omit<CreditDistribution, "notDistributed">[]> => {
-    const usersCost = getUsersCosts(state)();
-    const usersExpense = getUsersExpenses(state)();
+  (creanceId: Registerable.Registered<Creance>["id"] | undefined) =>
+  (): Either.Either<Error, Omit<CreditDistribution, "notDistributed">[]> => {
+    const usersCost = getUsersCosts(creanceId)();
+    const usersExpense = getUsersExpenses(creanceId)();
 
     if (Object.keys(usersCost).length && Object.keys(usersExpense).length) {
       return pipe(
-        sequenceS(either)(usersCost),
-        map((c) =>
+        sequenceS(Either.either)(usersCost),
+        Either.map((c) =>
           Object.entries(c).map(
             ([userId, userCost]: [string, UserDistribution]) => ({
               user: userId,
@@ -247,8 +280,8 @@ export const getUsersRepartition =
             })
           )
         ),
-        map(getUsersDistribution)
+        Either.map(getUsersDistribution)
       );
     }
-    return right([]);
+    return Either.right([]);
   };
