@@ -1,0 +1,1 @@
+export type StylableComponent<A> = A & { className?: string};

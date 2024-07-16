@@ -1,0 +1,48 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  color: #2a2a2a;
+}
+input,
+select {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  border-radius: 2px;
+  border: 0.5px solid;
+  font: inherit;
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+}
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+@keyframes loading {
+  from {
+    transform: "scale(1.25)";
+  }
+  to {
+    transform: "scale(0.75)";
+  }
+}
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

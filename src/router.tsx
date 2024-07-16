@@ -1,8 +1,14 @@
-export const ROUTE = {
-  HOME: "/",
-  CREANCE_LIST: "/creance",
-  ADD_CREANCE: "/creance/add",
-} as const;
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { routes, Route as RouteDefinition } from "./routes";
 
-export type RouteName = keyof typeof ROUTE;
-export type RoutePath<P extends RouteName> = (typeof ROUTE)[P];
+export function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {routes.map(({ path, component: Component }: RouteDefinition) => (
+          <Route key={path} path={path} element={<Component />} />
+        ))}
+      </Routes>
+    </BrowserRouter>
+  );
+}
