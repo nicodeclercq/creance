@@ -6,6 +6,8 @@ import { Container } from "../../shared/layout/container/container";
 import { Card } from "../../shared/library/card/card";
 import { Stack } from "../../shared/layout/stack/stack";
 import { secrets } from "../../secrets";
+import { THEME_COLOR } from "../../entities/color";
+import { useTranslations } from "../../hooks/useTranslation";
 
 const supabase = createClient(secrets.supabaseUrl, secrets.supabaseKey);
 
@@ -15,6 +17,7 @@ type Props = {
 
 export function Authenticated({ children }: Props) {
   const [session, setSession] = useState<Session>();
+  const translations = useTranslations();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -31,12 +34,40 @@ export function Authenticated({ children }: Props) {
   }, []);
 
   return !session ? (
-    <Container background="ACCENT" height="100vh">
+    <Container background="PRIMARY" height="100vh" paddingY="XXL">
       <Stack spacing="XL" align="CENTER" justify="CENTER">
         <Card>
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: translations["auth.input.email"],
+                  password_label: translations["auth.input.password"],
+                  button_label: translations["auth.button.login"],
+                },
+              },
+            }}
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: THEME_COLOR.ACCENT,
+                    brandAccent: THEME_COLOR.ACCENT_DARK,
+                    brandButtonText: THEME_COLOR.WHITE,
+                  },
+                  fonts: {
+                    bodyFontFamily: "Roboto",
+                    labelFontFamily: "Cormorant",
+                    inputFontFamily: "Roboto",
+                  },
+                  radii: {
+                    buttonBorderRadius: "9999rem",
+                  },
+                },
+              },
+            }}
             showLinks={false}
           />
         </Card>

@@ -1,4 +1,7 @@
 {
+  "auth.input.email": "Adresse email",
+  "auth.input.password": "Mot de passe",
+  "auth.button.login": "Me connecter",
   "componentsLibrary.welcomeMessage": "🇫🇷 Bienvenue %{userName} sur Créance!",
   "calculation.total.expenses": "Total des dépenses %{total}",
   "currency": "%{value}%{currency}",

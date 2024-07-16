@@ -30,15 +30,15 @@ function App() {
   }, []);
 
   return (
-    <Authenticated>
-      <StoreProvider store={Store} load={load} connections={connections}>
-        <I18nProvider>
+    <I18nProvider>
+      <Authenticated>
+        <StoreProvider store={Store} load={load} connections={connections}>
           <Theme>
             <Router />
           </Theme>
-        </I18nProvider>
-      </StoreProvider>
-    </Authenticated>
+        </StoreProvider>
+      </Authenticated>
+    </I18nProvider>
   );
 }
 
