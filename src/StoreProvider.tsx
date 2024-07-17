@@ -1,52 +1,34 @@
 import { ReactNode, createContext, useEffect, useState } from "react";
-import { BehaviorSubject, Observable } from "rxjs";
+import { debounceTime, distinctUntilChanged, map, Observable } from "rxjs";
 
 import { Loader } from "./pages/loader/loader";
 import { State } from "./models/State";
-import { Store } from "./services/StoreService";
+import { Runtime, Store } from "./services/StoreService";
 
 export type Connection = { connect: (obs: Observable<State>) => () => void };
 
 type Props = {
-  store: BehaviorSubject<State>;
-  connections: Connection[];
-  load: () => Promise<State>;
   children: ReactNode;
 };
 
 export const StoreContext = createContext(Store);
 
-export const StoreProvider = ({
-  store,
-  connections,
-  load,
-  children,
-}: Props) => {
-  const [isReady, setIsReady] = useState(false);
+export const StoreProvider = ({ children }: Props) => {
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(
-    function connectStores() {
-      const subscriptions = connections.map((connection) =>
-        connection.connect(store.asObservable())
-      );
-      return () => subscriptions.forEach((unsubscribe) => unsubscribe());
-    },
-    [connections, store]
-  );
+  useEffect(() => {
+    const subscriptions = Runtime.pipe(
+      map((state) => state.isLoading),
+      distinctUntilChanged(),
+      debounceTime(2000)
+    ).subscribe(setIsLoading);
 
-  useEffect(
-    function initState() {
-      load().then((state) => {
-        store.next(state);
-        setIsReady(true);
-      });
-    },
-    [load, store]
-  );
+    return () => subscriptions.unsubscribe();
+  }, []);
 
   return (
-    <StoreContext.Provider value={store}>
-      {isReady ? children : <Loader />}
+    <StoreContext.Provider value={Store}>
+      {isLoading ? <Loader /> : children}
     </StoreContext.Provider>
   );
 };

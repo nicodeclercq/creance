@@ -6,7 +6,9 @@ const KEY = "state";
 export const saveState = ({ state }: { state: State }) => {
   try {
     Promise.resolve(state)
-      .then(JSON.stringify)
+      .then(({ _tag, creances, settings }) =>
+        JSON.stringify({ _tag, creances, settings })
+      )
       .then((state) => localStorage.setItem(KEY, state));
   } catch (e) {
     return Promise.reject(e);

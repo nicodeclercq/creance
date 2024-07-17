@@ -25,7 +25,7 @@ export const equals = <T>(a: Registered<T>, b: Registered<T>) => a.id === b.id;
 
 export const of = <T>(a: T): Registered<T> => ({
   ...a,
-  id: uid(),
+  id: hasId(a) ? a.id : uid(),
   date: new Date(),
   _tag: REGISTERED,
 });
@@ -45,7 +45,6 @@ export const unregisted = <T>(entity: T): Unregistered<T> =>
   of(entity) as unknown as Unregistered<T>;
 
 export const register = <T>(entity: Unregistered<T>): Registered<T> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _tag, ...tmp } = entity;
 
   return of(tmp as unknown as T);

@@ -2,22 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import { secrets } from "../secrets";
 import { Creance } from "../models/State";
 import * as Registerable from "../models/Registerable";
-import { filterObject } from "../utils/object";
-
-const creances: Record<
-  string,
-  {
-    id?: number;
-    created_at?: string;
-    created_by?: string;
-    value: Registerable.Registered<Creance>;
-  }
-> = {};
-
 const supabase = createClient(secrets.supabaseUrl, secrets.supabaseKey);
 
 type CreanceDTO = {
-  id?: number;
+  id: number;
   created_at?: string;
   created_by?: string;
   value: string;
@@ -26,21 +14,16 @@ type CreanceDTO = {
 const creanceAdapter = {
   from: (creance: CreanceDTO): Registerable.Registered<Creance> => {
     const value = JSON.parse(creance.value);
-    creances[value.id] = {
-      id: creance.id,
-      created_at: creance.created_at,
-      created_by: creance.created_by,
-      value,
-    };
-    return Registerable.register(value);
+    return Registerable.register({ ...value, id: creance.id });
   },
   to: (creance: Registerable.Registered<Creance>) => {
-    const { id, created_at, created_by, value } = creances[creance.id] ?? {};
+    console.log({
+      id: creance.id,
+      value: JSON.stringify(creance),
+    });
     return {
-      id,
-      created_at,
-      created_by,
-      value: JSON.stringify(value),
+      id: creance.id,
+      value: JSON.stringify(creance),
     };
   },
 };
@@ -55,14 +38,13 @@ export const getAllCreances = () =>
         console.error(error);
         throw new Error(error.message);
       }
-      console.log("data", data);
-      return data;
+      return data.map((d) => creanceAdapter.from(d));
     });
 
 export const createCreance = (creance: Registerable.Registered<Creance>) => {
   return supabase
     .from("creance")
-    .insert({ value: JSON.stringify(creance) })
+    .insert(creanceAdapter.to(creance))
     .single()
     .then(({ data, error }) => {
       if (error) {
@@ -91,7 +73,20 @@ export const updateCreance = (creance: Registerable.Registered<Creance>) =>
 
 export const deleteCreance = (
   creanceId: Registerable.Registered<Creance>["id"]
-) => supabase.from("creance").delete().eq("id", creanceId).single();
+) =>
+  supabase
+    .from("creance")
+    .delete()
+    .eq("id", creanceId)
+    .single()
+    .then(({ data, error }) => {
+      if (error) {
+        throw error;
+      }
+
+      console.log("deleted", data, error);
+      return data;
+    });
 
 // TODO
 export const onChange = () =>
