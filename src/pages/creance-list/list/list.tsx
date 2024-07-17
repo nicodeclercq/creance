@@ -22,8 +22,7 @@ import { useParams } from "react-router-dom";
 export function List() {
   const params = useParams();
   const creanceId = params.creanceId as string;
-  const { getAll } = useCreanceState(creanceId);
-  const creanceList = getAll();
+  const { creanceList } = useCreanceState(creanceId);
   const { goTo } = useRoute();
 
   const listGroups = pipe(
@@ -46,7 +45,7 @@ export function List() {
                     ? "page.creances.list.count.singular"
                     : "page.creances.list.count.plural"
                 }
-                parameters={{ count: creanceList.length, activeCount }}
+                parameters={{ count: (creanceList ?? []).length, activeCount }}
               />
             </Title>
             <ColumnRigid contentFit>
@@ -76,7 +75,7 @@ export function List() {
           ))}
         </Fragment>
       ))}
-      {creanceList.length === 0 && (
+      {(creanceList ?? []).length === 0 && (
         <Container foreground="GREY" padding={CARD_PADDING}>
           <Stack align="CENTER" justify="CENTER" spacing="M">
             <Icon name="PIG" size="XXL" />

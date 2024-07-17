@@ -28,6 +28,7 @@ import Hamburger from "./_icons/hamburger";
 import Trash from "./_icons/trash";
 import Unlock from "./_icons/unlock";
 import Archive from "./_icons/archive";
+import Online from "./_icons/online";
 
 export type IconName =
   | "ADD"
@@ -58,7 +59,8 @@ export type IconName =
   | "TRASH"
   | "UNLOCK"
   | "USER"
-  | "WINE";
+  | "WINE"
+  | "ONLINE";
 
 const icons: {
   [key in IconName]: ({ animate: boolean }) => JSX.Element;
@@ -92,6 +94,7 @@ const icons: {
   TRASH: Trash,
   UNLOCK: Unlock,
   ARCHIVE: Archive,
+  ONLINE: Online,
 };
 
 export const ICONS = Object.keys(icons).reduce(

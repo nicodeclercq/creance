@@ -1,4 +1,4 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, timer, map } from "rxjs";
 import { FunctionN, pipe } from "fp-ts/function";
 import { State, defaultState } from "./../models/State";
 import * as LocalStorageService from "./LocalStorageService";
@@ -9,10 +9,14 @@ type Reducer<S, T> = (s: S) => (t: T) => S;
 
 type Runtime = {
   isLoading: boolean;
+  isOnline: boolean;
 };
 
 export const Store = new BehaviorSubject(defaultState);
-export const Runtime = new BehaviorSubject<Runtime>({ isLoading: true });
+export const Runtime = new BehaviorSubject<Runtime>({
+  isLoading: true,
+  isOnline: navigator.onLine,
+});
 
 export const get = Store.asObservable;
 export const update = (newState: State | FunctionN<[State], State>) =>
@@ -32,11 +36,18 @@ function syncLocalAndRemoteStates() {
         });
       })
     )
-    .then(() => Runtime.next({ isLoading: false }));
+    .then(() => Runtime.next({ ...Runtime.value, isLoading: false }));
+}
+
+function syncRuntimeData() {
+  return timer(1000)
+    .pipe(map(() => navigator.onLine))
+    .subscribe((isOnline) => Runtime.next({ ...Runtime.value, isOnline }));
 }
 
 function setup() {
   syncLocalAndRemoteStates();
+  syncRuntimeData();
   LocalStorageService.connect(Store.asObservable());
 }
 setup();

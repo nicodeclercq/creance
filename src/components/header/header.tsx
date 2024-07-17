@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-
+import * as RX from "rxjs";
 import { Container } from "../../shared/layout/container/container";
 import { Icon, ICONS } from "../../shared/library/icon/icon";
 import { ColumnRigid } from "../../shared/layout/columns/column-rigid";
@@ -12,6 +12,8 @@ import { ROUTES } from "../../routes";
 import { Link } from "../../shared/library/text/link/link";
 import { Columns } from "../../shared/layout/columns/columns";
 import { useCreanceState } from "../../hooks/useCreanceState";
+import { useObservable } from "react-use";
+import { Runtime } from "../../services/StoreService";
 
 type Props = {
   title: Translation;
@@ -41,9 +43,11 @@ function DropdownContent() {
 
 export function Header({ title }: Props) {
   const params = useParams();
+  const isOnline = useObservable(
+    Runtime.asObservable().pipe(RX.map((r) => r.isOnline))
+  );
   const creanceId = params.creanceId as string;
-  const { getState, isLocked } = useCreanceState(creanceId);
-  const state = getState();
+  const { currentCreance, isLocked } = useCreanceState(creanceId);
 
   return (
     <Container
@@ -70,7 +74,10 @@ export function Header({ title }: Props) {
             </ColumnFlexible>
           </Columns>
         </Link>
-        {!isLocked(state) && (
+        <ColumnRigid>
+          {isOnline ? <Icon name={ICONS.ONLINE} /> : <></>}
+        </ColumnRigid>
+        {currentCreance && !isLocked(currentCreance) && (
           <ColumnRigid>
             <Dropdown
               position="right"
