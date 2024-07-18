@@ -24,12 +24,18 @@ function DropdownContent() {
 
   return {
     user: (
-      <Link to={ROUTES.USER_LIST} parameters={params}>
+      <Link
+        to={ROUTES.USER_LIST}
+        parameters={params as { [key: string]: string }}
+      >
         <Translate name="page.user.list" />
       </Link>
     ),
     categories: (
-      <Link to={ROUTES.CATEGORIES_LIST} parameters={params}>
+      <Link
+        to={ROUTES.CATEGORIES_LIST}
+        parameters={params as { [key: string]: string }}
+      >
         <Translate name="page.category.list" />
       </Link>
     ),

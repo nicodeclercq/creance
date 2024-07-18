@@ -1,5 +1,3 @@
-import * as React from "react";
-
 export default () => {
   return (
     <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none">
@@ -17,4 +15,4 @@ export default () => {
       />
     </svg>
   );
-}
+};

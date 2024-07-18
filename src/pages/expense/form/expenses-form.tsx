@@ -13,7 +13,7 @@ import { ColumnFlexible } from "../../../shared/layout/columns/column-flexible";
 import { useCategoryState } from "../../../hooks/useCategoryState";
 import { useExpenseState } from "../../../hooks/useExpenseState";
 import { Expense } from "../../../models/Expense";
-import { Registered } from "../../../models/Registerable";
+import { Registered, Unregistered } from "../../../models/Registerable";
 import { useParams } from "react-router-dom";
 
 type Props = {
@@ -33,7 +33,8 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
 
   const users = getAll();
 
-  const submit = (data) => {
+  // TODO: fix type
+  const submit = (data: any) => {
     const newExpense = of({
       id: expense?.id,
       amount: data.amount,
@@ -45,7 +46,8 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
     if (expense) {
       update(newExpense);
     } else {
-      add(newExpense);
+      // TODO: fix type
+      add(newExpense as unknown as Unregistered<Expense>);
     }
     onSubmit();
   };

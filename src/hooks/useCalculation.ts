@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import { getUsersExpenses } from "./../services/CalculationService";
 import {
   getTotalExpense,

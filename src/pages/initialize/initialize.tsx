@@ -57,13 +57,13 @@ export function Initialize({ id }: { id: string }) {
             <Container margin="XXL">
               <Inline justify="END" spacing="M">
                 <ColumnRigid>
-                  <ButtonGhost onClick={() => previous(null)}>
+                  <ButtonGhost onClick={previous}>
                     <Translate name="init.previous" />
                   </ButtonGhost>
                 </ColumnRigid>
                 {!hasNoCategories() && (
                   <ColumnRigid>
-                    <ButtonPrimary onClick={() => next(null)}>
+                    <ButtonPrimary onClick={next}>
                       <Translate name="init.next" />
                     </ButtonPrimary>
                   </ColumnRigid>
@@ -105,7 +105,7 @@ export function Initialize({ id }: { id: string }) {
                 </ColumnRigid>
                 {!hasNoUsers() && (
                   <ColumnRigid>
-                    <ButtonPrimary onClick={() => next(null)}>
+                    <ButtonPrimary onClick={next}>
                       <Translate name="init.next" />
                     </ButtonPrimary>
                   </ColumnRigid>

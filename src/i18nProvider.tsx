@@ -1,17 +1,17 @@
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useState } from "react";
 import { Language } from "./entities/languages";
 import { I18nService } from "./i18n/i18nService";
 import defaultLanguage from "./i18n/fr/index.json";
 import { Translation } from "./@types/translations";
 
-const DEFAULT_LANG = "FR-fr";
+// const DEFAULT_LANG = "FR-fr";
 
 const context = {
   language: I18nService.getCurrentLanguage(),
   setLanguage: (newLanguage: Language) => {
     I18nService.changeLang(newLanguage);
   },
-  translations: null,
+  translations: {} as Record<Translation, string>,
   setTranslations: (_prevState: any) => {},
 };
 

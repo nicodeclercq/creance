@@ -109,7 +109,7 @@ export function Results() {
         >
           {pipe(
             distributions,
-            Either.mapLeft((e) => e.message),
+            Either.mapLeft((e) => e),
             Either.chain((distributions) =>
               pipe(
                 users,

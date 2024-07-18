@@ -4,7 +4,7 @@ import {
   distinctUntilChanged,
   debounceTime,
 } from "rxjs/operators";
-import { BehaviorSubject, pipe } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
 import { Language } from "../entities/languages";
 
@@ -61,10 +61,10 @@ export const I18nService = {
   getCurrentLanguage: () => currentLanguage,
   setTranslations: setTranslationsByLanguage,
   getTranslations: (language: Language) =>
-    pipe(
+    translationsByLanguage.asObservable().pipe(
       map((t) => t[language]),
       filter((t) => !!t),
       distinctUntilChanged(),
       debounceTime(1000)
-    )(translationsByLanguage),
+    ),
 };

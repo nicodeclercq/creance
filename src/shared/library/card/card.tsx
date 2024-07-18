@@ -22,7 +22,7 @@ export function Card({
     <Container
       background="WHITE"
       border={isFlat ? "LIGHT" : "NONE"}
-      shadow={isFlat ? null : "M"}
+      shadow={isFlat ? undefined : "M"}
       radius={type}
       scroll={false}
     >

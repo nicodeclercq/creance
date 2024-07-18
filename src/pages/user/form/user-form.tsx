@@ -26,7 +26,8 @@ export function UserForm({ user, onSubmit, onCancel, isMain = true }: Props) {
   const { add, of, update, getAll } = useUserState(creanceId);
   const { register, handleSubmit } = useForm();
 
-  const submit = (data) => {
+  // TODO: fix type
+  const submit = (data: any) => {
     const count = pipe(
       getAll(),
       Either.fold(

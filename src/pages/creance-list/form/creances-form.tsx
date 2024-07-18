@@ -5,7 +5,7 @@ import { uid } from "../../../uid";
 import { Label } from "../../../shared/library/text/label/label";
 import { Translate } from "../../../shared/translate/translate";
 import { Form } from "../../../shared/library/form/form";
-import { Registered } from "../../../models/Registerable";
+import * as Registerable from "../../../models/Registerable";
 import { Creance, defaultCreance } from "../../../models/State";
 import { useCreanceState } from "../../../hooks/useCreanceState";
 import { sort } from "../../../utils/date";
@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 type Props = {
   onSubmit: () => void;
   onCancel: () => void;
-  creance?: Registered<Creance>;
+  creance?: Registerable.Registered<Creance>;
 };
 
 type Value = string | undefined;
@@ -44,7 +44,8 @@ export function CreanceForm({ creance, onSubmit, onCancel }: Props) {
       .map((creance) => ({ label: creance.name, value: creance.id }))
   );
 
-  const submit = (data) => {
+  // TODO: check data
+  const submit = (data: { fromConfig?: unknown; name?: string }) => {
     const otherCreanceConfig =
       data.fromConfig == null
         ? {}
@@ -63,13 +64,13 @@ export function CreanceForm({ creance, onSubmit, onCancel }: Props) {
     const newCreance = of({
       ...defaultCreance,
       ...otherCreanceConfig,
-      name: data.name,
+      name: data.name ?? "",
       ...creance,
     });
     if (creance) {
-      update(newCreance);
+      update(newCreance as Registerable.Registered<Creance>);
     } else {
-      add(newCreance);
+      add(newCreance as Registerable.Unregistered<Creance>);
     }
     onSubmit();
   };

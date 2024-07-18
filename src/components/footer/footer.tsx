@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { Link, useMatch, useParams } from "react-router-dom";
 import { Container } from "../../shared/layout/container/container";
 import { Icon, ICONS } from "../../shared/library/icon/icon";
@@ -9,18 +9,21 @@ import { Text } from "../../shared/library/text/text/text";
 import { Translate } from "../../shared/translate/translate";
 import { Stack } from "../../shared/layout/stack/stack";
 
-const styles = (isActive: boolean) => ({
-  display: "flex",
-  width: "100%",
-  flexDirection: "column",
-  justifyContent: "center",
-  textDecoration: "none",
-  textAlign: "center",
-  borderTop: `0.5rem solid ${
-    isActive ? toCssValue(COLOR.PRIMARY_LIGHT) : toCssValue(COLOR.PRIMARY_DARK)
-  }`,
-  color: COLOR.WHITE,
-});
+const styles = (isActive: boolean) =>
+  ({
+    display: "flex",
+    width: "100%",
+    flexDirection: "column",
+    justifyContent: "center",
+    textDecoration: "none",
+    textAlign: "center",
+    borderTop: `0.5rem solid ${
+      isActive
+        ? toCssValue(COLOR.PRIMARY_LIGHT)
+        : toCssValue(COLOR.PRIMARY_DARK)
+    }`,
+    color: COLOR.WHITE,
+  } as CSSProperties);
 
 type Props = {
   children: ReactNode;
@@ -33,7 +36,10 @@ function PanelButton({ to, children }: Props) {
   const match = useMatch(path);
 
   return (
-    <Link to={getPath(to, params)} style={styles(match != null)}>
+    <Link
+      to={getPath(to, params as { [key: string]: string })}
+      style={styles(match != null)}
+    >
       <Container width="100%" height="100%" isFlex padding="M">
         <Stack isFull>{children}</Stack>
       </Container>

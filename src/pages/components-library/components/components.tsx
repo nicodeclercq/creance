@@ -1,8 +1,6 @@
-import React from 'react';
-
-import { Forms } from './forms/forms';
-import { Others } from './others/others';
-import { Layout } from './layout/layout';
+import { Forms } from "./forms/forms";
+import { Others } from "./others/others";
+import { Layout } from "./layout/layout";
 
 export function Components() {
   return (
@@ -12,5 +10,5 @@ export function Components() {
       <Others></Others>
       <Layout></Layout>
     </>
-  )
+  );
 }

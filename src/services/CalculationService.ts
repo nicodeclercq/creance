@@ -248,7 +248,8 @@ const getUsersDistribution = (
             notDistributed: lower.notDistributed + amount,
             distribution: [
               ...lower.distribution,
-              { user: upper?.user, amount },
+              // TODO: fixme
+              { user: (upper as any)?.user, amount },
             ],
           },
         ];
@@ -285,7 +286,8 @@ export const getUsersRepartition =
                 })
               )
             ),
-            Either.map(getUsersDistribution)
+            Either.map(getUsersDistribution),
+            Either.mapLeft((e) => e.message)
           );
         }
         return Either.right([]);

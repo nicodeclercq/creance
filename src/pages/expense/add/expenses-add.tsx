@@ -9,7 +9,7 @@ export function AddExpense() {
   const params = useParams();
   const { back, goTo } = useRoute();
   const onSubmit = () => {
-    goTo(ROUTES.EXPENSE_LIST, params);
+    goTo(ROUTES.EXPENSE_LIST, params as { [key: string]: string });
   };
 
   return (

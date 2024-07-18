@@ -9,7 +9,9 @@ export const mapObject =
   <T, U>(fn: Func<[T, string, { [key: string]: T }], U>) =>
   (o: { [key: string]: T }): { [key in keyof typeof o]: U } =>
     Object.entries(o)
-      .map(([key, value]: [string, T]) => [key, fn(value, key, o)])
+      .map(
+        ([key, value]: [string, T]) => [key, fn(value, key, o)] as [string, U]
+      )
       .reduce(
         (acc, [key, value]: [string, U]) => ({ ...acc, [key]: value }),
         {}

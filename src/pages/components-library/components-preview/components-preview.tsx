@@ -1,19 +1,17 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from "react";
 
-import './components-preview.css';
+import "./components-preview.css";
 
 type Props = {
   label: string;
-  children: ReactNode[] | ReactNode
+  children: ReactNode[] | ReactNode;
 };
 
-export function ComponentPreview({label, children}: Props){
+export function ComponentPreview({ label, children }: Props) {
   return (
     <div className="s-preview">
       <label>{label}</label>
-      <div className="s-preview__content">
-        {children}
-      </div>
+      <div className="s-preview__content">{children}</div>
     </div>
   );
 }

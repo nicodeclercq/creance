@@ -1,10 +1,8 @@
-import React from 'react';
-
-import { ComponentPreview } from '../components-preview/components-preview';
-import { Title } from '../../../shared/library/text/title/title';
-import { SubTitle } from '../../../shared/library/text/sub-title/sub-title';
-import { Label } from '../../../shared/library/text/label/label';
-import { Text } from '../../../shared/library/text/text/text';
+import { ComponentPreview } from "../components-preview/components-preview";
+import { Title } from "../../../shared/library/text/title/title";
+import { SubTitle } from "../../../shared/library/text/sub-title/sub-title";
+import { Label } from "../../../shared/library/text/label/label";
+import { Text } from "../../../shared/library/text/text/text";
 
 export function Texts() {
   return (
@@ -23,5 +21,5 @@ export function Texts() {
         <Text>Hello World</Text>
       </ComponentPreview>
     </>
-  )
+  );
 }

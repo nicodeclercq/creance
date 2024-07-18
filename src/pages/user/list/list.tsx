@@ -23,7 +23,7 @@ type Edit = { tag: "EDIT"; value: string };
 const add = (): Add => ({ tag: "ADD" });
 const edit = (value: string): Edit => ({ tag: "EDIT", value });
 const isAdd = (obj: Add | Edit | undefined): obj is Add =>
-  obj && obj.tag === "ADD";
+  obj != null && obj.tag === "ADD";
 const isEdit = (obj: Add | Edit | undefined, value: string) =>
   obj && obj.tag === "EDIT" && obj.value === value;
 

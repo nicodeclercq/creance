@@ -63,7 +63,7 @@ export type IconName =
   | "ONLINE";
 
 const icons: {
-  [key in IconName]: ({ animate: boolean }) => JSX.Element;
+  [key in IconName]: (p: { animate: boolean }) => JSX.Element;
 } = {
   PIG: Pig,
   CHECK: Check,

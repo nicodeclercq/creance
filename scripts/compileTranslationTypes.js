@@ -1,37 +1,41 @@
-const { writeFileSync } = require('fs');
-const { getLanguagesList, getLanguageTranslations, copyLanguageToPublicFolder } = require('./helper');
+import { writeFileSync } from "node:fs";
+import {
+  getLanguagesList,
+  getLanguageTranslations,
+  copyLanguageToPublicFolder,
+} from "./helper";
 
-const toString = (keys) => `/*********************************************************/
+const toString = (
+  keys
+) => `/*********************************************************/
 /** /!\ WARNING: this is a generated file do not modify **/
 /*********************************************************/
 
 export type Translation =
-  ${
-  keys.map(key => `'${key}'`)
-    .join(` 
-  | `)
-};
+  ${keys.map((key) => `'${key}'`).join(` 
+  | `)};
 `;
 
 function main() {
-  Promise.resolve(console.log('Compile translations'))
+  Promise.resolve(console.log("Compile translations"))
     .then(() => Promise.all(getLanguagesList().map(getLanguageTranslations)))
     .then((languageTranslations) => {
       const keys = new Set();
-      
-      languageTranslations.forEach(languageTranslation => {
+
+      languageTranslations.forEach((languageTranslation) => {
         copyLanguageToPublicFolder(languageTranslation.lang);
-        
-        Object.keys(languageTranslation.translations)
-          .forEach(key => {
-            keys.add(key);
-          })
+
+        Object.keys(languageTranslation.translations).forEach((key) => {
+          keys.add(key);
+        });
       });
 
-      return toString(Array.from(keys))
+      return toString(Array.from(keys));
     })
-    .then(types => writeFileSync(`${__dirname}/../src/@types/translations.d.ts`, types))
-    .then(() => console.log('✔️ Done\n'));
+    .then((types) =>
+      writeFileSync(`${__dirname}/../src/@types/translations.d.ts`, types)
+    )
+    .then(() => console.log("✔️ Done\n"));
 }
 
 /////////

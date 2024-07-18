@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { FONT } from "../../entities/font";
 import { toCssValue, COLOR } from "../../entities/color";
 import { Translate } from "../../shared/translate/translate";
@@ -75,7 +75,7 @@ const findBestPredicate = (date: Date) => {
     }
 
     return acc;
-  }, undefined);
+  }, undefined as ReactNode | undefined);
 };
 
 export function Date({ value }: { value: Date | string }) {

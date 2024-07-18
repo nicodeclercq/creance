@@ -18,7 +18,7 @@ export function EditExpense() {
   const { get } = useExpenseState(creanceId);
 
   const onSubmit = () => {
-    goTo(ROUTES.EXPENSE_LIST, params);
+    goTo(ROUTES.EXPENSE_LIST, params as { [key: string]: string });
   };
 
   return pipe(

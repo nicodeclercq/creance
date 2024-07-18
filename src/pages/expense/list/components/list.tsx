@@ -169,7 +169,12 @@ export function List() {
                     <ColumnRigid contentFit>
                       <ButtonGhost
                         withBackground
-                        onClick={() => goTo(ROUTES.EXPENSE_ADD, params)}
+                        onClick={() =>
+                          goTo(
+                            ROUTES.EXPENSE_ADD,
+                            params as { [key: string]: string }
+                          )
+                        }
                       >
                         <Icon name="ADD" />
                       </ButtonGhost>
