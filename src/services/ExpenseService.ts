@@ -1,13 +1,14 @@
-import { UID } from "./../@types/uid.d";
-import { register } from "../models/Registerable";
-import { pipe } from "fp-ts/function";
+import * as CreanceService from "../services/CreanceService";
 import * as Either from "fp-ts/Either";
 import * as Record from "fp-ts/Record";
-import * as CreanceService from "../services/CreanceService";
+import * as Registerable from "../models/Registerable";
+
 import { Creance } from "../models/State";
 import { Expense } from "../models/Expense";
-import * as Registerable from "../models/Registerable";
+import { UID } from "./../@types/uid.d";
 import { calculateExpression } from "../utils/number";
+import { pipe } from "fp-ts/function";
+import { register } from "../models/Registerable";
 
 export const of = (expense: {
   id?: string;
@@ -83,5 +84,10 @@ export const getAll =
       creanceId,
       Either.fromNullable("Creance id is not defined"),
       Either.chain(CreanceService.get),
-      Either.map((creance) => creance.expenses)
+      Either.map((creance) =>
+        creance.expenses.sort(
+          (expenseA, expenseB) =>
+            expenseB.date.getTime() - expenseA.date.getTime()
+        )
+      )
     );
