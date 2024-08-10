@@ -87,7 +87,8 @@ export const getAll =
       Either.map((creance) =>
         creance.expenses.sort(
           (expenseA, expenseB) =>
-            expenseB.date.getTime() - expenseA.date.getTime()
+            new Date(expenseB.date).getTime() -
+            new Date(expenseA.date).getTime()
         )
       )
     );
