@@ -6,7 +6,7 @@
   "calculation.total.expenses": "Total des dépenses %{total}",
   "currency": "%{value}%{currency}",
   "menu.expenses": "Dépenses",
-  "menu.distribution": "Charges / personne",
+  "menu.distribution": "Distribution",
   "menu.summary": "Partage",
   "init": "Initialisation %{step}/%{total}",
   "init.next": "Continuer",

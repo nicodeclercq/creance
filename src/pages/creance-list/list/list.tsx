@@ -1,28 +1,26 @@
-import { Stack } from "../../../shared/layout/stack/stack";
+import { CARD_PADDING, Card } from "../../../shared/library/card/card";
+
+import { ButtonGhost } from "../../../shared/library/button/buttonGhost";
+import { COLOR } from "../../../entities/color";
+import { ColumnRigid } from "../../../shared/layout/columns/column-rigid";
+import { Columns } from "../../../shared/layout/columns/columns";
 import { Container } from "../../../shared/layout/container/container";
+import { Fragment } from "react/jsx-runtime";
 import { Icon } from "../../../shared/library/icon/icon";
-import { sort } from "../../../utils/date";
-import { Translate } from "../../../shared/translate/translate";
-import { useCreanceState } from "../../../hooks/useCreanceState";
-import { Card, CARD_PADDING } from "../../../shared/library/card/card";
+import { Line } from "../../../components/line";
 import { ListItem } from "./listItem";
 import { ROUTES } from "../../../routes";
-import { useRoute } from "../../../hooks/useRoute";
-import { ButtonGhost } from "../../../shared/library/button/buttonGhost";
-import { Columns } from "../../../shared/layout/columns/columns";
+import { Stack } from "../../../shared/layout/stack/stack";
 import { Title } from "../../../shared/library/text/title/title";
-import { ColumnRigid } from "../../../shared/layout/columns/column-rigid";
-import { COLOR } from "../../../entities/color";
-import { pipe } from "../../../utils/functions";
+import { Translate } from "../../../shared/translate/translate";
 import { groupBy } from "../../../utils/array";
-import { Line } from "../../../components/line";
-import { Fragment } from "react/jsx-runtime";
-import { useParams } from "react-router-dom";
+import { pipe } from "../../../utils/functions";
+import { sort } from "../../../utils/date";
+import { useCreancesListState } from "../../../hooks/useCreancesListState";
+import { useRoute } from "../../../hooks/useRoute";
 
 export function List() {
-  const params = useParams();
-  const creanceId = params.creanceId as string;
-  const { creanceList } = useCreanceState(creanceId);
+  const { creanceList } = useCreancesListState();
   const { goTo } = useRoute();
 
   const listGroups = pipe(

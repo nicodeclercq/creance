@@ -1,9 +1,10 @@
-import { BehaviorSubject, timer, map } from "rxjs";
-import { FunctionN, pipe } from "fp-ts/function";
-import { State, defaultState } from "./../models/State";
+import * as CreanceService from "./CreanceService";
 import * as LocalStorageService from "./LocalStorageService";
 import * as SupabaseService from "./SupabaseService";
-import * as CreanceService from "./CreanceService";
+
+import { BehaviorSubject, map, timer } from "rxjs";
+import { FunctionN, pipe } from "fp-ts/function";
+import { State, defaultState } from "./../models/State";
 
 type Reducer<S, T> = (s: S) => (t: T) => S;
 

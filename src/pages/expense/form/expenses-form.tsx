@@ -1,20 +1,21 @@
-import { useForm } from "react-hook-form";
-import { Either } from "../../../components/Either";
-import { uid } from "../../../uid";
-import { Label } from "../../../shared/library/text/label/label";
-import { Translate } from "../../../shared/translate/translate";
-import { Stack } from "../../../shared/layout/stack/stack";
-import { useUserState } from "../../../hooks/useUserState";
+import { Registered, Unregistered } from "../../../models/Registerable";
+
 import { Avatar } from "../../../shared/library/avatar/avatar";
-import { Form } from "../../../shared/library/form/form";
-import { Columns } from "../../../shared/layout/columns/columns";
-import { ColumnRigid } from "../../../shared/layout/columns/column-rigid";
 import { ColumnFlexible } from "../../../shared/layout/columns/column-flexible";
+import { ColumnRigid } from "../../../shared/layout/columns/column-rigid";
+import { Columns } from "../../../shared/layout/columns/columns";
+import { Either } from "../../../components/Either";
+import { Expense } from "../../../models/Expense";
+import { Form } from "../../../shared/library/form/form";
+import { Label } from "../../../shared/library/text/label/label";
+import { Stack } from "../../../shared/layout/stack/stack";
+import { Translate } from "../../../shared/translate/translate";
+import { uid } from "../../../uid";
 import { useCategoryState } from "../../../hooks/useCategoryState";
 import { useExpenseState } from "../../../hooks/useExpenseState";
-import { Expense } from "../../../models/Expense";
-import { Registered, Unregistered } from "../../../models/Registerable";
+import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
+import { useUserState } from "../../../hooks/useUserState";
 
 type Props = {
   onSubmit: () => void;
@@ -27,7 +28,7 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
   const params = useParams();
   const creanceId = params.creanceId as string;
   const { getAll } = useUserState(creanceId);
-  const { getAll: getAllCategories } = useCategoryState(creanceId);
+  const { categories } = useCategoryState(creanceId);
   const { of, add, update } = useExpenseState(creanceId);
   const { register, handleSubmit } = useForm();
 
@@ -108,7 +109,7 @@ export function ExpenseForm({ expense, onSubmit, onCancel }: Props) {
           defaultValue={expense?.category}
         >
           <Either
-            data={getAllCategories()}
+            data={categories}
             onLeft={(e) => e}
             onRight={(categories) =>
               categories.map((category) => (

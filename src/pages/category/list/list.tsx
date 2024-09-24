@@ -1,20 +1,21 @@
-import { useState } from "react";
-import { Stack } from "../../../shared/layout/stack/stack";
-import { Columns } from "../../../shared/layout/columns/columns";
+import { ICONS, Icon } from "../../../shared/library/icon/icon";
+
+import { Avatar } from "../../../shared/library/avatar/avatar";
+import { ButtonAccent } from "../../../shared/library/button/buttonAccent";
+import { ButtonGhost } from "../../../shared/library/button/buttonGhost";
+import { Card } from "../../../shared/library/card/card";
+import { CategoryForm } from "../form/category-form";
 import { ColumnFlexible } from "../../../shared/layout/columns/column-flexible";
 import { ColumnRigid } from "../../../shared/layout/columns/column-rigid";
-import { Avatar } from "../../../shared/library/avatar/avatar";
-import { ButtonGhost } from "../../../shared/library/button/buttonGhost";
-import { Icon, ICONS } from "../../../shared/library/icon/icon";
+import { Columns } from "../../../shared/layout/columns/columns";
 import { Confirm } from "../../../shared/library/modal/confirm";
+import { Either } from "../../../components/Either";
+import { Stack } from "../../../shared/layout/stack/stack";
+import { Text } from "../../../shared/library/text/text/text";
 import { Translate } from "../../../shared/translate/translate";
 import { useCategoryState } from "../../../hooks/useCategoryState";
-import { CategoryForm } from "../form/category-form";
-import { Card } from "../../../shared/library/card/card";
-import { ButtonAccent } from "../../../shared/library/button/buttonAccent";
-import { Text } from "../../../shared/library/text/text/text";
-import { Either } from "../../../components/Either";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 
 type Add = { tag: "ADD" };
 type Edit = { tag: "EDIT"; value: string };
@@ -30,8 +31,7 @@ export function List() {
   const params = useParams();
   const creanceId = params.creanceId as string;
   const [editId, setEditId] = useState<Add | Edit | undefined>(undefined);
-  const { getAll, remove } = useCategoryState(creanceId);
-  const categories = getAll();
+  const { categories, remove } = useCategoryState(creanceId);
 
   const reset = () => {
     setEditId(undefined);

@@ -1,21 +1,35 @@
+import * as Either from "fp-ts/Either";
+
 import {
-  get,
-  getAll,
   add,
+  count,
+  get,
+  of,
   remove,
   update,
-  of,
-  isEmpty,
-  count,
 } from "./../services/CategoryService";
 
-export const useCategoryState = (id: string) => ({
-  isEmpty: isEmpty(id),
-  get: get(id),
-  getAll: getAll(id),
-  add: add(id),
-  remove: remove(id),
-  update: update(id),
-  of,
-  count: count(id),
-});
+import { pipe } from "fp-ts/function";
+import { useCreanceState } from "./useCreanceState";
+
+export const useCategoryState = (id: string) => {
+  const { currentCreance } = useCreanceState(id);
+
+  return {
+    categories: pipe(
+      currentCreance?.categories,
+      Either.fromNullable("Creance not found")
+    ),
+    isEmpty: pipe(
+      currentCreance?.categories,
+      Either.fromNullable("Creance not found"),
+      Either.map((categories) => categories.length === 0)
+    ),
+    get: get(id),
+    add: add(id),
+    remove: remove(id),
+    update: update(id),
+    of,
+    count: count(id),
+  };
+};

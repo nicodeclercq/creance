@@ -1,30 +1,30 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Either, fold } from "fp-ts/es6/Either";
+import * as Either from "fp-ts/Either";
 
-import { fold as foldUnion } from "../../utils/union-type-helper";
-import { FormLayout } from "../../components/formLayout/formLayout";
-import { Stack } from "../../shared/layout/stack/stack";
-import { Icon } from "../../shared/library/icon/icon";
 import { ButtonPrimary } from "../../shared/library/button/buttonPrimary";
+import { FormLayout } from "../../components/formLayout/formLayout";
+import { Icon } from "../../shared/library/icon/icon";
+import { Stack } from "../../shared/layout/stack/stack";
 import { Text } from "../../shared/library/text/text/text";
 import { Translate } from "../../shared/translate/translate";
-import { useExpenseState } from "../../hooks/useExpenseState";
-import { useCalculation } from "../../hooks/useCalculation";
-import { useCreanceState } from "../../hooks/useCreanceState";
-import { useUserState } from "../../hooks/useUserState";
-import { useCategoryState } from "../../hooks/useCategoryState";
+import { fold as foldUnion } from "../../utils/union-type-helper";
 import { toCSV } from "../../services/CSVService";
-import { useSettings } from "../../hooks/useSettings";
-import { useRoute } from "../../hooks/useRoute";
 import { toHTML } from "../../services/HTMLService";
+import { useCalculation } from "../../hooks/useCalculation";
+import { useCategoryState } from "../../hooks/useCategoryState";
+import { useCreanceState } from "../../hooks/useCreanceState";
+import { useExpenseState } from "../../hooks/useExpenseState";
+import { useParams } from "react-router-dom";
+import { useRoute } from "../../hooks/useRoute";
+import { useSettings } from "../../hooks/useSettings";
+import { useState } from "react";
+import { useUserState } from "../../hooks/useUserState";
 
 type ExportType = "csv" | "html";
 
 const WAIT_TIME = 1000;
 
-const eitherToPromise = <B, A>(c: Either<B, A>): Promise<A> =>
-  fold(Promise.reject, (a: A) => Promise.resolve(a))(c);
+const eitherToPromise = <B, A>(c: Either.Either<B, A>): Promise<A> =>
+  Either.fold(Promise.reject, (a: A) => Promise.resolve(a))(c);
 
 const wait = (time: number) =>
   new Promise((resolve) => {
@@ -35,24 +35,21 @@ export function Export() {
   const { creanceId: routeId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const { getAll: getUsers } = useUserState(routeId as string);
-  const { getAll: getCategories } = useCategoryState(routeId as string);
-  const { getAll } = useExpenseState(routeId as string);
+  const { categories } = useCategoryState(routeId as string);
+  const { expenses } = useExpenseState(routeId as string);
   const { getUsersRepartition } = useCalculation(routeId as string);
-  const { get } = useCreanceState(routeId);
+  const { currentCreance } = useCreanceState(routeId as string);
   const [settings] = useSettings();
   const { back } = useRoute();
   const { currency } = settings;
 
   const onClick = (type: ExportType) => () => {
-    const creance = get(routeId ?? "");
-    const expenses = getAll();
     const repartition = getUsersRepartition();
     const users = getUsers();
-    const categories = getCategories();
 
     const exportCreance = () =>
       Promise.all([
-        eitherToPromise(creance),
+        eitherToPromise(Either.fromNullable(undefined)(currentCreance)),
         eitherToPromise(expenses),
         eitherToPromise(users),
         eitherToPromise(categories),

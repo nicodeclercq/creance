@@ -1,38 +1,37 @@
-import { fold } from "fp-ts/es6/Either";
-import { useParams } from "react-router-dom";
+import { CARD_PADDING, Card } from "../../../../shared/library/card/card";
+import { COLOR, toCssValue } from "../../../../entities/color";
+import { ICONS, Icon } from "../../../../shared/library/icon/icon";
 
-import { useExpenseState } from "../../../../hooks/useExpenseState";
-import { Card, CARD_PADDING } from "../../../../shared/library/card/card";
-import { Stack } from "../../../../shared/layout/stack/stack";
+import { Accordion } from "../../../../components/accordion";
+import { Avatar } from "../../../../shared/library/avatar/avatar";
+import { ButtonGhost } from "../../../../shared/library/button/buttonGhost";
 import { ButtonPrimary } from "../../../../shared/library/button/buttonPrimary";
-import { Registered } from "../../../../models/Registerable";
-import { Expense } from "../../../../models/Expense";
-import { Currency } from "../../../../components/currency/currency";
-import { Date } from "../../../../components/date/date";
-import { Translate } from "../../../../shared/translate/translate";
-import { Columns } from "../../../../shared/layout/columns/columns";
+import { Category } from "../../../../models/Category";
 import { ColumnFlexible } from "../../../../shared/layout/columns/column-flexible";
 import { ColumnRigid } from "../../../../shared/layout/columns/column-rigid";
-import { ICONS, Icon } from "../../../../shared/library/icon/icon";
-import { useUserState } from "../../../../hooks/useUserState";
-import { Avatar } from "../../../../shared/library/avatar/avatar";
-import { User } from "../../../../models/User";
-import { useCategoryState } from "../../../../hooks/useCategoryState";
-import { Category } from "../../../../models/Category";
-import { ButtonGhost } from "../../../../shared/library/button/buttonGhost";
-import { Text } from "../../../../shared/library/text/text/text";
-import { Accordion } from "../../../../components/accordion";
+import { Columns } from "../../../../shared/layout/columns/columns";
 import { Confirm } from "../../../../shared/library/modal/confirm";
-import { useRoute } from "../../../../hooks/useRoute";
-import { ROUTES } from "../../../../routes";
-import { sort } from "../../../../utils/date";
-import { toCssValue, COLOR } from "../../../../entities/color";
 import { Container } from "../../../../shared/layout/container/container";
-import { useCreanceState } from "../../../../hooks/useCreanceState";
 import { Creance } from "../../../../models/State";
-import { Title } from "../../../../shared/library/text/title/title";
-import { Inline } from "../../../../shared/layout/inline/inline";
+import { Currency } from "../../../../components/currency/currency";
+import { Date } from "../../../../components/date/date";
 import { Either } from "../../../../components/Either";
+import { Expense } from "../../../../models/Expense";
+import { Inline } from "../../../../shared/layout/inline/inline";
+import { ROUTES } from "../../../../routes";
+import { Registered } from "../../../../models/Registerable";
+import { Stack } from "../../../../shared/layout/stack/stack";
+import { Text } from "../../../../shared/library/text/text/text";
+import { Title } from "../../../../shared/library/text/title/title";
+import { Translate } from "../../../../shared/translate/translate";
+import { User } from "../../../../models/User";
+import { sort } from "../../../../utils/date";
+import { useCategoryState } from "../../../../hooks/useCategoryState";
+import { useCreanceState } from "../../../../hooks/useCreanceState";
+import { useExpenseState } from "../../../../hooks/useExpenseState";
+import { useParams } from "react-router-dom";
+import { useRoute } from "../../../../hooks/useRoute";
+import { useUserState } from "../../../../hooks/useUserState";
 
 function ExpenseItem({
   expense,
@@ -60,9 +59,10 @@ function ExpenseItem({
       title={
         <Columns spacing="M" grow>
           <ColumnFlexible>
-            {fold(
-              () => <Avatar size="L" icon={ICONS.PIG} hideName />,
-              (category: Category) => (
+            <Either
+              data={categoryEither}
+              onLeft={() => <Avatar size="L" icon={ICONS.PIG} hideName />}
+              onRight={(category: Category) => (
                 <Columns spacing="S">
                   <Avatar
                     color={category.color}
@@ -76,8 +76,8 @@ function ExpenseItem({
                     <Date value={expense.date} />
                   </Stack>
                 </Columns>
-              )
-            )(categoryEither)}
+              )}
+            />
           </ColumnFlexible>
           <ColumnRigid>
             <Currency value={expense.amount} />
@@ -87,9 +87,10 @@ function ExpenseItem({
     >
       <Text>{expense.description}</Text>
       <span style={{ color: toCssValue(COLOR.GREY) }}>
-        {fold(
-          () => <Avatar size="M" name="Deleted User" />,
-          (user: User) => (
+        <Either
+          data={userEither}
+          onLeft={() => <Avatar size="M" name="Deleted User" />}
+          onRight={(user: User) => (
             <Inline spacing="S" align="CENTER">
               <Text>
                 <Translate
@@ -105,8 +106,8 @@ function ExpenseItem({
                 hideName
               />
             </Inline>
-          )
-        )(userEither)}
+          )}
+        />
       </span>
       {!isLocked(creance) && (
         <Columns spacing="M" margin="S">
@@ -139,11 +140,9 @@ function ExpenseItem({
 export function List() {
   const params = useParams();
   const creanceId = params.creanceId as string;
-  const { getAll } = useExpenseState(creanceId);
-  const { isLocked, getState } = useCreanceState(creanceId);
+  const { expenses } = useExpenseState(creanceId);
+  const { isLocked, currentCreance } = useCreanceState(creanceId);
   const { goTo } = useRoute();
-  const state = getState();
-  const expenses = getAll();
 
   return (
     <Either
@@ -152,7 +151,7 @@ export function List() {
       onRight={(expenses) => (
         <Card
           header={
-            !isLocked(state) ? (
+            currentCreance && !isLocked(currentCreance) ? (
               <Container background="PRIMARY_LIGHT" padding={CARD_PADDING}>
                 <Columns spacing="M" justify="SPACE_BETWEEN">
                   <Title>
@@ -165,7 +164,7 @@ export function List() {
                       parameters={{ count: expenses.length }}
                     />
                   </Title>
-                  {!isLocked(state) && (
+                  {currentCreance && !isLocked(currentCreance) && (
                     <ColumnRigid contentFit>
                       <ButtonGhost
                         withBackground
@@ -186,15 +185,16 @@ export function List() {
           }
         >
           <Stack spacing="M">
-            {expenses
-              .sort((a, b) => sort(b.date, a.date))
-              .map((expense) => (
-                <ExpenseItem
-                  key={expense.id}
-                  expense={expense}
-                  creance={state}
-                />
-              ))}
+            {currentCreance &&
+              expenses
+                .sort((a, b) => sort(b.date, a.date))
+                .map((expense) => (
+                  <ExpenseItem
+                    key={expense.id}
+                    expense={expense}
+                    creance={currentCreance}
+                  />
+                ))}
             {expenses.length === 0 && (
               <Container foreground="GREY" padding="M">
                 <Stack align="CENTER" justify="CENTER">
