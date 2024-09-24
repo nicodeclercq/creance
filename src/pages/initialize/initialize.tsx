@@ -1,26 +1,27 @@
-import { pipe } from "fp-ts/function";
-import * as Either from "fp-ts/Either";
+import * as EitherFP from "fp-ts/Either";
 
-import { DefaultLayout } from "../../components/defaultLayout/defaultLayout";
-import { List as UserList } from "../user/list/list";
-import { useModal } from "../../hooks/useModal";
-import { Label } from "../../shared/library/text/label/label";
-import { Translate } from "../../shared/translate/translate";
-import { SubTitle } from "../../shared/library/text/sub-title/sub-title";
-import { Stack } from "../../shared/layout/stack/stack";
 import { Arrow } from "../../components/arrow";
-import { useInitializationState } from "../../hooks/useInitializationState";
-import { Inline } from "../../shared/layout/inline/inline";
-import { ColumnRigid } from "../../shared/layout/columns/column-rigid";
 import { ButtonGhost } from "../../shared/library/button/buttonGhost";
-import { List as CategoryList } from "../category/list/list";
-import { Container } from "../../shared/layout/container/container";
 import { ButtonPrimary } from "../../shared/library/button/buttonPrimary";
-import { useUserState } from "../../hooks/useUserState";
-import { useCategoryState } from "../../hooks/useCategoryState";
-import { useRoute } from "../../hooks/useRoute";
+import { List as CategoryList } from "../category/list/list";
+import { ColumnRigid } from "../../shared/layout/columns/column-rigid";
+import { Container } from "../../shared/layout/container/container";
+import { DefaultLayout } from "../../components/defaultLayout/defaultLayout";
+import { Either } from "../../components/Either";
+import { Inline } from "../../shared/layout/inline/inline";
+import { Label } from "../../shared/library/text/label/label";
 import { ROUTES } from "../../routes";
+import { Stack } from "../../shared/layout/stack/stack";
+import { SubTitle } from "../../shared/library/text/sub-title/sub-title";
+import { Translate } from "../../shared/translate/translate";
+import { List as UserList } from "../user/list/list";
+import { pipe } from "fp-ts/function";
+import { useCategoryState } from "../../hooks/useCategoryState";
+import { useInitializationState } from "../../hooks/useInitializationState";
+import { useModal } from "../../hooks/useModal";
 import { useParams } from "react-router-dom";
+import { useRoute } from "../../hooks/useRoute";
+import { useUserState } from "../../hooks/useUserState";
 
 export function Initialize({ id }: { id: string }) {
   const { goTo } = useRoute();
@@ -61,13 +62,17 @@ export function Initialize({ id }: { id: string }) {
                     <Translate name="init.previous" />
                   </ButtonGhost>
                 </ColumnRigid>
-                {!hasNoCategories() && (
-                  <ColumnRigid>
-                    <ButtonPrimary onClick={next}>
-                      <Translate name="init.next" />
-                    </ButtonPrimary>
-                  </ColumnRigid>
-                )}
+                <Either
+                  data={hasNoCategories}
+                  onLeft={() => <></>}
+                  onRight={() => (
+                    <ColumnRigid>
+                      <ButtonPrimary onClick={next}>
+                        <Translate name="init.next" />
+                      </ButtonPrimary>
+                    </ColumnRigid>
+                  )}
+                />
               </Inline>
             </Container>
           ),
@@ -116,7 +121,7 @@ export function Initialize({ id }: { id: string }) {
           isFull: true,
         }),
       }),
-      Either.fold(
+      EitherFP.fold(
         (e) => ({
           content: <div>{e}</div>,
           title: <div>Unexpected Error</div>,
