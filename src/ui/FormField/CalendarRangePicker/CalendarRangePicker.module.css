@@ -1,0 +1,70 @@
+.calendar {
+  width: 100%;
+  max-width: 100%;
+  color: inherit;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap:var(--ui-semantic-gap-s);
+}
+.title {
+  flex: 1;
+  text-align: center;
+  margin: 0;
+  font: var(--ui-semantic-font-body-default);
+}
+
+.calendarGrid {
+  width: 100%;
+  border-collapse: collapse;
+  border-width: 0;
+
+  & td{
+    padding: var(--ui-semantic-padding-y-s) 0;
+  }
+}
+
+.calendarCell {
+  z-index: 0;
+  min-width: 2.4rem;
+  line-height: 2.4rem;
+  text-align: center;
+  border-radius: var(--ui-semantic-radius-l);
+  padding-inline: var(--ui-semantic-padding-x-s);
+  cursor: default;
+  outline: none;
+  forced-color-adjust: none;
+
+  &[data-outside-month] {
+    display: none;
+  }
+  &[data-focus-visible] {
+    z-index: 1;
+  }
+
+  &[data-pressed] {
+    background: var(--gray-100);
+  }
+
+  &[data-selected] {
+    color: var(--ui-background-default);
+    background: var(--ui-semantic-color-primary-default);
+    border-radius: 0;
+  }
+
+  &[data-selection-start] {
+    border-start-start-radius: var(--ui-semantic-radius-l);
+    border-end-start-radius: var(--ui-semantic-radius-l);
+  }
+
+  &[data-selection-end] {
+    border-start-end-radius: 6px;
+    border-end-end-radius: 6px;
+  }
+
+  &[aria-disabled="true"] {
+    color: var(--ui-semantic-color-neutral-weaker);
+  }
+}

@@ -1,0 +1,70 @@
+.select{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+}
+.popover{
+  background: var(--ui-background-default);
+  backdrop-filter: blur(0.2rem);
+  border: var(--ui-border-default);
+  overflow: auto;
+  border-radius: var(--ui-semantic-radius-s);
+}
+.button{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--ui-semantic-radius-l);
+  background: var(--ui-background-default);
+  border: 0.1rem solid currentColor;
+  color: inherit;
+  font: inherit;
+  padding: var(--ui-semantic-padding-action);
+}
+.isVariant-default .button{
+  padding: var(--ui-semantic-padding-action);
+}
+:is(.isVariant-small, .isVariant-grid) .button{
+  padding: 0;
+}
+
+.popover{
+  border-radius: var(--ui-semantic-radius-m);
+  box-shadow: var(--ui-semantic-shadow-l);
+  padding: var(--ui-semantic-padding-s);
+}
+
+.isVariant-grid .listbox{
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
+  gap: var(--ui-semantic-gap-m);
+  min-width: 16rem;
+
+  .option {
+    padding: var(--ui-semantic-padding-s);
+  }
+}
+
+.option:is(.isSelected, [data-focused="true"]) {
+  background: var(--ui-semantic-color-primary-weaker);
+}
+.option{
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  padding: var(--ui-semantic-padding-action);
+  cursor: pointer;
+  border-radius: var(--ui-semantic-radius-l);
+  gap: var(--ui-semantic-gap-m);
+}
+
+.optionLabel{
+  flex: 1;
+}
+.check{
+  flex: none;
+}

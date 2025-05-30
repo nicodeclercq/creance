@@ -1,0 +1,20 @@
+.addUserForm{
+  display: grid;
+  grid-template-columns: min-content 1fr 1fr min-content;
+  background: var(--ui-primitive-green-900);
+  border: 0.2rem dashed var(--ui-primitive-green-800);
+  border-radius: var(--ui-semantic-radius-s);
+  padding-block: var(--ui-semantic-padding-y-m);
+  padding-inline: var(--ui-semantic-padding-x-s);
+  margin-inline: calc(-1 * var(--ui-semantic-padding-x-s));
+  gap: var(--ui-semantic-gap-s);
+}
+.name{
+  grid-column: span 2;
+}
+
+.fieldLegend{
+  align-self: center;
+  font:var(--ui-semantic-font-body-smaller);
+
+}

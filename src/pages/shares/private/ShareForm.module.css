@@ -1,0 +1,19 @@
+.addShareItemForm {
+  background: var(--ui-primitive-green-900);
+  border: 0.2rem dashed var(--ui-primitive-green-800);
+  border-radius: var(--ui-semantic-radius-s);
+  padding: var(--ui-semantic-padding-y-m) var(--ui-semantic-padding-x-s);
+  margin-inline: calc(-1 * var(--ui-semantic-padding-x-s));
+  gap: var(--ui-semantic-gap-s);
+  width: calc(var(--ui-semantic-padding-x-s) * 2 + 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.shareItem {
+  width: 100%;
+  border-block: 0.1rem solid var(--ui-semantic-color-neutral-weaker);
+  margin-top: -0.1rem;
+}

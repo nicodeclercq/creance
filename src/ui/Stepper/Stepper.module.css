@@ -1,0 +1,22 @@
+.stepper{
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--ui-semantic-gap-s);
+  flex-direction: column;
+}
+.indicatorWrapper{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-semantic-gap-s);
+}
+.indicator{
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: var(--ui-semantic-radius-round);
+  border: var(--ui-semantic-borderWeight) solid var(--ui-semantic-color-primary-default);
+}
+.isActive {
+  background: var(--ui-semantic-color-primary-default);
+}

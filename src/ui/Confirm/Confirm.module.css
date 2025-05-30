@@ -1,0 +1,25 @@
+.overlay{
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100000;
+  background: hsl(from var(--ui-primitive-grey-200) h s l / 0.1);
+  backdrop-filter: blur(0.4rem);
+}
+
+.dialog{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100001;
+  min-width: min-content;
+  width: max-content;
+  max-width: 90vw;
+  padding: var(--ui-semantic-padding-l);
+  background-color: var(--ui-background-default);
+  border-radius: var(--ui-semantic-radius-m);
+  box-shadow: var(--ui-shadow-default);
+}

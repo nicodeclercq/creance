@@ -1,6 +1,9 @@
 export type User = {
+  _id: string;
   name: string;
   avatar: string;
-  color: string;
-  defaultDistribution: number;
+  share: {
+    adult: number;
+    children: number;
+  };
 };

@@ -1,13 +1,33 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { routes, Route as RouteDefinition } from "./routes";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route as RouteDefinition, routes } from "./routes";
+
+import { PrivatePage } from "./PrivatePage";
 
 export function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        {routes.map(({ path, component: Component }: RouteDefinition) => (
-          <Route key={path} path={path} element={<Component />} />
-        ))}
+        {routes.map(
+          ({
+            path,
+            component: Component,
+            isPublic = false,
+          }: RouteDefinition) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                isPublic ? (
+                  <Component />
+                ) : (
+                  <PrivatePage>
+                    <Component />
+                  </PrivatePage>
+                )
+              }
+            />
+          )
+        )}
       </Routes>
     </BrowserRouter>
   );

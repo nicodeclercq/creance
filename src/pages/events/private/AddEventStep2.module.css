@@ -1,0 +1,12 @@
+.addCategoryForm{
+  grid-column: span 3;
+  background: var(--ui-primitive-green-900);
+  border: 0.2rem dashed var(--ui-primitive-green-800);
+  display: grid;
+  border-radius: var(--ui-semantic-radius-s);
+  grid-template-columns: min-content 1fr min-content;
+  padding-block: var(--ui-semantic-padding-y-m);
+  padding-inline: var(--ui-semantic-padding-x-s);
+  margin-inline: calc(-1 * var(--ui-semantic-padding-x-s));
+  gap: var(--ui-semantic-gap-s);
+}

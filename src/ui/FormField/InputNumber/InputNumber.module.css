@@ -1,0 +1,38 @@
+.input{
+  display: inline-flex;
+  flex-direction: row;
+  background: var(--ui-background-default);
+  border: 0.1rem solid currentColor;
+  color: inherit;
+  font: inherit;
+  border-radius: var(--ui-semantic-radius-l);
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+
+  &:focus-within{
+    box-shadow: var(--ui-shadow-focus);
+  }
+}
+.input input{
+  width: 100%;
+  max-width: 100%;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: var(--ui-semantic-padding-action);
+
+  &:focus{
+    box-shadow: none;
+  }
+}
+
+.input:has(.unit) input{
+  padding-inline-end: var(--ui-semantic-padding-y-s);
+}
+
+.unit{
+  padding: var(--ui-semantic-padding-action);
+  padding-inline-start: 0;
+}

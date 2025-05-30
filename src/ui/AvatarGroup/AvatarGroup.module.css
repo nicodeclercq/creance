@@ -1,0 +1,14 @@
+.group{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:not(.isCondensed) > :not(:first-child) {
+    margin-left: -0.4rem;
+  }
+
+  &.isCondensed > :not(:first-child) {
+    margin-left: -0.8rem;
+  }
+}
+

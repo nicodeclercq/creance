@@ -1,0 +1,99 @@
+.button {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  border-radius: var(--ui-semantic-radius-l);
+  overflow: hidden;
+  min-width: 3.2rem;
+  min-height: 3.2rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease-in;
+  padding: var(--ui-semantic-padding-action);
+  align-items: center;
+  font: var(--ui-semantic-font-action-default);
+}
+.button:hover {
+  background: var(--ui-component-button-hover);
+}
+.button:active {
+  background: var(--ui-component-button-active);
+}
+.label {
+  font: var(--ui-semantic-font-action-default);
+}
+
+.isOverlay::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: background 0.2s ease-in;
+}
+.isOverlay:hover::after{
+  background: var(--ui-component-button-hover);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+.isOverlay:active::after{
+  background: var(--ui-component-button-active);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+.hasVariant-primary {
+  border: none;
+  color: var(--ui-background-default);
+  background: var(--ui-semantic-color-primary-default);
+}
+.hasVariant-primary:hover {
+  --ui-component-button-hover: var(--ui-semantic-color-primary-strong);
+}
+.hasVariant-primary:active {
+  --ui-component-button-active: var(--ui-semantic-color-primary-stronger);
+}
+
+.hasVariant-secondary {
+  border: 0.2rem solid var(--ui-semantic-color-primary-strong);
+  color: var(--ui-semantic-color-primary-default);
+  background: var(--ui-background-default);
+}
+.hasVariant-secondary:hover {
+  --ui-component-button-hover: var(--ui-semantic-color-primary-weaker);
+}
+.hasVariant-secondary:active {
+  --ui-component-button-active: var(--ui-semantic-color-primary-weak);
+}
+
+.hasVariant-tertiary {
+  border: var(--ui-border-default);
+  color: var(--ui-semantic-color-primary-default);
+  background: var(--ui-background-default);
+}
+.hasVariant-tertiary:hover {
+  --ui-component-button-hover: var(--ui-semantic-color-primary-weaker);
+}
+.hasVariant-tertiary:active {
+  --ui-component-button-active: var(--ui-semantic-color-primary-weak);
+}
+
+.contentWrapper{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.loader{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.isLoading .content {
+  visibility: hidden;
+}

@@ -1,0 +1,10 @@
+.input{
+  background: var(--ui-background-default);
+  border: 0.1rem solid currentColor;
+  color: inherit;
+  font: inherit;
+  border-radius: var(--ui-semantic-radius-l);
+  padding: var(--ui-semantic-padding-action);
+  width: 100%;
+  max-width: 100%;
+}

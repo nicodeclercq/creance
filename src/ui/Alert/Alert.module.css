@@ -1,0 +1,15 @@
+.alert{
+  display: grid;
+  grid-template-columns: min-content auto;
+  align-items: center;
+  gap: var(--ui-semantic-gap-s);
+  padding: var(--ui-semantic-padding-s);
+  background: var(--ui-semantic-color-warning-weaker);
+  color: var(--ui-semantic-color-warning-stronger);
+  border-radius: var(--ui-semantic-radius-m);
+  border: 0.1rem solid var(--ui-semantic-color-warning-default);
+}
+
+.icon {
+  color: var(--ui-semantic-color-warning-default);
+}
