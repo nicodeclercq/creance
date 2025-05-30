@@ -1,0 +1,53 @@
+.menu {
+  background: var(--ui-background-default);
+  box-shadow: var(--ui-semantic-shadow-l);
+  border-radius: var(--ui-semantic-radius-l);
+
+  &:focus-visible{
+    outline: none;
+    box-shadow: var(--ui-shadow-focus);
+  }
+}
+
+.action {
+  position: relative;
+  padding: var(--ui-semantic-padding-action);
+  background: transparent;
+  border: none;
+  font: var(--ui-semantic-font-action-default);
+  text-decoration: none;
+
+  &:first-child{
+    border-top-left-radius: var(--ui-semantic-radius-l);
+    border-top-right-radius: var(--ui-semantic-radius-l);
+  }
+  &:last-child{
+    border-bottom-left-radius: var(--ui-semantic-radius-l);
+    border-bottom-right-radius: var(--ui-semantic-radius-l);
+  }
+
+  &:not(:first-child)::before{
+    content: '';
+    position: absolute;
+    top:0;
+    left: 0;
+    right: 0;
+    display: block;
+    width: 100%;
+    height: 0.1rem;
+    background: var(--ui-primitive-grey-800);
+  }
+  &:not(.isDestructive) {
+    color: var(--ui-semantic-color-primary-default);
+  }
+  &.isDestructive {
+    color: var(--ui-semantic-color-failure-default);
+}
+}
+
+.action:hover {
+  background: var(--ui-semantic-color-primary-weaker);
+}
+.action:active {
+  background: var(--ui-semantic-color-primary-weak);
+}

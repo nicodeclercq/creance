@@ -1,6 +1,6 @@
 {
   "short_name": "Créance",
-  "name": "Créance: gérez vos frais en toute simplicité",
+  "name": "Créance",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#576F4F",
+  "theme_color": "#FCFCF6",
   "background_color": "#576F4F"
 }

@@ -1,0 +1,4 @@
+.divider {
+  border: 0.1rem solid var(--ui-semantic-color-neutral-weak);
+  width: 100%;
+}

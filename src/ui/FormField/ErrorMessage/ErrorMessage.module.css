@@ -1,0 +1,7 @@
+.error{
+  display: flex;
+  gap: var(--ui-semantic-gap-xs);
+  align-items: start;
+  font: var(--ui-semantic-font-body-small);
+  padding-block: var(--ui-semantic-padding-y-xs);
+}

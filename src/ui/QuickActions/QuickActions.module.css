@@ -1,0 +1,39 @@
+.quickActions{
+  position: fixed;
+  left: calc(100vw - 6.4rem - var(--ui-semantic-gap-m));
+  bottom: calc(var(--ui-semantic-gap-m) + 6.4rem);
+}
+
+.button{
+  width: 6rem !important;
+  height: 6rem !important;
+  border-radius: var(--ui-semantic-radius-round);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--ui-semantic-shadow-l);
+  border: 0.1rem solid var(--ui-background-default);
+}
+
+
+.actionsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: end;
+}
+
+.action{
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  border-radius: var(--ui-semantic-radius-round);
+  padding: var(--ui-semantic-padding-y-s) var(--ui-semantic-padding-x-m);
+  background-color: var(--ui-background-default);
+  color: var(--ui-semantic-color-primary-default);
+  border: 0.2rem solid var(--ui-semantic-color-primary-default);
+  gap: var(--ui-semantic-gap-xs);
+  box-shadow: var(--ui-semantic-shadow-l);
+}

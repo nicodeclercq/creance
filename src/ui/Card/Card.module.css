@@ -1,0 +1,21 @@
+.card {
+  position: relative;
+  background: var(--ui-background-default);
+  overflow: auto;
+}
+
+.isInteractive{
+  cursor: pointer;
+}
+
+.hasPadding-s{
+  padding: var(--ui-semantic-padding-s);
+}
+
+.hasPadding-m{
+  padding: var(--ui-semantic-padding-m);
+}
+
+.hasPadding-l{
+  padding: var(--ui-semantic-padding-l);
+}

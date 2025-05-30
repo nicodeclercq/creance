@@ -1,0 +1,4 @@
+.label{
+  font: var(--ui-semantic-font-label);
+  color: inherit;
+}

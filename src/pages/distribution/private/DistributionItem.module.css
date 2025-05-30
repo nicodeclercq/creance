@@ -1,0 +1,12 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-semantic-gap-s);
+  padding: var(--ui-semantic-padding-s);
+  margin: 0;
+
+}
+.item {
+  padding: 0;
+  list-style-type: none;
+}

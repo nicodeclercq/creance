@@ -1,0 +1,14 @@
+.statusIcon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ui-semantic-radius-round);
+  background: var(--ui-background-default);
+  color: var(--ui-semantic-color-neutral-default)
+}

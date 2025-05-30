@@ -1,0 +1,8 @@
+.formActions {
+  border-block-start: 0.1rem solid var(--ui-semantic-color-neutral-weaker);
+  display: flex;
+  justify-content: end;
+  gap: var(--ui-semantic-gap-m);
+  padding-block: var(--ui-semantic-padding-y-l);
+  flex-wrap: wrap;
+}

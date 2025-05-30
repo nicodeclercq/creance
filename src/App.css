@@ -1,48 +1,153 @@
-*,
-*:before,
-*:after {
+:root {
+  --ui-primitive-_grey-hue: 145;
+  --ui-primitive-_grey-saturation: 1%;
+  --ui-primitive-grey-000: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 5%);
+  --ui-primitive-grey-100: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 10%);
+  --ui-primitive-grey-200: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 20%);
+  --ui-primitive-grey-300: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 30%);
+  --ui-primitive-grey-400: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 40%);
+  --ui-primitive-grey-500: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 50%);
+  --ui-primitive-grey-600: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 60%);
+  --ui-primitive-grey-700: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 70%);
+  --ui-primitive-grey-800: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 80%);
+  --ui-primitive-grey-900: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 90%);
+  --ui-primitive-grey-1000: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 99%);
+
+  --ui-primitive-_green-hue: 110;
+  --ui-primitive-_green-saturation: 30%;
+  --ui-primitive-green-100: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 10%);
+  --ui-primitive-green-200: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 20%);
+  --ui-primitive-green-300: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 28%);
+  --ui-primitive-green-400: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 35%);
+  --ui-primitive-green-500: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 50%);
+  --ui-primitive-green-600: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 60%);
+  --ui-primitive-green-700: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 70%);
+  --ui-primitive-green-800: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 80%);
+  --ui-primitive-green-900: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 90%);
+
+  --ui-primitive-_red-hue: 355;
+  --ui-primitive-_red-saturation: 75%;
+  --ui-primitive-red-100: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 10%);
+  --ui-primitive-red-200: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 20%);
+  --ui-primitive-red-300: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 30%);
+  --ui-primitive-red-400: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 40%);
+  --ui-primitive-red-500: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 50%);
+  --ui-primitive-red-600: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 60%);
+  --ui-primitive-red-700: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 70%);
+  --ui-primitive-red-800: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 80%);
+  --ui-primitive-red-900: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 90%);
+
+  --ui-primitive-_orange-hue: 35;
+  --ui-primitive-_orange-saturation: 75%;
+  --ui-primitive-orange-100: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 10%);
+  --ui-primitive-orange-200: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 20%);
+  --ui-primitive-orange-300: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 30%);
+  --ui-primitive-orange-400: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 40%);
+  --ui-primitive-orange-500: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 50%);
+  --ui-primitive-orange-600: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 60%);
+  --ui-primitive-orange-700: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 70%);
+  --ui-primitive-orange-800: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 80%);
+  --ui-primitive-orange-900: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 90%);
+
+  --ui-semantic-font-body-smaller: normal 1.2rem / 1.6rem roboto, sans-serif;
+  --ui-semantic-font-body-small: normal 1.4rem / 1.6rem roboto, sans-serif;
+  --ui-semantic-font-body-default: normal 1.6rem / 2.4rem roboto, sans-serif;
+  --ui-semantic-font-label: normal 1.4rem / 1.6rem roboto, sans-serif;
+  --ui-semantic-font-input: normal 1.6rem / 2rem roboto, sans-serif;
+  --ui-semantic-font-body-large: normal 2rem / 2.4rem roboto, sans-serif;
+  --ui-semantic-font-body-larger: normal 3.2rem / 4rem roboto, sans-serif;
+  
+  --ui-semantic-font-action-default: bold 1.6rem / 2.4rem roboto, sans-serif;
+  
+  --ui-primitive-spacing-xs: 0.2rem;
+  --ui-primitive-spacing-s: 0.4rem;
+  --ui-primitive-spacing-m: 0.8rem;
+  --ui-primitive-spacing-l: 1.6rem;
+  --ui-primitive-spacing-xl: 2.4rem;
+  --ui-primitive-spacing-xxl: 3.2rem;
+  
+  --ui-semantic-color-neutral-weaker: var(--ui-primitive-grey-800);
+  --ui-semantic-color-neutral-weak: var(--ui-primitive-grey-600);
+  --ui-semantic-color-neutral-default: var(--ui-primitive-grey-400);
+  --ui-semantic-color-neutral-strong: var(--ui-primitive-grey-200);
+  --ui-semantic-color-neutral-stronger: var(--ui-primitive-grey-000);
+  
+  --ui-semantic-color-primary-weaker: var(--ui-primitive-green-800);
+  --ui-semantic-color-primary-weak: var(--ui-primitive-green-600);
+  --ui-semantic-color-primary-default: var(--ui-primitive-green-400);
+  --ui-semantic-color-primary-strong: var(--ui-primitive-green-300);
+  --ui-semantic-color-primary-stronger: var(--ui-primitive-green-200);
+  
+  --ui-semantic-color-failure-weaker: var(--ui-primitive-red-800);
+  --ui-semantic-color-failure-weak: var(--ui-primitive-red-600);
+  --ui-semantic-color-failure-default: var(--ui-primitive-red-400);
+  --ui-semantic-color-failure-strong: var(--ui-primitive-red-300);
+  --ui-semantic-color-failure-stronger: var(--ui-primitive-red-200);
+
+  --ui-semantic-color-warning-weaker: var(--ui-primitive-orange-800);
+  --ui-semantic-color-warning-weak: var(--ui-primitive-orange-600);
+  --ui-semantic-color-warning-default: var(--ui-primitive-orange-400);
+  --ui-semantic-color-warning-strong: var(--ui-primitive-orange-300);
+  --ui-semantic-color-warning-stronger: var(--ui-primitive-orange-200);
+  
+  
+  --ui-semantic-radius-round: 9999999rem;
+  --ui-semantic-radius-s: 0.2rem;
+  --ui-semantic-radius-m: 0.4rem;
+  --ui-semantic-radius-l: 0.8rem;
+  
+  --ui-semantic-padding-x-xs: var(--ui-primitive-spacing-s);
+  --ui-semantic-padding-x-s: var(--ui-primitive-spacing-m);
+  --ui-semantic-padding-x-m: var(--ui-primitive-spacing-l);
+  --ui-semantic-padding-x-l: var(--ui-primitive-spacing-xl);
+  --ui-semantic-padding-y-xs: var(--ui-primitive-spacing-xs);
+  --ui-semantic-padding-y-s: var(--ui-primitive-spacing-s);
+  --ui-semantic-padding-y-m: var(--ui-primitive-spacing-m);
+  --ui-semantic-padding-y-l: var(--ui-primitive-spacing-l);
+  
+  --ui-semantic-padding-xs: var(--ui-semantic-padding-x-xs) var(--ui-semantic-padding-y-xs);
+  --ui-semantic-padding-s: var(--ui-semantic-padding-x-s) var(--ui-semantic-padding-y-s);
+  --ui-semantic-padding-m: var(--ui-semantic-padding-x-m) var(--ui-semantic-padding-y-m);
+  --ui-semantic-padding-l: var(--ui-semantic-padding-x-l) var(--ui-semantic-padding-y-l);
+  
+  --ui-semantic-padding-action: var(--ui-semantic-padding-y-s) var(--ui-semantic-padding-x-l);
+
+  --ui-semantic-gap-xs: var(--ui-primitive-spacing-s);
+  --ui-semantic-gap-s: var(--ui-primitive-spacing-m);
+  --ui-semantic-gap-m: var(--ui-primitive-spacing-l);
+  --ui-semantic-gap-l: var(--ui-primitive-spacing-xl);
+  --ui-semantic-gap-xl: var(--ui-primitive-spacing-xxl);
+
+  --ui-semantic-borderWeight: 0.1rem;
+
+
+  --ui-border-default: var(--ui-semantic-borderWeight) solid var(--ui-primitive-grey-800);
+  --ui-background-body: var(--ui-primitive-grey-900);
+  --ui-background-default: var(--ui-primitive-grey-1000);
+  --ui-background-inverted: var(--ui-primitive-green-200);
+  --ui-semantic-color-inverted: var(--ui-primitive-grey-1000);
+  --ui-shadow-default: 0 0.1rem 0 hsl(from var(--ui-primitive-grey-200) h s l / 0.1),
+    0.2rem 0.2rem 0.4rem hsl(from var(--ui-primitive-grey-200) h s l / 0.2);
+  --ui-semantic-shadow-l: 0 0.1rem 0 hsl(from var(--ui-primitive-grey-200) h s l / 0.1),
+    0 0rem 0.2rem hsl(from var(--ui-primitive-grey-200) h s l / 0.1),
+    0.4rem 0.4rem 0.8rem hsl(from var(--ui-primitive-grey-200) h s l / 0.2);
+  --ui-shadow-inset-subtle: inset 0.2rem 0.2rem 0.4rem hsl(from var(--ui-primitive-grey-200) h s l / 0.2);
+  --ui-shadow-focus: 0 0  0 0.1rem var(--ui-primitive-green-800), 0 0 0 0.3rem  var(--ui-primitive-green-200);
+}
+
+*, *:before, *:after {
   box-sizing: border-box;
 }
 
-html,
+html {
+  font-size: 62.5%;
+}
 body {
-  margin: 0;
+  font: var(--ui-semantic-font-body-default);
+  color: var(--ui-semantic-color-neutral-default);
+  background: var(--ui-background-body);
 }
-
-body {
-  width: 100vw;
-  height: 100vh;
-  color: #2a2a2a;
-}
-input,
-select {
-  display: block;
-  padding: 0.25rem 0.5rem;
-  width: 100%;
-  border-radius: 2px;
-  border: 0.5px solid;
-  font: inherit;
-  margin-top: 0.25rem;
-  margin-bottom: 1rem;
-}
-#root {
-  height: 100%;
-  width: 100%;
-}
-
-@keyframes loading {
-  from {
-    transform: "scale(1.25)";
-  }
-  to {
-    transform: "scale(0.75)";
-  }
-}
-@keyframes dropdownAppear {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+:is(input, button, textarea, a, select, [role="button"]):focus {
+    outline: none;
+    box-shadow: var(--ui-shadow-focus);
 }

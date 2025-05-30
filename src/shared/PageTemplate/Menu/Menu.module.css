@@ -1,0 +1,35 @@
+.menu{
+  z-index: 1;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+  background: var(--ui-background-inverted);
+  color: var(--ui-semantic-color-inverted);
+  border-block-start: 0.1rem solid var(--ui-semantic-color-inverted);
+}
+
+.link{
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: var(--ui-semantic-padding-y-xs) var(--ui-semantic-padding-x-s);
+  text-align: center;
+
+  &:any-link{
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.isActive{
+  background: var(--ui-semantic-color-primary-strong);
+  color: var(--ui-background-inverted);
+  border-block-end: 0.4rem solid currentColor;
+}

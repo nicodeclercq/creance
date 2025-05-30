@@ -1,0 +1,16 @@
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.isInvalid {
+  color: var(--ui-semantic-color-failure-default);
+}
+.isDisabled {
+  color: var(--ui-semantic-color-neutral-weak);
+}
+
+.message {
+  font: var(--ui-semantic-font-body-small);
+  padding-block: var(--ui-semantic-padding-y-xs);
+}

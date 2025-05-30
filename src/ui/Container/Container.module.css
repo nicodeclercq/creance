@@ -1,0 +1,47 @@
+.container{
+  margin: 0;
+}
+
+/* PADDING */
+.hasPadding-s {
+  padding: var(--ui-semantic-padding-s);
+}
+.hasPadding-m {
+  padding: var(--ui-semantic-padding-m);
+}
+.hasPadding-l {
+  padding: var(--ui-semantic-padding-l);
+}
+/* POSITION */
+.hasPosition-absolute {
+  position: absolute;
+}
+.hasPosition-relative {
+  position: relative;
+}
+/* BACKGROUND */
+.hasBackground-default {
+  background: var(--ui-background-default, red);
+}
+.hasBackground-transparent {
+  background: transparent;
+}
+/* DISPLAY */
+.hasDisplay-flex {
+  display: flex;
+}
+.hasDisplay-grid {
+  display: grid;
+}
+.hasDisplay-block {
+  display: block;
+}
+.hasDisplay-inline-block {
+  display: inline-block;
+}
+.hasDisplay-inline-flex {
+  display: inline-flex;
+}
+.hasDisplay-inline-grid {
+  display: inline-grid;
+}

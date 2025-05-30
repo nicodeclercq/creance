@@ -1,0 +1,116 @@
+import { Controller, useForm } from "react-hook-form";
+
+import { Card } from "../../ui/Card/Card";
+import { Container } from "../../ui/Container/Container";
+import { Form } from "../../ui/Form/Form";
+import { Heading } from "../../ui/Heading/Heading";
+import { InputPassword } from "../../ui/FormField/InputPassword/InputPassword";
+import { InputText } from "../../ui/FormField/InputText/InputText";
+import { PigImage } from "../../ui/Pig";
+import { Redirect } from "../../Redirect";
+import { Stack } from "../../ui/Stack/Stack";
+import { loginUser } from "../../service/firebase";
+import { useAuthentication } from "../../hooks/useAnthentication";
+import { useRoute } from "../../hooks/useRoute";
+import { useTranslation } from "react-i18next";
+
+export function LoginPage() {
+  const { t } = useTranslation();
+  const { goTo } = useRoute();
+  const { currentUserId } = useAuthentication();
+  const { control, formState, handleSubmit } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  if (currentUserId) {
+    return <Redirect to="EVENT_LIST" />;
+  }
+
+  const hasError = Object.keys(formState.errors).length > 0;
+
+  const submit = (data: { email: string; password: string }) =>
+    loginUser(data)().then(() => {
+      goTo("EVENT_LIST");
+    });
+
+  return (
+    <Container
+      styles={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        alignItems: "start",
+        justifyContent: "center",
+        background: "inverted",
+        padding: "l",
+      }}
+    >
+      <Stack alignItems="center" gap="m">
+        <div
+          style={{
+            position: "relative",
+            color: "#fff",
+            top: "4rem",
+            aspectRatio: "1 / 1",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1rem",
+            borderRadius: "var(--ui-semantic-radius-round)",
+            backgroundColor: "var(--ui-semantic-color-primary-stronger)",
+            zIndex: 1,
+            border: "0.5rem solid #fff",
+            boxShadow: "var(--ui-semantic-shadow-l)",
+          }}
+        >
+          <PigImage width="25vw" />
+        </div>
+        <Card padding="m">
+          <Form
+            hasError={hasError}
+            handleSubmit={handleSubmit}
+            submit={{
+              label: t("page.login.actions.submit"),
+              onClick: submit,
+            }}
+          >
+            <Stack gap="m" alignItems="stretch">
+              <Heading level={1} styles={{ font: "body-larger" }}>
+                {t("page.login.title")}
+              </Heading>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { value, onChange } }) => (
+                  <InputText
+                    type="email"
+                    label={t("page.login.email.label")}
+                    isRequired
+                    value={value}
+                    onChange={onChange}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { value, onChange } }) => (
+                  <InputPassword
+                    type="password"
+                    label={t("page.login.password.label")}
+                    isRequired
+                    value={value}
+                    onChange={onChange}
+                  />
+                )}
+              />
+            </Stack>
+          </Form>
+        </Card>
+      </Stack>
+    </Container>
+  );
+}
