@@ -7,7 +7,6 @@ import { AddEventPage } from "./pages/events/AddEventPage";
 import { EventPage } from "./pages/event/EventPage";
 import { AddExpensePage } from "./pages/event/AddExpensePage";
 import { EditExpensePage } from "./pages/event/EditExpensePage";
-import { DebugPage } from "./pages/DebugPage";
 import { CategoriesPage } from "./pages/categories/CategoriesPage";
 import { SharesPage } from "./pages/shares/SharesPage";
 import { UserSharePage } from "./pages/shares/UserSharePage";
@@ -70,10 +69,6 @@ export const ROUTES_DEFINITION = {
   ICONS: {
     path: "/icons",
     component: IconsPage,
-  },
-  DEBUG: {
-    path: "/debug",
-    component: DebugPage,
   },
   /*
   CREANCE_ADD: "/creances/add",

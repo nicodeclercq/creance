@@ -5,12 +5,10 @@ import {
   DialogTrigger,
   Heading,
   Modal,
-  ModalOverlay,
 } from "react-aria-components";
 
 import { Columns } from "../Columns/Columns";
 import { Icon } from "../Icon/Icon";
-import { Illustration } from "../Illustration/Illustration";
 import { Paragraph } from "../Paragraph/Paragraph";
 import { Stack } from "../Stack/Stack";
 import buttonStyles from "../Button/Button.module.css";
