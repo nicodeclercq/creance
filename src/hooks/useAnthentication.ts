@@ -1,12 +1,16 @@
-import { isAuthenticated } from "../service/firebase";
+import { AuthState, listenToAuthChange } from "../service/firebase";
+import { useEffect, useState } from "react";
+
 import { useStore } from "../store/StoreProvider";
 
 export function useAuthentication() {
-  const isAuth = isAuthenticated();
+  const [state, setState] = useState<AuthState>({ type: "loading" });
   const [currentUserId] = useStore("currentUserId");
 
+  useEffect(() => listenToAuthChange(setState), []);
+
   return {
-    isAuthenticated: isAuth,
-    currentUserId: isAuth ? currentUserId : null,
+    state,
+    currentUserId: state.type === "authenticated" ? currentUserId : null,
   };
 }

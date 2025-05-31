@@ -12,6 +12,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  onAuthStateChanged,
 } from "firebase/auth"; // Assuming you're using Firebase Auth
 import { initializeApp } from "firebase/app";
 import { pipe } from "fp-ts/function";
@@ -25,6 +26,37 @@ const COLLECTIONS = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+
+type LoadtingState = {
+  type: "loading";
+};
+type AuthenticatedState = {
+  type: "authenticated";
+  userId: string;
+};
+type UnauthenticatedState = {
+  type: "unauthenticated";
+};
+export type AuthState =
+  | LoadtingState
+  | AuthenticatedState
+  | UnauthenticatedState;
+
+export const listenToAuthChange = (callback: (state: AuthState) => void) => {
+  callback({ type: "loading" });
+
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user === null) {
+      return callback({ type: "unauthenticated" });
+    } else if (user.uid) {
+      return callback({ type: "authenticated", userId: user.uid });
+    }
+  });
+
+  return () => {
+    unsubscribe();
+  };
+};
 
 type FirebaseEventData = {
   data: string;

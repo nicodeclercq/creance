@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 export function LoginPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const { currentUserId } = useAuthentication();
+  const { state } = useAuthentication();
   const { control, formState, handleSubmit } = useForm({
     defaultValues: {
       email: "",
@@ -25,7 +25,7 @@ export function LoginPage() {
     },
   });
 
-  if (currentUserId) {
+  if (state.type === "authenticated") {
     return <Redirect to="EVENT_LIST" />;
   }
 
