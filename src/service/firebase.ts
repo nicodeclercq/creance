@@ -7,7 +7,7 @@ import { type Event } from "../models/Event";
 import { User } from "../models/User";
 import * as z from "zod";
 import { type ZodSchema } from "zod";
-import { firebaseConfig } from "../../secrets";
+import { firebaseConfig } from "../secrets";
 import {
   getAuth,
   createUserWithEmailAndPassword,
