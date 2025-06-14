@@ -43,7 +43,6 @@ export function ShareItem({ user, share, onDelete, eventId }: ShareItemProps) {
             icon: "trash",
             label: t("page.event.shares.actions.delete"),
             onClick: onDelete,
-            isDestructive: true,
             confirmation: {
               title: t("page.event.shares.actions.delete.confirmation.title"),
               description: t(

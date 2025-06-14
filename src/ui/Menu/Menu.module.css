@@ -16,6 +16,7 @@
   border: none;
   font: var(--ui-semantic-font-action-default);
   text-decoration: none;
+  color: var(--ui-semantic-color-primary-default);
 
   &:first-child{
     border-top-left-radius: var(--ui-semantic-radius-l);
@@ -37,12 +38,6 @@
     height: 0.1rem;
     background: var(--ui-primitive-grey-800);
   }
-  &:not(.isDestructive) {
-    color: var(--ui-semantic-color-primary-default);
-  }
-  &.isDestructive {
-    color: var(--ui-semantic-color-failure-default);
-}
 }
 
 .action:hover {

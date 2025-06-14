@@ -19,7 +19,6 @@ type Action =
     })
   | (DistributiveOmit<ButtonProps<AsButton>, "icon" | "variant"> & {
       icon: IconName;
-      isDestructive?: boolean;
       confirmation?: DistributiveOmit<ConfirmProps, "action">;
     });
 
@@ -71,9 +70,7 @@ export function Menu({ label, icon = "menu", actions }: MenuProps) {
                   key={label}
                   {...action.confirmation}
                   action={{
-                    className: classNames(styles.action, {
-                      [styles.isDestructive]: action.isDestructive,
-                    }),
+                    className: styles.action,
                     icon: {
                       name: icon,
                       position: "end",
@@ -85,9 +82,7 @@ export function Menu({ label, icon = "menu", actions }: MenuProps) {
               ) : (
                 <Button
                   key={label}
-                  className={classNames(styles.action, {
-                    [styles.isDestructive]: action.isDestructive,
-                  })}
+                  className={styles.action}
                   {...action}
                   onClick={action.onClick}
                 >

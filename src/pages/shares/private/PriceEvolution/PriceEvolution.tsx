@@ -3,7 +3,6 @@ import * as Either from "fp-ts/Either";
 import { Either as EitherComponent, sequence } from "../../../../ui/Either";
 
 import { Columns } from "../../../../ui/Columns/Columns";
-import { Event } from "../../../../models/Event";
 import { Grid } from "../../../../ui/Grid/Grid";
 import { Icon } from "../../../../ui/Icon/Icon";
 import { Paragraph } from "../../../../ui/Paragraph/Paragraph";
