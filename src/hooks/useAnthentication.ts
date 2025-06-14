@@ -1,13 +1,23 @@
-import { AuthState, listenToAuthChange } from "../service/firebase";
+import { $isAuthenticated, AuthState } from "../service/firebase";
 import { useEffect, useState } from "react";
 
 import { useStore } from "../store/StoreProvider";
 
 export function useAuthentication() {
   const [state, setState] = useState<AuthState>({ type: "loading" });
-  const [currentUserId] = useStore("currentUserId");
+  const [currentUserId, setCurrentUserId] = useStore("currentUserId");
 
-  useEffect(() => listenToAuthChange(setState), []);
+  useEffect(() => {
+    const subscription = $isAuthenticated.asObservable().subscribe({
+      next: (authState) => {
+        setState(authState);
+        if (authState.type === "authenticated") {
+          setCurrentUserId(() => authState.userId);
+        }
+      },
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   return {
     state,

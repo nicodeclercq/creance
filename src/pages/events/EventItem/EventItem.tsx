@@ -42,11 +42,6 @@ export function EventItem({
               label: users[userId].name,
             }))}
           />
-          <Paragraph styles={{ font: "body-small" }}>
-            {t("page.events.list.item.usersNumber", {
-              number: eventUsers.length,
-            })}
-          </Paragraph>
         </Columns>
       </Stack>
       <IconButton

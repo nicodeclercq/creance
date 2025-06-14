@@ -6,9 +6,9 @@ import {
   useEffect,
 } from "react";
 import { BehaviorSubject } from "rxjs";
-import * as RX from "rxjs/operators";
+import * as RX from "rxjs";
 
-type Path<T, Prefix extends string = ""> = T extends object
+export type Path<T, Prefix extends string = ""> = T extends object
   ? {
       [K in (string | number) & keyof T]: `${Prefix}${
         | `${K}`
@@ -18,7 +18,7 @@ type Path<T, Prefix extends string = ""> = T extends object
     }[(string | number) & keyof T]
   : never;
 
-type ValueFromPath<P, O> = P extends `${infer Head}.${infer Tail}`
+export type ValueFromPath<P, O> = P extends `${infer Head}.${infer Tail}`
   ? Head extends keyof O
     ? ValueFromPath<Tail, O[Head]>
     : never
@@ -47,8 +47,26 @@ function setValueAtPath<P extends Path<S>, S>(
   map: (oldValue: ValueFromPath<P, S>) => ValueFromPath<P, S>,
   state: S
 ): S {
+  // automatically add updatedAt date to the value
+  const mapWithUpdatedAtDate = (
+    oldValue: ValueFromPath<P, S>
+  ): ValueFromPath<P, S> => {
+    const newValue = map(oldValue);
+    if (
+      typeof newValue === "object" &&
+      newValue !== null &&
+      "updatedAt" in newValue
+    ) {
+      return {
+        ...newValue,
+        updatedAt: new Date(),
+      };
+    }
+    return newValue;
+  };
+
   if (path.length === 0) {
-    return map(state as ValueFromPath<P, S>) as S;
+    return mapWithUpdatedAtDate(state as ValueFromPath<P, S>) as S;
   }
 
   const [h, ...t] = path.split(".");
@@ -78,11 +96,11 @@ export function createContextStore<State>(initialState: State) {
     );
 
     useEffect(() => {
-      const subscription = store
+      const subscription = RX.connectable(store)
         .pipe(
+          RX.connect(RX.identity),
           RX.map(getValueFromPath(path)),
-          RX.distinctUntilChanged(),
-          RX.debounceTime(100)
+          RX.distinctUntilChanged()
         )
         .subscribe({
           next: setState,
@@ -110,9 +128,42 @@ export function createContextStore<State>(initialState: State) {
     return () => subscription.unsubscribe();
   }
 
-  function load(state: State) {
-    store.next(state);
+  function onPathChange<P extends Path<State>>(
+    path: P,
+    callback: (newValue: ValueFromPath<P, State>) => void
+  ) {
+    const subscription = RX.connectable(store)
+      .pipe(RX.map(getValueFromPath(path)), RX.distinctUntilChanged())
+      .subscribe({
+        next: (value) => {
+          callback(value);
+        },
+      });
+
+    return () => subscription.unsubscribe();
   }
 
-  return { StoreProvider, useStore, onChange, load } as const;
+  function load(state: State | ((currentState: State) => State)) {
+    if (typeof state === "function") {
+      store.next((state as (currentState: State) => State)(store.getValue()));
+    } else {
+      store.next(state);
+    }
+  }
+
+  const update =
+    <P extends Path<State>>(path: P) =>
+    (map: (oldValue: ValueFromPath<P, State>) => ValueFromPath<P, State>) => {
+      load((currentState) => setValueAtPath(path, map, currentState as State));
+    };
+
+  return {
+    StoreProvider,
+    useStore,
+    onChange,
+    onPathChange,
+    load,
+    update,
+    $store: store.asObservable(),
+  } as const;
 }

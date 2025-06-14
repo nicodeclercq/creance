@@ -74,12 +74,13 @@ export function AddEventPage() {
             departure: step1Data.departure,
           },
           description: step1Data.description,
-          receivables: {},
+          expenses: [],
           categories: step2Data.categories.reduce(
             (acc, category) => ({ ...acc, [category._id]: category }),
             {} as Record<string, Category>
           ),
           participants: data.users.map((user) => user._id),
+          updatedAt: new Date(),
         },
       };
     });
@@ -89,7 +90,7 @@ export function AddEventPage() {
         .reduce(
           (acc, user) => ({
             ...acc,
-            [user._id]: user,
+            [user._id]: { ...user, updatedAt: new Date() },
           }),
           {}
         );

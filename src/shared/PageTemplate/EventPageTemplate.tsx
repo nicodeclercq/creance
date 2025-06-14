@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Action, QuickActions } from "../../ui/QuickActions/QuickActions";
 import { useStore } from "../../store/StoreProvider";
 import { useRoute } from "../../hooks/useRoute";
+import * as RecordFP from "fp-ts/Record";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -14,17 +15,52 @@ type EventPageTemplateProps = {
 export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const [_, setEvents] = useStore("events");
+  const [_, setEvent] = useStore(`events.${event._id}`);
+  const [__, setExpenses] = useStore(`expenses`);
+  const [___, setEvents] = useStore(`events`);
 
   const actions: Action[] = event.isClosed
-    ? []
+    ? [
+        {
+          label: t("page.event.list.actions.delete"),
+          icon: "trash",
+          onClick: () => {
+            setExpenses(
+              RecordFP.filter(
+                (expense) => !event.expenses.includes(expense._id)
+              )
+            );
+            setEvents((currentEvents) => {
+              const updatedEvents = { ...currentEvents };
+              delete updatedEvents[event._id];
+              return updatedEvents;
+            });
+            goTo("EVENT_LIST");
+          },
+        },
+        {
+          label: t("page.event.list.actions.unlock"),
+          icon: "unlock",
+          onClick: () => {
+            setEvent((currentEvent) => ({
+              ...currentEvent,
+              isClosed: false,
+            }));
+            goTo("EVENT_LIST");
+          },
+        },
+      ]
     : [
         {
-          label: t("page.event.list.actions.updateUsers"),
-          icon: "user-group",
-          as: "link",
-          to: "SHARES",
-          params: { eventId: event._id },
+          label: t("page.event.list.actions.lock"),
+          icon: "lock",
+          onClick: () => {
+            setEvent((currentEvent) => ({
+              ...currentEvent,
+              isClosed: true,
+            }));
+            goTo("EVENT_LIST");
+          },
         },
         {
           label: t("page.event.list.actions.updateCategories"),
@@ -34,25 +70,18 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           params: { eventId: event._id },
         },
         {
+          label: t("page.event.list.actions.updateUsers"),
+          icon: "user-group",
+          as: "link",
+          to: "SHARES",
+          params: { eventId: event._id },
+        },
+        {
           label: t("page.event.list.actions.addExpense"),
           icon: "shopping-cart",
           as: "link",
           to: "EXPENSE_ADD",
           params: { eventId: event._id },
-        },
-        {
-          label: t("page.event.list.actions.lock"),
-          icon: "lock",
-          onClick: () => {
-            setEvents((events) => ({
-              ...events,
-              [event._id]: {
-                ...event,
-                isClosed: !event.isClosed,
-              },
-            }));
-            goTo("EVENT_LIST");
-          },
         },
       ];
 

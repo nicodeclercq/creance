@@ -1,5 +1,5 @@
 import { Category } from "./Category";
-import { Expense } from "./Expense";
+import { Period } from "./Period";
 
 export type DefaultUserShare = {
   type: "default";
@@ -48,14 +48,10 @@ export type Event = {
   isClosed?: boolean;
   name: string;
   shares: Record<string, UserShare>;
-  period: {
-    start: Date;
-    end: Date;
-    arrival: "AM" | "PM";
-    departure: "AM" | "PM";
-  };
+  period: Period;
   description: string;
-  receivables: Record<string, Expense>;
+  expenses: string[];
   categories: Record<string, Category>;
   participants: string[];
+  updatedAt: Date;
 };

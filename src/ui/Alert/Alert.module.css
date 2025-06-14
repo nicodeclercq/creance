@@ -8,6 +8,7 @@
   color: var(--ui-semantic-color-warning-stronger);
   border-radius: var(--ui-semantic-radius-m);
   border: 0.1rem solid var(--ui-semantic-color-warning-default);
+  font: var(--ui-semantic-font-body-small)
 }
 
 .icon {

@@ -35,7 +35,7 @@ export function DistributionItem({
     receives: right,
   };
 
-  const Container = ({ children }: { children: ReactNode }) =>
+  const Wrapper = ({ children }: { children: ReactNode }) =>
     isCurrentUser ? (
       <Stack gap="s" justifyContent="center" alignItems="center">
         {children}
@@ -48,20 +48,24 @@ export function DistributionItem({
 
   return (
     <Card>
-      <Stack gap="s">
-        <Container>
+      <Stack>
+        <Wrapper>
           <Avatar label={users[userId].name} size={isCurrentUser ? "l" : "m"} />
           <Paragraph>{users[userId].name}</Paragraph>
-        </Container>
+        </Wrapper>
         {(["gives", "receives"] as const).map((array) => (
           <Fragment key={array}>
             {values[array].length > 0 ? (
               <>
-                <Paragraph>
-                  {array === "gives"
-                    ? t("page.distribution.gives")
-                    : t("page.distribution.receives")}
-                </Paragraph>
+                <div style={{ paddingInlineStart: "4rem" }}>
+                  <Paragraph>
+                    <strong>
+                      {array === "gives"
+                        ? t("page.distribution.gives")
+                        : t("page.distribution.receives")}
+                    </strong>
+                  </Paragraph>
+                </div>
                 <ul className={styles.list}>
                   {values[array].map(({ amount, type, user }, index) => (
                     <li key={index} className={styles.item}>

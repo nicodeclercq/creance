@@ -11,7 +11,5 @@ export const isAfter = (a: Date) => (b: Date) => b.getTime() > a.getTime();
 export const isBetween = (start: Date, end: Date) => (c: Date) =>
   isBefore(start)(c) && isAfter(end)(c);
 export const isInInterval =
-  (a: { start: Date; end: Date }) => (b: { start: Date; end: Date }) => {
-    console.log("isInInterval", a, b);
-    return isBefore(a.start)(b.start) && isAfter(a.end)(b.end);
-  };
+  (a: { start: Date; end: Date }) => (b: { start: Date; end: Date }) =>
+    isBefore(a.start)(b.start) && isAfter(a.end)(b.end);

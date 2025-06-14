@@ -197,6 +197,7 @@ export function Container({
             : "100%",
         height,
         display,
+        margin: 0,
         position: computePosition(position),
         padding: computePadding(padding),
         alignItems: computeAlignItems(alignItems),

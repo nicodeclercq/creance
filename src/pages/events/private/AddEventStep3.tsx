@@ -52,6 +52,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
         adult: data.adult,
         children: data.children,
       },
+      updatedAt: new Date(),
     };
     onAdd(newUser);
     reset();

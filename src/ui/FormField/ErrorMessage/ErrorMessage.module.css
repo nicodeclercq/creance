@@ -4,4 +4,5 @@
   align-items: start;
   font: var(--ui-semantic-font-body-small);
   padding-block: var(--ui-semantic-padding-y-xs);
+  color: var(--ui-semantic-color-failure-default);
 }

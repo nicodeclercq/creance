@@ -23,4 +23,5 @@ export type Expense = {
   date: Date;
   share: Share;
   lender: User["_id"];
+  updatedAt: Date;
 };

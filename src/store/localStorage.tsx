@@ -1,8 +1,8 @@
 import * as Either from "fp-ts/Either";
 
+import { DEFAULT_STATE, State } from "./state";
 import { fromState, toState } from "../adapters/json";
 
-import { State } from "./state";
 import { pipe } from "fp-ts/function";
 
 export function synchronizeLocalStorage({
@@ -23,9 +23,11 @@ export function synchronizeLocalStorage({
       }
     }),
     Either.chainW(toState),
-    Either.fold((error) => {
-      console.error("Invalid state in localStorage", error);
-    }, load)
+    Either.getOrElse((error) => {
+      console.error("Failed to load state from localStorage:", error);
+      return DEFAULT_STATE;
+    }),
+    load
   );
 
   onChange((state) => {

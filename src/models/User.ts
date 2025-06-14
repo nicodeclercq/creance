@@ -6,4 +6,5 @@ export type User = {
     adult: number;
     children: number;
   };
+  updatedAt: Date;
 };

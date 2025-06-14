@@ -78,6 +78,7 @@ export const toExpense = (
         amount: data.amount,
         date: data.date,
         share: { type: "default" } as DefaultShare,
+        updatedAt: new Date(),
       });
     case "fixed":
       const fixedDistribution = Object.entries(data.share.fixedUser).reduce(
@@ -109,6 +110,7 @@ export const toExpense = (
             type: "fixed",
             distribution,
           } as FixedShare,
+          updatedAt: new Date(),
         }))
       );
     case "percentage":
@@ -144,6 +146,7 @@ export const toExpense = (
             type: "percentage",
             distribution,
           } as PercentageShare,
+          updatedAt: new Date(),
         }))
       );
   }

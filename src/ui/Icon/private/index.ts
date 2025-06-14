@@ -18,6 +18,7 @@ import { PlusIcon } from "./PlusIcon";
 import { ShoppingCartIcon } from "./ShoppingCartIcon";
 import { ShowIcon } from "./ShowIcon";
 import { TrashIcon } from "./TrashIcon";
+import { UnlockIcon } from "./UnlockIcon";
 import { UserAddIcon } from "./UserAddIcon";
 import { UserGroupIcon } from "./UserGroupIcon";
 import { UserIcon } from "./UserIcon";
@@ -45,6 +46,7 @@ export const ICONS = {
   "shopping-cart": ShoppingCartIcon,
   show: ShowIcon,
   trash: TrashIcon,
+  unlock: UnlockIcon,
   user: UserIcon,
   "user-add": UserAddIcon,
   "user-group": UserGroupIcon,

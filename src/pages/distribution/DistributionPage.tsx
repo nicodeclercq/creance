@@ -17,20 +17,16 @@ import { useTranslation } from "react-i18next";
 export function DistributionPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
-  const [events] = useStore("events");
+  const [currentEvent] = useStore(`events.${eventId}`);
+  const [expenses] = useStore("expenses");
   const [currentUserId] = useStore("currentUserId");
 
-  if (!eventId) {
+  if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
-  const currentEvent = events[eventId];
   const users = useEventUsers(eventId);
 
-  if (!currentEvent) {
-    return <EventNotFoundPage />;
-  }
-
-  if (Object.keys(currentEvent.receivables).length === 0) {
+  if (currentEvent.expenses.length === 0) {
     return (
       <EventPageTemplate event={currentEvent}>
         <EmptyEvent event={currentEvent} />
@@ -39,7 +35,7 @@ export function DistributionPage() {
   }
 
   const distribution = pipe(
-    getEventDistribution(currentEvent, users),
+    getEventDistribution(currentEvent, expenses, users),
     Either.map((dist) => {
       const currentUserDistribution = dist[currentUserId];
       delete dist[currentUserId];

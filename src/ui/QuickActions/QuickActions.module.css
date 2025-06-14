@@ -15,12 +15,17 @@
   border: 0.1rem solid var(--ui-background-default);
 }
 
-
 .actionsWrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   align-items: end;
+  padding: var(--ui-semantic-padding-xs);
+  filter: drop-shadow(0 0 1rem hsl(from var(--ui-background-default) h s l / 1))
+    drop-shadow(0 0 2rem hsl(from var(--ui-background-default) h s l / 0.8))
+    drop-shadow(0 0 4rem hsl(from var(--ui-background-default) h s l / 0.4))
+    drop-shadow(0 0 8rem hsl(from var(--ui-background-default) h s l / 0.2));
 }
 
 .action{

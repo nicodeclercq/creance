@@ -16,19 +16,15 @@ export function AddExpensePage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const { goTo } = useRoute();
-  const [events, setEvents] = useStore("events");
+  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const [_expenses, setExpenses] = useStore("expenses");
   const users = useEventUsers(eventId);
   const [currentUserId] = useStore("currentUserId");
 
-  if (!eventId) {
+  if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
-  const currentEvent = events[eventId];
   const currentUser = users[currentUserId];
-
-  if (!currentEvent) {
-    return <EventNotFoundPage />;
-  }
 
   if (currentEvent.isClosed) {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
@@ -37,15 +33,13 @@ export function AddExpensePage() {
   const defaultCategory = Object.values(currentEvent.categories)[0];
 
   const addExpense = (expense: Expense) => {
-    setEvents((events) => ({
-      ...events,
-      [currentEvent._id]: {
-        ...currentEvent,
-        receivables: {
-          ...currentEvent.receivables,
-          [expense._id]: expense,
-        },
-      },
+    setEvent((event) => ({
+      ...event,
+      expenses: [...event.expenses, expense._id],
+    }));
+    setExpenses((expenses) => ({
+      ...expenses,
+      [expense._id]: expense,
     }));
     goTo(ROUTES.EVENT, { eventId: currentEvent._id });
   };
@@ -82,6 +76,7 @@ export function AddExpensePage() {
                 {} as Record<string, string>
               ),
             },
+            updatedAt: new Date(),
           }}
           submitLabel={t("page.event.add.form.actions.submit")}
           onSubmit={addExpense}

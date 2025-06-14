@@ -14,16 +14,11 @@ import { pipe } from "fp-ts/function";
 import { useTranslation } from "react-i18next";
 
 type PriceEvolutionProps = {
-  event: Event;
   children: string | number;
   total: string | number;
 };
 
-export function PriceEvolution({
-  children,
-  total,
-  event,
-}: PriceEvolutionProps) {
+export function PriceEvolution({ children, total }: PriceEvolutionProps) {
   const { t } = useTranslation();
   const expensesAmount =
     typeof children === "string"
@@ -46,16 +41,6 @@ export function PriceEvolution({
       onLeft={() => <>-</>}
       onRight={({ expensesAmount, participation, difference }) => (
         <Stack gap="s">
-          {!event.isClosed && (
-            <Paragraph
-              styles={{
-                font: "body-smaller",
-                textAlign: "start",
-              }}
-            >
-              {t("component.priceEvolution.difference.warning")}
-            </Paragraph>
-          )}
           <Grid columns={2} gap="s" align="center">
             <Paragraph styles={{ font: "body-large", textAlign: "start" }}>
               {t("component.priceEvolution.participation")}

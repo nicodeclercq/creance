@@ -7,12 +7,12 @@ import { useStore } from "../../store/StoreProvider";
 
 export function EventPage() {
   const { eventId } = useParams();
-  const [events, setEvents] = useStore("events");
+  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const [expenses, setExpenses] = useStore("expenses");
 
   if (!eventId) {
     return <EventNotFoundPage />;
   }
-  const currentEvent = events[eventId];
   const users = useEventUsers(eventId);
 
   if (!currentEvent) {
@@ -20,18 +20,17 @@ export function EventPage() {
   }
 
   const deleteExpense = (expenseId: string) => {
-    setEvents((events) => ({
-      ...events,
-      [currentEvent._id]: {
-        ...currentEvent,
-        receivables: removeFromObject(currentEvent.receivables, expenseId),
-      },
+    setEvent((event) => ({
+      ...event,
+      expenses: event.expenses.filter((expense) => expense !== expenseId),
     }));
+    setExpenses((expenses) => removeFromObject(expenses, expenseId));
   };
 
   return (
     <ExpenseList
       event={currentEvent}
+      expenses={expenses}
       users={users}
       onDeleteExpense={deleteExpense}
     />

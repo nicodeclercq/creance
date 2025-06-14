@@ -53,7 +53,7 @@ export function ExpenseItem({
           <Paragraph styles={{ font: "body-small" }}>{lender.name}</Paragraph>
         </Columns>
       </Stack>
-      <CalendarDate date={expense.date} />
+      <CalendarDate date={expense.date} styles={{ font: "body-smaller" }} />
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}
@@ -69,9 +69,7 @@ export function ExpenseItem({
             {
               icon: "trash",
               label: t("page.event.expenseList.actions.delete"),
-              onClick: () => {
-                console.log("Delete action triggered");
-              },
+              onClick: onDelete,
               confirmation: {
                 title: t(
                   "page.event.expenseList.actions.delete.confirmation.title"

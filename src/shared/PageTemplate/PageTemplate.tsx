@@ -1,9 +1,8 @@
 import { Container } from "../../ui/Container/Container";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Stack } from "../../ui/Stack/Stack";
 import { Columns } from "../../ui/Columns/Columns";
 import { Heading } from "../../ui/Heading/Heading";
-import { useStore } from "../../store/StoreProvider";
 import type { IconButtonProps, AsLink } from "../../ui/IconButton/IconButton";
 import { IconButton } from "../../ui/IconButton/IconButton";
 import { Menu, MenuProps } from "./Menu/Menu";
@@ -18,15 +17,9 @@ type PageTemplateProps = {
 export function PageTemplate({
   leftAction,
   children,
-  title: providedTitle,
+  title,
   menu,
 }: PageTemplateProps) {
-  const [title, setTitle] = useStore("layout.pageTitle");
-
-  useEffect(() => {
-    setTitle(() => providedTitle);
-  }, [setTitle, providedTitle]);
-
   return (
     <Stack>
       <Container

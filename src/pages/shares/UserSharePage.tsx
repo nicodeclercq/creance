@@ -13,20 +13,16 @@ import { useTranslation } from "react-i18next";
 export function UserSharePage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const [events, setEvents] = useStore("events");
   const { eventId, shareId } = useParams();
+  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
   const users = useEventUsers(eventId);
 
-  if (!eventId) {
+  if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 
-  const currentEvent = events[eventId];
   const currentUser = users[shareId ?? ""];
 
-  if (!currentEvent) {
-    return <EventNotFoundPage />;
-  }
   if (!shareId || !currentUser) {
     return <ShareNotFoundPage eventId={currentEvent._id} />;
   }
@@ -38,14 +34,11 @@ export function UserSharePage() {
   const share = currentEvent.shares[shareId];
 
   const saveShare = (data: UserShare) => {
-    setEvents((events) => ({
-      ...events,
-      [eventId]: {
-        ...currentEvent,
-        shares: {
-          ...currentEvent.shares,
-          [shareId]: data,
-        },
+    setEvent((event) => ({
+      ...event,
+      shares: {
+        ...currentEvent.shares,
+        [shareId]: data,
       },
     }));
     goTo("SHARES", { eventId: currentEvent._id });

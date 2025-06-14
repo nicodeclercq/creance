@@ -13,15 +13,9 @@ export function CategoriesPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const { goTo } = useRoute();
-  const [events, setEvents] = useStore("events");
+  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
 
-  if (!eventId) {
-    return <EventNotFoundPage />;
-  }
-
-  const currentEvent = events[eventId];
-
-  if (!currentEvent) {
+  if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 
@@ -30,15 +24,12 @@ export function CategoriesPage() {
   }
 
   const updateCategories = (categories: Category[]) => {
-    setEvents((events) => ({
-      ...events,
-      [currentEvent._id]: {
-        ...currentEvent,
-        categories: categories.reduce((acc, category) => {
-          acc[category._id] = category;
-          return acc;
-        }, {} as Record<string, Category>),
-      },
+    setEvent((event) => ({
+      ...event,
+      categories: categories.reduce((acc, category) => {
+        acc[category._id] = category;
+        return acc;
+      }, {} as Record<string, Category>),
     }));
     goTo("EVENT", { eventId: currentEvent._id });
   };

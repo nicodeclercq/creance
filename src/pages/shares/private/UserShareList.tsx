@@ -8,6 +8,7 @@ import {
   getUserTotalExpenseAmount,
 } from "../../../service/calculation";
 
+import { Alert } from "../../../ui/Alert/Alert";
 import { Card } from "../../../ui/Card/Card";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
 import { Columns } from "../../../ui/Columns/Columns";
@@ -15,6 +16,7 @@ import { Container } from "../../../ui/Container/Container";
 import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
 import { Divider } from "../../../ui/Divider/Divider";
 import { Event } from "../../../models/Event";
+import { Expense } from "../../../models/Expense";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { PieChart } from "../../../ui/Pie/PieChart";
 import { Price } from "../../../ui/Price/Price";
@@ -29,43 +31,58 @@ import { useTranslation } from "react-i18next";
 
 type UserShareListProps = {
   event: Event;
+  expenses: Record<string, Expense>;
   users: Record<string, User>;
   currentUserId: string;
 };
 
 export function UserShareList({
   event,
+  expenses,
   users,
   currentUserId,
 }: UserShareListProps) {
   const { t } = useTranslation();
   const [userId, setUserId] = useState<string>(currentUserId);
 
-  const expenses = getEventSharesByUser({
+  const eventSharesByUser = getEventSharesByUser({
     event,
+    expenses,
     users,
     userId,
   });
 
   const sharesByCategory = getEventSharesByUserAndCategory({
-    shares: expenses,
+    shares: eventSharesByUser,
   });
 
   const total = pipe(
-    expenses,
+    eventSharesByUser,
     Either.map((expenses) =>
       expenses.reduce((sum, expense) => sum + expense.share, 0)
     )
   );
 
-  const totalExpenseAmount = getUserTotalExpenseAmount({ event, userId });
+  const totalExpenseAmount = getUserTotalExpenseAmount({
+    event,
+    expenses,
+    userId,
+  });
 
   return (
     <EitherComponent
-      data={sequence({ expenses, total, sharesByCategory, totalExpenseAmount })}
+      data={sequence({
+        expenses: eventSharesByUser,
+        total,
+        sharesByCategory,
+        totalExpenseAmount,
+      })}
       onLeft={() => <Paragraph>{t("page.usershare.error")}</Paragraph>}
       onRight={({ expenses, total, sharesByCategory, totalExpenseAmount }) => (
         <Stack gap="m" justifyContent="stretch">
+          {!event.isClosed && (
+            <Alert>{t("component.priceEvolution.difference.warning")}</Alert>
+          )}
           <Select
             label={t("page.usershare.select.label")}
             onChange={(value) => setUserId(value)}
@@ -102,7 +119,7 @@ export function UserShareList({
               />
               <Divider />
               <Container styles={{ textAlign: "end" }}>
-                <PriceEvolution event={event} total={total}>
+                <PriceEvolution total={total}>
                   {totalExpenseAmount}
                 </PriceEvolution>
               </Container>

@@ -18,6 +18,7 @@ type CommonProps = {
 
 export type AsLink = {
   as: "link";
+  type?: undefined;
   to: RouteName;
   params?: Record<string, string | number>;
 };

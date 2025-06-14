@@ -15,8 +15,8 @@ export function LoadingIcon({ size }: LoadingIconProps) {
   return (
     <svg
       className={styles.loader}
-      width={size ? `calc(0.8rem * ${factor[size]})` : "1em"}
-      height={size ? `calc(0.8rem * ${factor[size]})` : "1em"}
+      width={size ? `${0.8 * factor[size]}rem` : "1em"}
+      height={size ? `${0.8 * factor[size]}rem` : "1em"}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

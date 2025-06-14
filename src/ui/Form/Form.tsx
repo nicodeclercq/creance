@@ -53,9 +53,18 @@ export function Form<TFieldValues extends FieldValues, TTransformedValues>({
           </div>
         )}
         <div className={styles.formActions}>
-          {cancel && <Button {...cancel} variant="secondary" />}
+          {cancel && (
+            <Button
+              {...cancel}
+              type={
+                (cancel.as === "button" ? "button" : undefined) as undefined
+              }
+              variant="secondary"
+            />
+          )}
           <Button
             {...submit}
+            type="submit"
             variant="primary"
             isLoading={isLoading}
             isDisabled={hasError}

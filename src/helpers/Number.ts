@@ -63,7 +63,8 @@ export function calculationAsNumber(
 ): Either.Either<Error, number> {
   try {
     const withoutUnknownChars = value.replace(/[^0-9.,+*-/]/g, "");
-    const cents = decimalToCent(withoutUnknownChars);
+    const withoutTrailingZeros = withoutUnknownChars.replace(/^0+/g, "");
+    const cents = decimalToCent(withoutTrailingZeros);
     const result = eval(cents);
     if (isNaN(result)) {
       console.error("Invalid calculation:", { value, result, cents });
@@ -80,7 +81,10 @@ export function asNumber(value: string): number {
   return pipe(
     value,
     calculationAsNumber,
-    Either.getOrElse(() => NaN)
+    Either.getOrElse(() => {
+      console.warn("Invalid calculation, returning NaN", value);
+      return NaN;
+    })
   );
 }
 

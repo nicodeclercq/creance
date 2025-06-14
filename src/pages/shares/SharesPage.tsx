@@ -12,14 +12,9 @@ export function SharesPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const users = useEventUsers(eventId);
-  const [events] = useStore("events");
+  const [currentEvent] = useStore(`events.${eventId}`);
 
-  if (!eventId) {
-    return <EventNotFoundPage />;
-  }
-
-  const currentEvent = events[eventId];
-  if (!currentEvent) {
+  if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 

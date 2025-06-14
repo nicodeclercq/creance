@@ -89,8 +89,7 @@
   --ui-semantic-color-warning-default: var(--ui-primitive-orange-400);
   --ui-semantic-color-warning-strong: var(--ui-primitive-orange-300);
   --ui-semantic-color-warning-stronger: var(--ui-primitive-orange-200);
-  
-  
+    
   --ui-semantic-radius-round: 9999999rem;
   --ui-semantic-radius-s: 0.2rem;
   --ui-semantic-radius-m: 0.4rem;
@@ -119,7 +118,6 @@
   --ui-semantic-gap-xl: var(--ui-primitive-spacing-xxl);
 
   --ui-semantic-borderWeight: 0.1rem;
-
 
   --ui-border-default: var(--ui-semantic-borderWeight) solid var(--ui-primitive-grey-800);
   --ui-background-body: var(--ui-primitive-grey-900);

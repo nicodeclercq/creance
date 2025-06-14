@@ -65,6 +65,10 @@ export const ROUTES_DEFINITION = {
     path: "/events/:eventId/distribution",
     component: DistributionPage,
   },
+  JOIN: {
+    path: "/join/:eventId/:shareId",
+    component: () => <h1>Join event</h1>,
+  },
   // TECH
   ICONS: {
     path: "/icons",

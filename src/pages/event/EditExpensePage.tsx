@@ -16,16 +16,11 @@ export function EditExpensePage() {
   const { t } = useTranslation();
   const { eventId, expenseId } = useParams();
   const { goTo } = useRoute();
-  const [events, setEvents] = useStore("events");
+  const [currentEvent] = useStore(`events.${eventId}`);
+  const [currentExpense, setExpense] = useStore(`expenses.${expenseId}`);
   const users = useEventUsers(eventId);
 
-  if (!eventId) {
-    return <EventNotFoundPage />;
-  }
-
-  const currentEvent = events[eventId];
-
-  if (!currentEvent) {
+  if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 
@@ -33,23 +28,18 @@ export function EditExpensePage() {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
   }
 
-  if (!expenseId || !currentEvent.receivables[expenseId]) {
+  if (
+    !expenseId ||
+    !currentEvent.expenses.includes(expenseId) ||
+    !currentExpense
+  ) {
     return <>Expense not found</>;
   }
 
-  const defaultValues = fromExpense(currentEvent.receivables[expenseId], users);
+  const defaultValues = fromExpense(currentExpense, users);
 
   const editExpense = (expense: Expense) => {
-    setEvents((events) => ({
-      ...events,
-      [currentEvent._id]: {
-        ...currentEvent,
-        receivables: {
-          ...currentEvent.receivables,
-          [expenseId]: expense,
-        },
-      },
-    }));
+    setExpense(() => expense);
     goTo(ROUTES.EVENT, { eventId: currentEvent._id });
   };
 

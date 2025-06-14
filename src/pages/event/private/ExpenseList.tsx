@@ -3,6 +3,7 @@ import { Card } from "../../../ui/Card/Card";
 import { EmptyEvent } from "../EmptyEvent";
 import { Event } from "../../../models/Event";
 import { EventPageTemplate } from "../../../shared/PageTemplate/EventPageTemplate";
+import { Expense } from "../../../models/Expense";
 import { ExpenseItem } from "./ExpenseItem";
 import { Stack } from "../../../ui/Stack/Stack";
 import { TotalAmount } from "./TotalAmount";
@@ -11,13 +12,21 @@ import { useTranslation } from "react-i18next";
 
 type Props = {
   event: Event;
+  expenses: Record<string, Expense>;
   users: Record<string, User>;
   onDeleteExpense: (expenseId: string) => void;
 };
 
-export function ExpenseList({ event, users, onDeleteExpense }: Props) {
+export function ExpenseList({
+  event,
+  users,
+  expenses: expensesCollection,
+  onDeleteExpense,
+}: Props) {
   const { t } = useTranslation();
-  const expenses = Object.values(event.receivables);
+  const expenses = event.expenses
+    .map((id) => expensesCollection[id])
+    .filter(Boolean);
 
   const deleteExpense = (expenseId: string) => () => {
     onDeleteExpense(expenseId);

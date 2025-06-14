@@ -10,6 +10,7 @@ import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
 import { CategoryIconName } from "../../../ui/CategoryIcon/private";
 import { Columns } from "../../../ui/Columns/Columns";
 import { DistributiveOmit } from "../../../helpers/DistributiveOmit";
+import { ErrorMessage } from "../../../ui/FormField/ErrorMessage/ErrorMessage";
 import { Event } from "../../../models/Event";
 import { Expense } from "../../../models/Expense";
 import { Form } from "../../../ui/Form/Form";
@@ -41,11 +42,51 @@ export function ExpenseForm({
 }: Props) {
   const { t } = useTranslation();
 
-  const { control, handleSubmit, formState, setError, watch } =
-    useForm<FormExpense>({
-      defaultValues,
-      mode: "onChange",
-    });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setError,
+    watch,
+    trigger,
+  } = useForm<FormExpense>({
+    defaultValues,
+    mode: "onChange",
+    resolver: (data) => {
+      const errors: Record<string, { message: string }> = {};
+
+      if (data.share.type === "percentage") {
+        const sum = Object.values(data.share.percentageUser).reduce(
+          (acc, val) => acc + asNumber(val),
+          0
+        );
+
+        if (sum === 0) {
+          errors.share = {
+            message: t(
+              "page.event.add.form.field.share.percentage.validation.sum"
+            ),
+          };
+        }
+      } else if (data.share.type === "fixed") {
+        const sum = Object.values(data.share.fixedUser).reduce(
+          (acc, val) => acc + asNumber(val),
+          0
+        );
+
+        if (sum !== asNumber(data.amount)) {
+          errors.share = {
+            message: t("page.event.add.form.field.share.fixed.validation.sum", {
+              sum,
+              amount: data.amount,
+            }),
+          };
+        }
+      }
+
+      return { values: data, errors };
+    },
+  });
 
   const submit = (data: FormExpense) => {
     const expense = toExpense(data, setError, t);
@@ -56,10 +97,9 @@ export function ExpenseForm({
     onSubmit(expense.right);
   };
 
-  const hasError = Object.keys(formState.errors).length > 0;
+  const hasError = Object.keys(errors).length > 0;
 
   const currentType = watch("share.type");
-  console.log("defaultValues", defaultValues);
 
   return (
     <Form
@@ -74,7 +114,6 @@ export function ExpenseForm({
       <Controller
         name="lender"
         control={control}
-        rules={{ required: true }}
         render={({ field: { value, onChange } }) => (
           <Select
             label={t("page.event.add.form.field.lender.label")}
@@ -94,7 +133,6 @@ export function ExpenseForm({
       <Controller
         name="category"
         control={control}
-        rules={{ required: true }}
         render={({ field: { value, onChange } }) => (
           <Select
             label={t("page.event.add.form.field.category.label")}
@@ -231,12 +269,22 @@ export function ExpenseForm({
             key={user._id}
             name={`share.percentageUser.${user._id}`}
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            rules={{
+              required: true,
+              validate: (value) => {
+                const result = asNumber(value);
+                if (result < 0) {
+                  return t(
+                    "page.event.add.form.field.share.percentage.validation.positive"
+                  );
+                }
+              },
+            }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Columns gap="m">
                 <Columns align="center" gap="s" styles={{ flexGrow: true }}>
                   <Avatar label={user.name} />
-                  <p>{user.name}</p>
+                  <Paragraph>{user.name}</Paragraph>
                 </Columns>
                 <InputNumber
                   as="string"
@@ -246,7 +294,11 @@ export function ExpenseForm({
                   )}
                   value={value}
                   isRequired
-                  onChange={onChange}
+                  onChange={(v) => {
+                    onChange(v);
+                    trigger("share");
+                  }}
+                  error={error?.message}
                 />
               </Columns>
             )}
@@ -258,12 +310,22 @@ export function ExpenseForm({
             key={user._id}
             name={`share.fixedUser.${user._id}`}
             control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
+            rules={{
+              required: true,
+              validate: (value) => {
+                const result = asNumber(value);
+                if (result < 0) {
+                  return t(
+                    "page.event.add.form.field.share.fixed.validation.positive"
+                  );
+                }
+              },
+            }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Columns gap="m">
                 <Columns align="center" gap="s" styles={{ flexGrow: true }}>
                   <Avatar label={user.name} />
-                  <p>{user.name}</p>
+                  <Paragraph>{user.name}</Paragraph>
                 </Columns>
                 <InputNumber
                   as="string"
@@ -274,12 +336,17 @@ export function ExpenseForm({
                   )}
                   value={value}
                   isRequired
-                  onChange={onChange}
+                  onChange={(v) => {
+                    onChange(v);
+                    trigger("share");
+                  }}
+                  error={error?.message}
                 />
               </Columns>
             )}
           />
         ))}
+      {errors.share?.message && <ErrorMessage message={errors.share.message} />}
     </Form>
   );
 }
