@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { type AsLink } from "../../ui/Button/Button";
+import type { AsButton, AsLink } from "../../ui/IconButton/IconButton";
 import { Columns } from "../../ui/Columns/Columns";
 import { Container } from "../../ui/Container/Container";
 import { Heading } from "../../ui/Heading/Heading";
@@ -10,7 +10,9 @@ import {
 import { Menu, type MenuProps } from "../../ui/Menu/Menu";
 
 export type HeaderProps = {
-  leftAction?: Omit<IconButtonProps<AsLink>, "variant">;
+  leftAction?:
+    | Omit<IconButtonProps<AsLink>, "variant">
+    | Omit<IconButtonProps<AsButton>, "variant">;
   title: string;
   rightActions?: MenuProps["actions"];
 };
