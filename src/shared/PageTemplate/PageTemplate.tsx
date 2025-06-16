@@ -1,44 +1,39 @@
 import { Container } from "../../ui/Container/Container";
 import { type ReactNode } from "react";
 import { Stack } from "../../ui/Stack/Stack";
-import { Columns } from "../../ui/Columns/Columns";
-import { Heading } from "../../ui/Heading/Heading";
-import type { IconButtonProps, AsLink } from "../../ui/IconButton/IconButton";
-import { IconButton } from "../../ui/IconButton/IconButton";
+import type {
+  IconButtonProps,
+  AsLink,
+  AsButton,
+} from "../../ui/IconButton/IconButton";
+
 import { Menu, MenuProps } from "./Menu/Menu";
+import { Header, HeaderProps } from "./Header";
 
 type PageTemplateProps = {
   title: string;
   children: ReactNode;
-  leftAction?: Omit<IconButtonProps<AsLink>, "variant">;
+  leftAction?:
+    | Omit<IconButtonProps<AsLink>, "variant">
+    | Omit<IconButtonProps<AsButton>, "variant">;
+  rightActions?: HeaderProps["rightActions"];
   menu?: MenuProps["actions"];
 };
 
 export function PageTemplate({
   leftAction,
+  rightActions,
   children,
   title,
   menu,
 }: PageTemplateProps) {
   return (
     <Stack>
-      <Container
-        styles={{
-          padding: "m",
-          background: "inverted",
-          color: "inverted",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        <Columns gap="s" styles={{ background: "transparent" }} align="center">
-          {leftAction && <IconButton {...leftAction} variant="primary" />}
-          <Heading styles={{ font: "body-large", color: "inverted" }}>
-            {title}
-          </Heading>
-        </Columns>
-      </Container>
+      <Header
+        leftAction={leftAction}
+        title={title}
+        rightActions={rightActions}
+      />
       {menu && <Menu actions={menu} />}
       <Container styles={{ padding: "m", background: "transparent" }}>
         {children}

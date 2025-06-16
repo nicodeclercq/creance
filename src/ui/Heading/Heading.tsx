@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
 type ParagraphProps = {
   children: ReactNode;
   level?: 1 | 2 | 3 | 4 | 5 | 6;
-  styles?: ContainerStyles<TypographyStyles>;
+  styles?: ContainerStyles<TypographyStyles | "flexGrow">;
 };
 
 export function Heading({ styles = {}, level = 1, children }: ParagraphProps) {

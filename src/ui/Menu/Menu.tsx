@@ -22,20 +22,26 @@ type Action =
       confirmation?: DistributiveOmit<ConfirmProps, "action">;
     });
 
-type MenuProps = {
+export type MenuProps = {
   label: string;
+  variant?: "primary" | "secondary" | "tertiary";
   icon?: IconName;
   actions: Action[];
 };
 
-export function Menu({ label, icon = "menu", actions }: MenuProps) {
+export function Menu({
+  label,
+  icon = "menu",
+  variant = "tertiary",
+  actions,
+}: MenuProps) {
   return (
     <DialogTrigger>
       <Button
         className={classNames(
           buttonStyles.button,
           iconButtonStyles.button,
-          buttonStyles["hasVariant-tertiary"]
+          buttonStyles[`hasVariant-${variant}`]
         )}
         aria-label={label}
       >

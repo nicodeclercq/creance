@@ -14,6 +14,7 @@ import { EventUserSharePage } from "./pages/shares/EventUserSharePage";
 import { DistributionPage } from "./pages/distribution/DistributionPage";
 import { ValueOf } from "./utils/object";
 import { LoginPage } from "./pages/auth/LoginPage";
+import { InformationPage } from "./pages/settinhgs/InformationPage";
 
 export const ROUTES_DEFINITION = {
   ROOT: {
@@ -23,6 +24,11 @@ export const ROUTES_DEFINITION = {
   LOGIN: {
     path: "/login",
     component: LoginPage,
+    isPublic: true,
+  },
+  INFORMATION: {
+    path: "/information",
+    component: InformationPage,
     isPublic: true,
   },
   EVENT_LIST: {

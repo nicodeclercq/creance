@@ -4,6 +4,7 @@ import { EmptyEventList } from "./EmptyEventList";
 import { Event } from "../../models/Event";
 import { EventItem } from "./EventItem/EventItem";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
+import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
 import { User } from "../../models/User";
 import { useTranslation } from "react-i18next";
@@ -17,7 +18,17 @@ export function EventList({ events, users }: EventListProps) {
   const { t } = useTranslation();
 
   return (
-    <PageTemplate title={t("page.events.list.title")}>
+    <PageTemplate
+      title={t("page.events.list.title")}
+      rightActions={[
+        {
+          as: "link",
+          label: t("page.information.title"),
+          icon: "user",
+          to: ROUTES.INFORMATION,
+        },
+      ]}
+    >
       {events.length === 0 ? (
         <EmptyEventList />
       ) : (

@@ -6,6 +6,7 @@ import { Action, QuickActions } from "../../ui/QuickActions/QuickActions";
 import { useStore } from "../../store/StoreProvider";
 import { useRoute } from "../../hooks/useRoute";
 import * as RecordFP from "fp-ts/Record";
+import { ROUTES } from "../../routes";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -94,6 +95,14 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
         label: t("page.event.list.actions.backToList"),
         icon: "chevron-left",
       }}
+      rightActions={[
+        {
+          as: "link",
+          label: t("page.information.title"),
+          icon: "user",
+          to: ROUTES.INFORMATION,
+        },
+      ]}
       menu={[
         {
           label: t("page.menu.expenses"),
