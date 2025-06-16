@@ -10,6 +10,7 @@ import { PigImage } from "../../ui/Pig";
 import { Redirect } from "../../Redirect";
 import { Stack } from "../../ui/Stack/Stack";
 import { loginUser } from "../../service/firebase";
+import styles from "./LoginPage.module.css";
 import { useAuthentication } from "../../hooks/useAnthentication";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
@@ -49,24 +50,7 @@ export function LoginPage() {
       }}
     >
       <Stack alignItems="center" gap="m">
-        <div
-          style={{
-            position: "relative",
-            color: "#fff",
-            top: "4rem",
-            aspectRatio: "1 / 1",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-            borderRadius: "var(--ui-semantic-radius-round)",
-            backgroundColor: "var(--ui-semantic-color-primary-stronger)",
-            zIndex: 1,
-            border: "0.5rem solid #fff",
-            boxShadow: "var(--ui-semantic-shadow-l)",
-            maxWidth: "12rem",
-          }}
-        >
+        <div className={styles.pigContainer}>
           <PigImage width="25vw" />
         </div>
         <Card padding="m" styles={{ maxWidth: "40rem" }}>
