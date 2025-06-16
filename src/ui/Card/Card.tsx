@@ -7,7 +7,7 @@ type CardProps = {
   as?: "div" | "li";
   padding?: ContainerStyles["padding"];
   isInteractive?: boolean;
-  styles?: ContainerStyles<"padding" | "position">;
+  styles?: ContainerStyles<"padding" | "position" | "maxWidth">;
 };
 
 export function Card({
@@ -15,11 +15,13 @@ export function Card({
   as = "div",
   padding = "m",
   isInteractive = false,
+  styles = {},
 }: CardProps) {
   return (
     <Container
       as={as}
       styles={{
+        ...styles,
         display: "block",
         background: "default",
         position: "relative",

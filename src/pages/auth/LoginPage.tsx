@@ -64,11 +64,12 @@ export function LoginPage() {
             zIndex: 1,
             border: "0.5rem solid #fff",
             boxShadow: "var(--ui-semantic-shadow-l)",
+            maxWidth: "12rem",
           }}
         >
           <PigImage width="25vw" />
         </div>
-        <Card padding="m">
+        <Card padding="m" styles={{ maxWidth: "40rem" }}>
           <Form
             hasError={hasError}
             handleSubmit={handleSubmit}

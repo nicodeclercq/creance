@@ -68,7 +68,11 @@ type Styles = {
   overflow?: "hidden" | "auto" | "scroll" | "visible";
   zIndex?: number;
   width?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
+  maxWidth?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
+  minWidth?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
   height?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
+  minHeight?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
+  maxHeight?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
 };
 
 export type LayoutStyles = "display" | "padding" | "flexGrow";
@@ -179,6 +183,10 @@ export function Container({
     top,
     zIndex,
     width,
+    minWidth,
+    maxWidth,
+    minHeight,
+    maxHeight,
     height,
     ...styles
   } = providedStyles;
@@ -188,6 +196,8 @@ export function Container({
       className={computeStyles(styles)}
       style={{
         cursor,
+        minWidth,
+        maxWidth,
         width:
           width ??
           (display ?? Component === "div" ? "block" : "inline")?.startsWith(
@@ -196,6 +206,8 @@ export function Container({
             ? undefined
             : "100%",
         height,
+        minHeight,
+        maxHeight,
         display,
         margin: 0,
         position: computePosition(position),

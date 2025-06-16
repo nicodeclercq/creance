@@ -14,7 +14,7 @@ type MergeDiff<Data> = {
   remote: Diff<Data>;
 };
 
-const lastUpdate = {
+export const lastUpdate = {
   get: (collectionName: string) => {
     const model = z
       .string()

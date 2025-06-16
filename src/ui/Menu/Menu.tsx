@@ -11,7 +11,7 @@ import { Stack } from "../Stack/Stack";
 import { Columns } from "../Columns/Columns";
 import { Link } from "react-router-dom";
 import { getPath } from "../../routes";
-import { Confirm, ConfirmProps } from "../Confirm/Confirm";
+import { ConfirmButton, ConfirmProps } from "../ConfirmButton/ConfirmButton";
 
 type Action =
   | (DistributiveOmit<ButtonProps<AsLink>, "icon"> & {
@@ -72,7 +72,7 @@ export function Menu({
                   {content}
                 </Link>
               ) : action.confirmation ? (
-                <Confirm
+                <ConfirmButton
                   key={label}
                   {...action.confirmation}
                   action={{
@@ -82,7 +82,6 @@ export function Menu({
                       position: "end",
                     },
                     label,
-                    onClick: action.onClick,
                   }}
                 />
               ) : (

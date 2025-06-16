@@ -13,10 +13,10 @@ import { Paragraph } from "../Paragraph/Paragraph";
 import { Stack } from "../Stack/Stack";
 import buttonStyles from "../Button/Button.module.css";
 import classNames from "classnames";
-import styles from "./Confirm.module.css";
+import styles from "./ConfirmButton.module.css";
 
 export type ConfirmProps = {
-  action: ButtonProps<AsButton> & { className?: string };
+  action: Omit<ButtonProps<AsButton>, "onClick"> & { className?: string };
   title: string;
   description?: string;
   cancel?: {
@@ -29,7 +29,7 @@ export type ConfirmProps = {
   };
 };
 
-export function Confirm({
+export function ConfirmButton({
   action,
   title,
   description,
@@ -38,7 +38,14 @@ export function Confirm({
 }: ConfirmProps) {
   return (
     <DialogTrigger>
-      <Button {...action} onClick={undefined}>
+      <Button
+        {...action}
+        className={classNames(
+          buttonStyles.button,
+          buttonStyles[`hasVariant-${action.variant}`]
+        )}
+        onClick={undefined}
+      >
         <Columns align="center" gap="s" styles={{ background: "transparent" }}>
           <span>{action.label}</span>
           {action.icon && <Icon name={action.icon.name} size="m" />}

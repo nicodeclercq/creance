@@ -1,18 +1,44 @@
 import { Avatar } from "../../ui/Avatar/Avatar";
+import { COLLECTIONS } from "../../service/firebase";
 import { Card } from "../../ui/Card/Card";
+import { Columns } from "../../ui/Columns/Columns";
+import { ConfirmButton } from "../../ui/ConfirmButton/ConfirmButton";
+import { DateFormatter } from "../../ui/DateFormatter/DateFormatter";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { Stack } from "../../ui/Stack/Stack";
+import { lastUpdate } from "../../service/synchronize";
+import { resetStore } from "../../store/reset";
 import { useRoute } from "../../hooks/useRoute";
 import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
+function Item({ label, date }: { label: string; date: Date }) {
+  return (
+    <Columns wrap gap="s" align="baseline">
+      <Paragraph>{label}</Paragraph>
+      <DateFormatter
+        format="medium"
+        withTime
+        styles={{ font: "body-small", color: "neutral-weak" }}
+      >
+        {date}
+      </DateFormatter>
+    </Columns>
+  );
+}
+
 export function InformationPage() {
   const { t } = useTranslation();
-  const { back } = useRoute();
+  const { goTo, back } = useRoute();
 
   const [currentUserId] = useStore("currentUserId");
   const [users] = useStore("users");
+
+  const reset = () => {
+    goTo("ROOT");
+    resetStore();
+  };
 
   const currentUser = users[currentUserId];
 
@@ -41,9 +67,44 @@ export function InformationPage() {
             ) : (
               <Paragraph>{t("page.information.noUser")}</Paragraph>
             )}
-            <Paragraph styles={{ font: "body-smaller" }}>
+            <Paragraph styles={{ font: "body-smaller", color: "neutral-weak" }}>
               {currentUserId}
             </Paragraph>
+          </Stack>
+        </Card>
+        <Card>
+          <Stack gap="s">
+            <Paragraph styles={{ font: "body-large" }}>
+              {t("page.information.synchronization")}
+            </Paragraph>
+            <Item
+              label={COLLECTIONS.USERS}
+              date={lastUpdate.get(COLLECTIONS.USERS)}
+            />
+            <Item
+              label={COLLECTIONS.EVENTS}
+              date={lastUpdate.get(COLLECTIONS.EVENTS)}
+            />
+            <Item
+              label={COLLECTIONS.EXPENSES}
+              date={lastUpdate.get(COLLECTIONS.EXPENSES)}
+            />
+            <ConfirmButton
+              title={t("page.information.clear.confirmation.title")}
+              description={t("page.information.clear.confirmation.description")}
+              confirm={{
+                label: t("page.information.clear.confirmation.delete"),
+                onClick: reset,
+              }}
+              cancel={{
+                label: t("page.information.clear.confirmation.cancel"),
+              }}
+              action={{
+                label: t("page.information.actions.clear"),
+                icon: { name: "trash", position: "end" },
+                variant: "secondary",
+              }}
+            />
           </Stack>
         </Card>
       </Stack>

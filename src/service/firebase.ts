@@ -31,7 +31,7 @@ import { synchronize } from "./synchronize";
 
 type Schema<Data> = ZodSchema<Data, any, any>;
 
-const COLLECTIONS = {
+export const COLLECTIONS = {
   EVENTS: "events",
   EXPENSES: "expenses",
   USERS: "users",
@@ -171,6 +171,14 @@ export function loginUser({
           new Error(`Failed to create user: ${errorCode} - ${errorMessage}`)
         );
       });
+}
+
+export function logoutUser() {
+  auth.signOut().then(() => {
+    Object.values(COLLECTIONS).forEach((collectionName) => {
+      localStorage.getItem(`lastUpdate_${collectionName}`);
+    });
+  });
 }
 
 function save<Data extends { _id: string }>({
