@@ -43,8 +43,21 @@ type Font =
 
 type GridTemplate = string[] | number;
 
-type AlignItems = "default" | "center" | "start" | "end" | "baseline";
-type JustifyContent = "default" | "center" | "start" | "end";
+type AlignItems =
+  | "default"
+  | "center"
+  | "start"
+  | "end"
+  | "baseline"
+  | "stretch";
+type JustifyContent =
+  | "default"
+  | "center"
+  | "start"
+  | "end"
+  | "stretch"
+  | "space-between"
+  | "space-around";
 type TextAlign = "default" | "start" | "center" | "end";
 type Radius = "none" | "s" | "m" | "l" | "round";
 type Styles = {
@@ -61,6 +74,7 @@ type Styles = {
   alignItems?: AlignItems;
   justifyContent?: JustifyContent;
   textAlign?: TextAlign;
+  flexDirection?: "row" | "column";
   flexGrow?: boolean;
   flexWrap?: boolean;
   radius?: Radius;
@@ -165,6 +179,7 @@ export function Container({
 }: ContainerProps) {
   const {
     display,
+    flexDirection,
     position,
     gridTemplateColumns,
     color,
@@ -196,6 +211,7 @@ export function Container({
       className={computeStyles(styles)}
       style={{
         cursor,
+        flexDirection,
         minWidth,
         maxWidth,
         width:

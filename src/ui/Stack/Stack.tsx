@@ -1,11 +1,6 @@
-import {
-  ContainerStyles,
-  computeGap,
-  computePadding,
-} from "../Container/Container";
+import { Container, ContainerStyles } from "../Container/Container";
 
 import type { ReactNode } from "react";
-import styles from "./Stack.module.css";
 
 type StackProps = {
   children: ReactNode;
@@ -20,30 +15,36 @@ type StackProps = {
     | "stretch";
   gap?: ContainerStyles["gap"];
   padding?: ContainerStyles["padding"];
-  width?: "auto" | `${number}%` | `${number}vw`;
+  width?: ContainerStyles["width"];
+  styles?: ContainerStyles<"background" | "color" | "zIndex">;
 };
 
 export function Stack({
   children,
-  as: Component = "div",
+  as,
   alignItems = "start",
   justifyContent = "start",
   gap = "none",
   padding = "none",
   width = "100%",
+  styles,
 }: StackProps) {
   return (
-    <Component
-      className={styles.stack}
-      style={{
+    <Container
+      as={as}
+      styles={{
+        background: "transparent",
+        ...styles,
+        display: "flex",
+        flexDirection: "column",
         alignItems,
         justifyContent,
-        gap: computeGap(gap),
-        padding: computePadding(padding),
+        gap,
+        padding,
         width,
       }}
     >
       {children}
-    </Component>
+    </Container>
   );
 }

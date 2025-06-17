@@ -62,7 +62,11 @@ export function LoginPage() {
               onClick: submit,
             }}
           >
-            <Stack gap="m" alignItems="stretch">
+            <Stack
+              gap="m"
+              alignItems="stretch"
+              styles={{ background: "default", zIndex: 1 }}
+            >
               <Heading level={1} styles={{ font: "body-larger" }}>
                 {t("page.login.title")}
               </Heading>

@@ -145,6 +145,10 @@ body {
   color: var(--ui-semantic-color-neutral-default);
   background: var(--ui-background-body);
 }
+ul,li, p, h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
 :is(input, button, textarea, a, select, [role="button"]):focus {
     outline: none;
     box-shadow: var(--ui-shadow-focus);

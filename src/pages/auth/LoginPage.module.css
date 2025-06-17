@@ -15,20 +15,15 @@
   max-width: 12rem;
 }
 .pigContainer:active{
-  animation: forwards pigAnimation 1s ease-in-out;
+  animation: forwards infinite pigAnimation 1.25s linear(0 0%, 0.392 36.37%, 0.424 53.97%, 0.492 58.37%, 0.496 73.17%, 1 100%)
 }
 
 @keyframes pigAnimation {
-  0% {
-    transform: translateY(-20rem) rotate(180deg);
-  }
-  25% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(360deg);
-  }
-  100% {
-    transform: rotate(720deg);
-  }
+    0% { transform: translate3d(-100rem, -200rem, 0) scaleY(3) rotate(180deg); }
+    30% { transform: translate3d(-10rem, 2.5rem, 0) scaleY(0.8) rotate(215deg); }
+    37% { transform: translate3d(-5rem, -1rem, 0) rotate(270deg); }
+    45% { transform: translate3d(-2rem, 0.5rem, 0) rotate(360deg); }
+    50% { transform: translate3d(0, 0, 0) rotate(405deg); }
+    75% { transform: translate3d(0, 14rem, 0)  rotate(450deg); }
+    to { transform: translate3d(0, 14rem, 0)  rotate(495deg); }
 }
