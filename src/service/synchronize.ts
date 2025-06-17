@@ -144,6 +144,7 @@ export function synchronize<Data extends { updatedAt: Date }>({
     )
     .subscribe({
       next: ({ local, remote }) => {
+        console.log("sync", collectionName);
         Promise.all([
           Promise.resolve(hasChanges(local)).then((changed) =>
             changed ? saveLocal(local) : undefined

@@ -72,44 +72,68 @@ const listenToRemoteChanges = <LocalData>(
   collectionName: CollectionName,
   adapter: (d: unknown) => LocalData = identity as (d: unknown) => LocalData,
   onChange: (data: Either.Either<Error, Record<string, LocalData>>) => void
-): (() => void) => {
+) => {
   const collectionRef = ref(db, collectionName);
-  const unsubscribe = onValue(
-    collectionRef,
-    (snapshot) =>
-      pipe(
-        snapshot,
-        Either.fromPredicate(
-          (s: DataSnapshot) => s.exists(),
-          () =>
-            new Error(
-              `No data found in Firebase for collection ${collectionName}`
-            )
-        ),
-        Either.chain((s) => {
-          const firebaseSchema = z.record(z.string(), z.unknown());
-          const result = firebaseSchema.safeParse(s.val());
+  const firebaseWatch = (): RX.Observable<
+    Either.Either<Error, Record<string, LocalData>>
+  > => {
+    const $value = new RX.Subject<
+      Either.Either<Error, Record<string, LocalData>>
+    >();
 
-          return result.success
-            ? pipe(result.data, RecordFP.map(adapter), Either.right)
-            : Either.left(new Error(result.error.message));
-        }),
-        onChange
-      ),
-    (error: Error) => {
-      console.error(error);
-      onChange(
-        Either.left(
-          new Error(
-            `Error listening to changes in Firebase for collection ${collectionName}:`
+    onValue(
+      collectionRef,
+      (snapshot) =>
+        pipe(
+          snapshot,
+          Either.fromPredicate(
+            (s: DataSnapshot) => s.exists(),
+            () =>
+              new Error(
+                `No data found in Firebase for collection ${collectionName}`
+              )
+          ),
+          Either.chain((s) => {
+            const firebaseSchema = z.record(z.string(), z.unknown());
+            const result = firebaseSchema.safeParse(s.val());
+
+            return result.success
+              ? pipe(result.data, RecordFP.map(adapter), Either.right)
+              : Either.left(new Error(result.error.message));
+          }),
+          (value) => $value.next(value)
+        ),
+      (error: Error) => {
+        console.error(error);
+        $value.next(
+          Either.left(
+            new Error(
+              `Error listening to changes in Firebase for collection ${collectionName}:`
+            )
           )
-        )
-      );
-    }
-  );
-  return () => {
-    unsubscribe();
+        );
+      }
+    );
+    return $value;
   };
+
+  $isAuthenticated
+    .asObservable()
+    .pipe(
+      RX.switchMap((authentication) => {
+        if (
+          !(
+            authentication.type === "loading" ||
+            authentication.type === "unauthenticated"
+          )
+        ) {
+          return firebaseWatch();
+        } else {
+          return RX.of();
+        }
+      })
+    )
+    .subscribe({ next: (newValue) => onChange(newValue) });
 };
 
 const toFirebaseData = <Data>(data: Data): string => JSON.stringify(data);

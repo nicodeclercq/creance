@@ -19,7 +19,7 @@
 }
 
 @keyframes pigAnimation {
-    0% { transform: translate3d(-100rem, -200rem, 0) scaleY(3) rotate(180deg); }
+    0% { transform: translate3d(-50rem, -50rem, 0) scaleY(3) rotate(180deg); }
     30% { transform: translate3d(-10rem, 2.5rem, 0) scaleY(0.8) rotate(215deg); }
     37% { transform: translate3d(-5rem, -1rem, 0) rotate(270deg); }
     45% { transform: translate3d(-2rem, 0.5rem, 0) rotate(360deg); }
