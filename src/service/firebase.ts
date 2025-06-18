@@ -119,10 +119,6 @@ const listenToRemoteChanges = <LocalData>(
 
   firebaseWatch().subscribe({
     next: (data) => {
-      console.log(
-        `Data changed in Firebase collection ${collectionName}:`,
-        data
-      );
       onChange(data);
     },
   });

@@ -24,8 +24,6 @@ export function PrivatePage({ children }: Props) {
     }));
   };
 
-  console.log("currentUser", currentUser);
-
   switch (state.type) {
     case "loading":
       return (
