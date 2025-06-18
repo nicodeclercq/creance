@@ -1,4 +1,5 @@
 import { Avatar } from "../../ui/Avatar/Avatar";
+import { Button } from "../../ui/Button/Button";
 import { COLLECTIONS } from "../../service/firebase";
 import { Card } from "../../ui/Card/Card";
 import { Columns } from "../../ui/Columns/Columns";
@@ -10,6 +11,7 @@ import { Stack } from "../../ui/Stack/Stack";
 import { lastUpdate } from "../../service/synchronize";
 import { resetStore } from "../../store/reset";
 import { useRoute } from "../../hooks/useRoute";
+import { useState } from "react";
 import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
@@ -30,6 +32,7 @@ function Item({ label, date }: { label: string; date: Date }) {
 
 export function InformationPage() {
   const { t } = useTranslation();
+  const [isDebug, setIsDebug] = useState(sessionStorage.getItem("debug"));
   const { goTo, back } = useRoute();
 
   const [currentUserId] = useStore("currentUserId");
@@ -38,6 +41,10 @@ export function InformationPage() {
   const reset = () => {
     goTo("ROOT");
     resetStore();
+  };
+  const toggleDebug = () => {
+    setIsDebug(isDebug === "true" ? "false" : "true");
+    sessionStorage.setItem("debug", isDebug === "true" ? "false" : "true");
   };
 
   const currentUser = users[currentUserId];
@@ -106,6 +113,17 @@ export function InformationPage() {
               }}
             />
           </Stack>
+        </Card>
+        <Card>
+          <Button
+            variant="secondary"
+            onClick={toggleDebug}
+            label={
+              isDebug === "true"
+                ? t("page.information.actions.toggleDebug.off")
+                : t("page.information.actions.toggleDebug.on")
+            }
+          ></Button>
         </Card>
       </Stack>
     </PageTemplate>

@@ -116,6 +116,8 @@
   "page.information.clear.confirmation.description": "Cette action supprimera toutes les données locale de l'application. Vous devrez vous reconnecter pour récupérer vos données.",
   "page.information.clear.confirmation.cancel": "Annuler",
   "page.information.clear.confirmation.delete": "Supprimer",
+  "page.information.actions.toggleDebug.on": "Activer le mode debug",
+  "page.information.actions.toggleDebug.off": "Désactiver le mode debug",
   "page.information.noUser": "Aucune donnée utilisateur",
   "page.event.add.actions.backToList": "Retour aux listes de créances",
   "page.event.add.title": "Ajouter une dépense",

@@ -13,6 +13,16 @@
   justify-content: center;
   box-shadow: var(--ui-semantic-shadow-l);
   border: 0.1rem solid var(--ui-background-default);
+
+  & > *{
+    @media (prefers-reduced-motion: no-preference) {
+      transition: transform 0.2s ease-in-out;
+    }
+  }
+
+  &[aria-expanded="true"] > * {
+    transform: rotate(135deg);
+  }
 }
 
 .actionsWrapper {

@@ -8,6 +8,7 @@ import {
   update,
 } from "./store/StoreProvider";
 
+import { Debug } from "./ui/Debug/Debug";
 import { I18nProvider } from "react-aria";
 import { Router } from "./router";
 import { synchronizeFirebase } from "./service/firebase";
@@ -22,6 +23,7 @@ function App() {
     <I18nProvider locale="fr-FR">
       <StoreProvider>
         <Router />
+        <Debug />
       </StoreProvider>
     </I18nProvider>
   );

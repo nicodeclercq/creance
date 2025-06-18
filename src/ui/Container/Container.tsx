@@ -215,10 +215,11 @@ export function Container({
         minWidth,
         maxWidth,
         width:
-          width ??
-          (display ?? Component === "div" ? "block" : "inline")?.startsWith(
-            "inline"
-          )
+          width != null
+            ? width
+            : (display ?? Component === "div" ? "block" : "inline")?.startsWith(
+                "inline"
+              )
             ? undefined
             : "100%",
         height,

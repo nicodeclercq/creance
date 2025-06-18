@@ -1,6 +1,7 @@
 import * as RX from "rxjs";
 import { type Observable } from "rxjs";
 import * as z from "zod";
+import { log } from "../ui/Debug/Debug";
 
 type Diff<Data> = {
   created: Record<string, Data>;
@@ -144,6 +145,7 @@ export function synchronize<Data extends { updatedAt: Date }>({
     )
     .subscribe({
       next: ({ local, remote }) => {
+        log("synchronize", "local", local, "remote", remote);
         Promise.all([
           Promise.resolve(hasChanges(local)).then((changed) =>
             changed ? saveLocal(local) : undefined

@@ -28,6 +28,7 @@ import { eventSchema, expenseSchema, userSchema } from "../adapters/json";
 import { State } from "../store/state";
 import { Path, ValueFromPath } from "../store/store";
 import { synchronize } from "./synchronize";
+import { log } from "../ui/Debug/Debug";
 
 type Schema<Data> = ZodSchema<Data, any, any>;
 
@@ -61,6 +62,7 @@ export const $isAuthenticated = new RX.BehaviorSubject<AuthState>({
   type: "loading",
 });
 onAuthStateChanged(auth, (user) => {
+  log("firebase", "Auth state changed:", user);
   if (user === null) {
     $isAuthenticated.next({ type: "unauthenticated" });
   } else if (user.uid) {
@@ -278,7 +280,8 @@ function getRemoteStore<Data>(
       ([state, isAuthenticated]) =>
         (isLoaded(state) || isError(state)) && isAuthenticated
     ),
-    RX.map(([state]) => (isLoaded(state) ? (state as Loaded).data : {}))
+    RX.map(([state]) => (isLoaded(state) ? (state as Loaded).data : {})),
+    RX.tap((state) => log("firebase", "Remote changed:", state))
   );
 }
 
