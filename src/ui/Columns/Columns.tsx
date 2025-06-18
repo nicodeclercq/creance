@@ -31,12 +31,14 @@ export function Columns({
   isInline = false,
   wrap,
 }: ColumnsProps) {
+  const displayType = gridTemplateColumns != null ? "grid" : "flex";
+
   return (
     <Container
       as={as}
       styles={{
         ...styles,
-        display: isInline ? "inline-flex" : "flex",
+        display: isInline ? `inline-${displayType}` : displayType,
         alignItems: align,
         gap,
         gridTemplateColumns,

@@ -41,6 +41,7 @@ export function ConfirmButton({
       <Button
         {...action}
         className={classNames(
+          action.className,
           buttonStyles.button,
           buttonStyles[`hasVariant-${action.variant}`]
         )}

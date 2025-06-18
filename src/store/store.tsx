@@ -96,12 +96,8 @@ export function createContextStore<State>(initialState: State) {
     );
 
     useEffect(() => {
-      const subscription = RX.connectable(store)
-        .pipe(
-          RX.connect(RX.identity),
-          RX.map(getValueFromPath(path)),
-          RX.distinctUntilChanged()
-        )
+      const subscription = store
+        .pipe(RX.map(getValueFromPath(path)), RX.distinctUntilChanged())
         .subscribe({
           next: setState,
         });

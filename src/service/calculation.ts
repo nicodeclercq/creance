@@ -66,7 +66,7 @@ function getDefaultUserShareCount(period: Period, user: User) {
   return pipe(
     period,
     getHalfDaysCount,
-    (count) => count * (user.share.adult * 2 + user.share.children)
+    (count) => count * (user.share.adults * 2 + user.share.children)
   );
 }
 

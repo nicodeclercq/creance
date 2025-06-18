@@ -35,6 +35,7 @@ export function Form<TFieldValues extends FieldValues, TTransformedValues>({
 
   return (
     <form
+      className={styles.form}
       onSubmit={handleSubmit((data) => {
         const result = submit.onClick(data);
         if (result instanceof Promise) {

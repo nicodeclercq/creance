@@ -117,23 +117,15 @@ const listenToRemoteChanges = <LocalData>(
     return $value;
   };
 
-  $isAuthenticated
-    .asObservable()
-    .pipe(
-      RX.switchMap((authentication) => {
-        if (
-          !(
-            authentication.type === "loading" ||
-            authentication.type === "unauthenticated"
-          )
-        ) {
-          return firebaseWatch();
-        } else {
-          return RX.of();
-        }
-      })
-    )
-    .subscribe({ next: (newValue) => onChange(newValue) });
+  firebaseWatch().subscribe({
+    next: (data) => {
+      console.log(
+        `Data changed in Firebase collection ${collectionName}:`,
+        data
+      );
+      onChange(data);
+    },
+  });
 };
 
 const toFirebaseData = <Data>(data: Data): string => JSON.stringify(data);

@@ -1,3 +1,7 @@
+.form{
+  width: 100%;
+}
+
 .formActions {
   border-block-start: 0.1rem solid var(--ui-semantic-color-neutral-weaker);
   display: flex;

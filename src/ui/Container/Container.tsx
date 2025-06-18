@@ -81,7 +81,7 @@ type Styles = {
   shadow?: ShadowStyles;
   overflow?: "hidden" | "auto" | "scroll" | "visible";
   zIndex?: number;
-  width?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
+  width?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}` | "auto";
   maxWidth?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
   minWidth?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;
   height?: `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`;

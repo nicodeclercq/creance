@@ -37,7 +37,7 @@ export function ExpenseItem({
       as="li"
       align="center"
       gap="m"
-      template={["max-content", "1fr", "max-content"]}
+      template={["max-content", "1fr", "max-content", "max-content"]}
       styles={{
         position: "relative",
         padding: "m",

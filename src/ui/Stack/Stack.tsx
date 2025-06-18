@@ -15,7 +15,7 @@ type StackProps = {
     | "stretch";
   gap?: ContainerStyles["gap"];
   padding?: ContainerStyles["padding"];
-  width?: ContainerStyles["width"];
+  width?: ContainerStyles["width"] | "auto";
   styles?: ContainerStyles<"background" | "color" | "zIndex">;
 };
 

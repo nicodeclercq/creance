@@ -2,7 +2,7 @@ import { Icon } from "../Icon/Icon";
 import { IconName } from "../Icon/private";
 import styles from "./Avatar.module.css";
 
-type Size = "s" | "m" | "l";
+type Size = "s" | "m" | "l" | "xl";
 
 export type AvatarProps = {
   label: string;
@@ -13,6 +13,7 @@ export type AvatarProps = {
 
 function computeSize(value: Size = "m") {
   const factor = {
+    xl: 16,
     l: 8,
     m: 4,
     s: 2,

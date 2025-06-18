@@ -50,7 +50,7 @@ export function Menu({
       <Popover>
         <Dialog className={styles.menu}>
           <Stack alignItems="stretch">
-            {actions.map(({ label, icon, ...action }) => {
+            {actions.map(({ label, icon, ...action }, index) => {
               const content = (
                 <Columns
                   styles={{ background: "transparent" }}
@@ -65,7 +65,10 @@ export function Menu({
               return action.as === "link" ? (
                 <Link
                   key={label}
-                  className={styles.action}
+                  className={classNames(styles.action, {
+                    [styles.isFirst]: index === 0,
+                    [styles.isLast]: index === actions.length - 1,
+                  })}
                   {...action}
                   to={getPath(action.to, action.params)}
                 >
@@ -76,7 +79,10 @@ export function Menu({
                   key={label}
                   {...action.confirmation}
                   action={{
-                    className: styles.action,
+                    className: classNames(styles.action, {
+                      [styles.isFirst]: index === 0,
+                      [styles.isLast]: index === actions.length - 1,
+                    }),
                     icon: {
                       name: icon,
                       position: "end",
@@ -87,7 +93,10 @@ export function Menu({
               ) : (
                 <Button
                   key={label}
-                  className={styles.action}
+                  className={classNames(styles.action, {
+                    [styles.isFirst]: index === 0,
+                    [styles.isLast]: index === actions.length - 1,
+                  })}
                   {...action}
                   onClick={action.onClick}
                 >

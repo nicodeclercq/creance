@@ -1,9 +1,9 @@
 export type User = {
   _id: string;
   name: string;
-  avatar: string;
+  avatar?: string;
   share: {
-    adult: number;
+    adults: number;
     children: number;
   };
   updatedAt: Date;

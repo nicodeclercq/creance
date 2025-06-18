@@ -220,5 +220,16 @@
   "page.login.password.label": "Mot de passe",
   "page.login.password.validation.required": "Vous devez entrer un mot de passe",
   "page.login.actions.submit": "Se connecter",
-  "component.password.showHide": "Afficher / Cacher le mot de passe"
+  "component.password.showHide": "Afficher / Cacher le mot de passe",
+  "page.setCurrentUser.title": "Mais qui êtes-vous ?",
+  "page.setCurrentUser.description": "Avant de commencer à utiliser l'application, nous avons besoin d'en savoir plus sur vous. Vous pourrez modifier ces informations à tout moment.",
+  "page.setCurrentUser.actions.submit": "Enregistrer",
+  "userForm.name.label": "Nom du participant ou du groupe",
+  "userForm.adults.label": "Nombre d'adultes",
+  "userForm.children.label": "Nombre d'enfants (1/2 part)",
+  "userForm.adults.validation.required": "Vous devez entrer un nombre d'adultes",
+  "userForm.adults.validation.min": "La valeur doit être supérieure ou égale à 0",
+  "userForm.multipliers.validation.min": "Il doit y avoir au moins une personne dans le groupe",
+  "userForm.children.validation.required": "Vous devez entrer un nombre d'enfants",
+  "userForm.children.validation.min": "La valeur doit être supérieure ou égale à 0"
 }

@@ -30,7 +30,7 @@ type AddUsersFormProps = {
 
 type AddUsersFormData = {
   name: string;
-  adult: number;
+  adults: number;
   children: number;
 };
 function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
@@ -38,7 +38,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
   const { control, handleSubmit, watch, reset } = useForm<AddUsersFormData>({
     defaultValues: {
       name: "",
-      adult: 1,
+      adults: 1,
       children: 0,
     },
   });
@@ -49,7 +49,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
       name: data.name,
       avatar: data.name,
       share: {
-        adult: data.adult,
+        adults: data.adults,
         children: data.children,
       },
       updatedAt: new Date(),
@@ -112,7 +112,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
             message: t("page.events.add.form.user.share.adults.validation.min"),
           },
         }}
-        name="adult"
+        name="adults"
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputNumber
             as="number"
@@ -201,7 +201,7 @@ export function AddEventStep3({
               <Paragraph styles={{ flexGrow: true }}>{item.name}</Paragraph>
               <Paragraph styles={{ font: "body-smaller" }}>
                 {t("page.events.add.form.user.share.count", {
-                  adults: item.share.adult,
+                  adults: item.share.adults,
                   children: item.share.children,
                 })}
               </Paragraph>

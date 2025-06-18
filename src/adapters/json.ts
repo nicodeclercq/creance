@@ -68,9 +68,9 @@ export const expenseSchema = z.strictObject({
 export const userSchema = z.strictObject({
   _id: z.string(),
   name: z.string(),
-  avatar: z.string(),
+  avatar: z.string().optional(),
   share: z.strictObject({
-    adult: z.number(),
+    adults: z.number(),
     children: z.number(),
   }),
   updatedAt: z
