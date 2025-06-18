@@ -258,6 +258,7 @@ function getRemoteStore<Data>(
             `Error listening to changes in collection ${collectionName}:`,
             error
           );
+          log("firebase", `Error in collection ${collectionName}:`, error);
           $remoteStore.next({ type: "errored" });
         },
         (newRemoteData: Record<string, Data>) => {

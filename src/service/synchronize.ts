@@ -135,6 +135,9 @@ export function synchronize<Data extends { updatedAt: Date }>({
         (prev, cur) => JSON.stringify(prev) === JSON.stringify(cur)
       ),
       RX.debounceTime(100),
+      RX.tap((state) =>
+        log("synchronise", `Change in collection ${collectionName}:`, state)
+      ),
       RX.map(([localData, remoteData]) =>
         getMergeDiffs({
           local: localData,
@@ -160,6 +163,9 @@ export function synchronize<Data extends { updatedAt: Date }>({
           .catch((error) => {
             console.error("Error saving data:", error);
           });
+      },
+      error: (error) => {
+        log("Error during synchronization:", error);
       },
     });
 }
