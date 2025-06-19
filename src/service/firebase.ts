@@ -25,7 +25,12 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { pipe, flow } from "fp-ts/function";
-import { eventSchema, expenseSchema, userSchema } from "../adapters/json";
+import {
+  depositSchema,
+  eventSchema,
+  expenseSchema,
+  userSchema,
+} from "../adapters/json";
 import { State } from "../store/state";
 import { Path, ValueFromPath } from "../store/store";
 import { synchronize } from "./synchronize";
@@ -37,6 +42,7 @@ export const COLLECTIONS = {
   EVENTS: "events",
   EXPENSES: "expenses",
   USERS: "users",
+  DEPOSITS: "deposits",
 } as const;
 type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 
@@ -71,11 +77,12 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-const getData = <Data>(
-  collectionName: CollectionName,
-  adapter: (data: unknown) => Data = identity as (data: unknown) => Data
-): TaskEither.TaskEither<Error, Record<string, Data>> => {
-  return () => {
+const getData =
+  <Data>(
+    collectionName: CollectionName,
+    adapter: (data: unknown) => Data = identity as (data: unknown) => Data
+  ): TaskEither.TaskEither<Error, Record<string, Data>> =>
+  () => {
     log("firebase", `Getting data from collection ${collectionName}`);
     const collectionRef = ref(db, collectionName);
     return auth
@@ -124,7 +131,6 @@ const getData = <Data>(
         );
       });
   };
-};
 
 const listenToRemoteChanges = <LocalData>(
   collectionName: CollectionName,
@@ -480,6 +486,16 @@ export function synchronizeFirebase({
     $localStore: $localStore.pipe(RX.map(({ expenses }) => expenses)),
     adapter: {
       in: fromFirebaseData(expenseSchema),
+      out: toFirebaseData,
+    },
+  });
+
+  synchronizeCollection({
+    collectionName: COLLECTIONS.DEPOSITS,
+    updateLocalState: updateLocalState("deposits"),
+    $localStore: $localStore.pipe(RX.map(({ deposits }) => deposits)),
+    adapter: {
+      in: fromFirebaseData(depositSchema),
       out: toFirebaseData,
     },
   });

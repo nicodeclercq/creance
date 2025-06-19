@@ -63,6 +63,9 @@ export const expenseSchema = z.strictObject({
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
+  createdAt: z
+    .string()
+    .transform((date) => (date == null ? new Date() : new Date(date))),
 });
 
 export const userSchema = z.strictObject({
@@ -91,6 +94,20 @@ export const periodSchema = z.strictObject({
   departure: z.enum(["AM", "PM"]),
 });
 
+export const depositSchema = z.strictObject({
+  _id: z.string(),
+  amount: z.string(),
+  updatedAt: z
+    .string()
+    .transform((date) => (date == null ? new Date() : new Date(date))),
+  createdAt: z
+    .string()
+    .transform((date) => (date == null ? new Date() : new Date(date))),
+  from: z.string(),
+  to: z.string(),
+  note: z.string(),
+});
+
 export const eventSchema = z.strictObject({
   _id: z.string(),
   isClosed: z.boolean().optional(),
@@ -99,6 +116,7 @@ export const eventSchema = z.strictObject({
   period: periodSchema,
   description: z.string(),
   expenses: z.array(z.string()),
+  deposits: z.array(z.string()),
   categories: z.record(z.string(), categorySchema),
   participants: z.array(z.string()),
   updatedAt: z
@@ -111,6 +129,7 @@ const stateSchema = z.strictObject({
   users: z.record(z.string(), userSchema),
   events: z.record(z.string(), eventSchema),
   expenses: z.record(z.string(), expenseSchema),
+  deposits: z.record(z.string(), depositSchema),
 });
 
 export const toState = (data: unknown): Either.Either<ZodError, State> => {

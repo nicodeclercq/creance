@@ -8,6 +8,7 @@ import { ChevronRightIcon } from "./ChevronRightIcon";
 import { CreditCardIcon } from "./CreditCardIcon";
 import { EditIcon } from "./EditIcon";
 import { ErrorIcon } from "./ErrorIcon";
+import { ExchangeMoneyIcon } from "./ExchangeMoneyIcon";
 import { FolderIcon } from "./FolderIcon";
 import { GiveMoneyIcon } from "./GiveMoneyIcon";
 import { HideIcon } from "./HideIcon";
@@ -38,6 +39,7 @@ export const ICONS = {
   error: ErrorIcon,
   folder: FolderIcon,
   "give-money": GiveMoneyIcon,
+  "exchange-money": ExchangeMoneyIcon,
   hide: HideIcon,
   lock: LockIcon,
   menu: MenuIcon,

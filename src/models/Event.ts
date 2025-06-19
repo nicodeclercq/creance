@@ -51,6 +51,7 @@ export type Event = {
   period: Period;
   description: string;
   expenses: string[];
+  deposits: string[];
   categories: Record<string, Category>;
   participants: string[];
   updatedAt: Date;

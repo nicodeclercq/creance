@@ -15,6 +15,8 @@ import { DistributionPage } from "./pages/distribution/DistributionPage";
 import { ValueOf } from "./utils/object";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { InformationPage } from "./pages/settinhgs/InformationPage";
+import { AddDepositPage } from "./pages/deposits/AddDepositPage";
+import { EditDepositPage } from "./pages/deposits/EditDepositPage";
 
 export const ROUTES_DEFINITION = {
   ROOT: {
@@ -54,6 +56,14 @@ export const ROUTES_DEFINITION = {
   CATEGORIES_EDIT: {
     path: "/events/:eventId/categories/edit",
     component: CategoriesPage,
+  },
+  DEPOSIT_ADD: {
+    path: "/events/:eventId/deposits/add",
+    component: AddDepositPage,
+  },
+  DEPOSIT_EDIT: {
+    path: "/events/:eventId/deposits/:depositId/edit",
+    component: EditDepositPage,
   },
   SHARES: {
     path: "/events/:eventId/shares",

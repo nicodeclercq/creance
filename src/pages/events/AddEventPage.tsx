@@ -75,6 +75,7 @@ export function AddEventPage() {
           },
           description: step1Data.description,
           expenses: [],
+          deposits: [],
           categories: step2Data.categories.reduce(
             (acc, category) => ({ ...acc, [category._id]: category }),
             {} as Record<string, Category>

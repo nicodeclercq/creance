@@ -77,6 +77,7 @@ export function AddExpensePage() {
               ),
             },
             updatedAt: new Date(),
+            createdAt: new Date(),
           }}
           submitLabel={t("page.event.add.form.actions.submit")}
           onSubmit={addExpense}

@@ -1,3 +1,4 @@
+import { Deposit } from "../models/Deposit";
 import { Event } from "../models/Event";
 import { Expense } from "../models/Expense";
 import { User } from "../models/User";
@@ -7,6 +8,7 @@ export type State = {
   users: Record<string, User>;
   events: Record<string, Event>;
   expenses: Record<string, Expense>;
+  deposits: Record<string, Deposit>;
 };
 
 export const DEFAULT_STATE = {
@@ -14,4 +16,5 @@ export const DEFAULT_STATE = {
   users: {},
   events: {},
   expenses: {},
+  deposits: {},
 } as State;

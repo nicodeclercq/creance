@@ -78,6 +78,13 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           params: { eventId: event._id },
         },
         {
+          label: t("page.event.list.actions.addDeposit"),
+          icon: "exchange-money",
+          as: "link",
+          to: "DEPOSIT_ADD",
+          params: { eventId: event._id },
+        },
+        {
           label: t("page.event.list.actions.addExpense"),
           icon: "shopping-cart",
           as: "link",

@@ -9,6 +9,7 @@ export function EventPage() {
   const { eventId } = useParams();
   const [currentEvent, setEvent] = useStore(`events.${eventId}`);
   const [expenses, setExpenses] = useStore("expenses");
+  const [deposits] = useStore("deposits");
 
   if (!eventId) {
     return <EventNotFoundPage />;
@@ -31,6 +32,7 @@ export function EventPage() {
     <ExpenseList
       event={currentEvent}
       expenses={expenses}
+      deposits={deposits}
       users={users}
       onDeleteExpense={deleteExpense}
     />
