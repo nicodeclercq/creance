@@ -73,7 +73,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-export const getData = <Data>(
+const getData = <Data>(
   collectionName: CollectionName,
   adapter: (data: unknown) => Data = identity as (data: unknown) => Data
 ): TaskEither.TaskEither<Error, Record<string, Data>> => {
@@ -466,4 +466,7 @@ export function synchronizeFirebase({
       out: toFirebaseData,
     },
   });
+
+  const data = getData(COLLECTIONS.USERS, fromFirebaseData(userSchema));
+  log("firebase", "Initial data from USERS:", data);
 }
