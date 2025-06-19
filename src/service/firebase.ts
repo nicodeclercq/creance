@@ -77,36 +77,37 @@ const getData = <Data>(
   collectionName: CollectionName,
   adapter: (data: unknown) => Data = identity as (data: unknown) => Data
 ): TaskEither.TaskEither<Error, Record<string, Data>> => {
-  return () =>
-    new Promise((resolve, reject) => {
-      const collectionRef = ref(db, collectionName);
-      get(collectionRef)
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            const firebaseSchema = z.record(z.string(), z.unknown());
-            const result = firebaseSchema.safeParse(data);
+  return () => {
+    const collectionRef = ref(db, collectionName);
+    return auth
+      .authStateReady()
+      .then(() => get(collectionRef))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const firebaseSchema = z.record(z.string(), z.unknown());
+          const result = firebaseSchema.safeParse(data);
 
-            if (result.success) {
-              const adaptedData = RecordFP.map(adapter)(result.data);
-              resolve(Either.right(adaptedData));
-            } else {
-              reject(new Error(result.error.message));
-            }
+          if (result.success) {
+            const adaptedData = RecordFP.map(adapter)(result.data);
+            return Either.right(adaptedData);
           } else {
-            resolve(Either.right({}));
+            return Either.left(new Error(result.error.message));
           }
-        })
-        .catch((error) => {
-          console.error(
-            `Failed to get data from collection ${collectionName}:`,
-            error
+        } else {
+          log(
+            "firebase",
+            `No data found in collection ${collectionName}. Returning empty object.`
           );
-          reject(
-            new Error(`Failed to get data from collection ${collectionName}`)
-          );
-        });
-    });
+          return Either.right({});
+        }
+      })
+      .catch(() => {
+        return Either.left(
+          new Error(`Failed to get data from collection ${collectionName}`)
+        );
+      });
+  };
 };
 
 const listenToRemoteChanges = <LocalData>(
