@@ -468,6 +468,7 @@ export function synchronizeFirebase({
     },
   });
 
-  const data = getData(COLLECTIONS.USERS, fromFirebaseData(userSchema));
-  log("firebase", "Initial data from USERS:", data);
+  getData(COLLECTIONS.USERS, fromFirebaseData(userSchema))().then((result) => {
+    log("firebase", "Initial data from USERS:", result);
+  });
 }
