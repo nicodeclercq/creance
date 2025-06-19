@@ -13,7 +13,6 @@ import {
   get,
   ref,
   set,
-  forceLongPolling,
 } from "firebase/database";
 
 import { type ZodSchema } from "zod";
@@ -44,7 +43,6 @@ type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-forceLongPolling();
 
 type LoadtingState = {
   type: "loading";
@@ -81,7 +79,18 @@ const getData = <Data>(
     const collectionRef = ref(db, collectionName);
     return auth
       .authStateReady()
+      .then(() => {
+        log("firebase", `Getting data from collection ${collectionName}`);
+      })
       .then(() => get(collectionRef))
+      .then((snapshot) => {
+        log(
+          "firebase",
+          `Data received from collection ${collectionName}:`,
+          snapshot
+        );
+        return snapshot;
+      })
       .then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
@@ -105,6 +114,12 @@ const getData = <Data>(
       .catch(() => {
         return Either.left(
           new Error(`Failed to get data from collection ${collectionName}`)
+        );
+      })
+      .finally(() => {
+        log(
+          "firebase",
+          `Finished getting data from collection ${collectionName}`
         );
       });
   };
