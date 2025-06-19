@@ -118,7 +118,7 @@ const listenToRemoteChanges = <LocalData>(
           (value) => $value.next(value)
         ),
       (error: Error) => {
-        console.error(error);
+        log("Error", collectionName, error);
         $value.next(
           Either.left(
             new Error(
