@@ -10,6 +10,8 @@ import {
   DataSnapshot,
   getDatabase,
   onValue,
+  get,
+  forceWebSockets,
   ref,
   set,
 } from "firebase/database";
@@ -42,6 +44,7 @@ type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+forceWebSockets();
 
 type LoadtingState = {
   type: "loading";
@@ -70,6 +73,42 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+const getData = <Data>(
+  collectionName: CollectionName,
+  adapter: (data: unknown) => Data = identity as (data: unknown) => Data
+): TaskEither.TaskEither<Error, Record<string, Data>> => {
+  return () =>
+    new Promise((resolve, reject) => {
+      const collectionRef = ref(db, collectionName);
+      get(collectionRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            const firebaseSchema = z.record(z.string(), z.unknown());
+            const result = firebaseSchema.safeParse(data);
+
+            if (result.success) {
+              const adaptedData = RecordFP.map(adapter)(result.data);
+              resolve(Either.right(adaptedData));
+            } else {
+              reject(new Error(result.error.message));
+            }
+          } else {
+            resolve(Either.right({}));
+          }
+        })
+        .catch((error) => {
+          console.error(
+            `Failed to get data from collection ${collectionName}:`,
+            error
+          );
+          reject(
+            new Error(`Failed to get data from collection ${collectionName}`)
+          );
+        });
+    });
+};
+
 const listenToRemoteChanges = <LocalData>(
   collectionName: CollectionName,
   adapter: (d: unknown) => LocalData = identity as (d: unknown) => LocalData,
@@ -87,53 +126,64 @@ const listenToRemoteChanges = <LocalData>(
       `Listening to changes in Firebase for collection ${collectionName}`
     );
 
-    onValue(
-      collectionRef,
-      (snapshot) =>
-        pipe(
-          snapshot,
-          (a) => {
-            log(
-              "firebase",
-              `Data received from Firebase for collection ${collectionName}:`,
-              a
-            );
-            return a;
-          },
-          Either.fromPredicate(
-            (s: DataSnapshot) => s.exists(),
-            () =>
-              new Error(
-                `No data found in Firebase for collection ${collectionName}`
-              )
-          ),
-          Either.chain((s) => {
-            const firebaseSchema = z.record(z.string(), z.unknown());
-            const result = firebaseSchema.safeParse(s.val());
+    try {
+      onValue(
+        collectionRef,
+        (snapshot) =>
+          pipe(
+            snapshot,
+            (a) => {
+              log(
+                "firebase",
+                `Data received from Firebase for collection ${collectionName}:`,
+                a
+              );
+              return a;
+            },
+            Either.fromPredicate(
+              (s: DataSnapshot) => s.exists(),
+              () =>
+                new Error(
+                  `No data found in Firebase for collection ${collectionName}`
+                )
+            ),
+            Either.chain((s) => {
+              const firebaseSchema = z.record(z.string(), z.unknown());
+              const result = firebaseSchema.safeParse(s.val());
 
-            return result.success
-              ? pipe(result.data, RecordFP.map(adapter), Either.right)
-              : Either.left(new Error(result.error.message));
-          }),
-          (value) => $value.next(value)
-        ),
-      (error: Error) => {
-        log("Error", collectionName, error);
-        $value.next(
-          Either.left(
-            new Error(
-              `Error listening to changes in Firebase for collection ${collectionName}:`
+              return result.success
+                ? pipe(result.data, RecordFP.map(adapter), Either.right)
+                : Either.left(new Error(result.error.message));
+            }),
+            (value) => $value.next(value)
+          ),
+        (error: Error) => {
+          log("Error", collectionName, error);
+          $value.next(
+            Either.left(
+              new Error(
+                `Error listening to changes in Firebase for collection ${collectionName}:`
+              )
             )
-          )
-        );
-      }
-    );
+          );
+        }
+      );
+    } catch (error) {
+      log(
+        "firebase",
+        `Error setting up listener for collection ${collectionName}:`,
+        error
+      );
+    }
     return $value;
   };
 
   firebaseWatch().subscribe({
     next: (data) => {
       onChange(data);
+    },
+    error: (error) => {
+      log("firebase", `Error in collection ${collectionName}:`, error);
     },
   });
 };
