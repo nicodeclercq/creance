@@ -11,7 +11,6 @@ import {
   getDatabase,
   onValue,
   get,
-  forceWebSockets,
   ref,
   set,
   forceLongPolling,
