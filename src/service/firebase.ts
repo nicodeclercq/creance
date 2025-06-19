@@ -73,7 +73,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-const getData = <Data>(
+export const getData = <Data>(
   collectionName: CollectionName,
   adapter: (data: unknown) => Data = identity as (data: unknown) => Data
 ): TaskEither.TaskEither<Error, Record<string, Data>> => {
