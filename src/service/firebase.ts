@@ -82,12 +82,24 @@ const listenToRemoteChanges = <LocalData>(
     const $value = new RX.Subject<
       Either.Either<Error, Record<string, LocalData>>
     >();
+    log(
+      "firebase",
+      `Listening to changes in Firebase for collection ${collectionName}`
+    );
 
     onValue(
       collectionRef,
       (snapshot) =>
         pipe(
           snapshot,
+          (a) => {
+            log(
+              "firebase",
+              `Data received from Firebase for collection ${collectionName}:`,
+              a
+            );
+            return a;
+          },
           Either.fromPredicate(
             (s: DataSnapshot) => s.exists(),
             () =>
