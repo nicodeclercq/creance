@@ -76,6 +76,7 @@ const getData = <Data>(
   adapter: (data: unknown) => Data = identity as (data: unknown) => Data
 ): TaskEither.TaskEither<Error, Record<string, Data>> => {
   return () => {
+    log("firebase", `Getting data from collection ${collectionName}`);
     const collectionRef = ref(db, collectionName);
     return auth
       .authStateReady()
