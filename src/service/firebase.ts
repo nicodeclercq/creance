@@ -14,6 +14,7 @@ import {
   forceWebSockets,
   ref,
   set,
+  forceLongPolling,
 } from "firebase/database";
 
 import { type ZodSchema } from "zod";
@@ -44,7 +45,7 @@ type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-forceWebSockets();
+forceLongPolling();
 
 type LoadtingState = {
   type: "loading";
