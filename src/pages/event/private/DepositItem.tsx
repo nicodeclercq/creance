@@ -64,10 +64,7 @@ export function DepositItem({
           </Paragraph>
         </Columns>
       </Stack>
-      <CalendarDate
-        date={deposit.createdAt}
-        styles={{ font: "body-smaller" }}
-      />
+      <CalendarDate date={deposit.date} styles={{ font: "body-smaller" }} />
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}
@@ -78,7 +75,7 @@ export function DepositItem({
               icon: "edit",
               label: t("page.event.depositItem.actions.edit"),
               to: "DEPOSIT_EDIT",
-              params: { eventId, expenseId: deposit._id },
+              params: { eventId, depositId: deposit._id },
             },
             {
               icon: "trash",

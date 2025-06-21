@@ -23,6 +23,21 @@ export function Price({
       ? calculationAsNumber(children)
       : Either.right(children);
 
+  const getTranslationKey = () => {
+    switch (type) {
+      case "default":
+        return "component.price.value";
+      case "sum":
+        const isNegative =
+          typeof children === "number"
+            ? children < 0
+            : children.startsWith("-");
+        return `component.price.sum${isNegative ? ".negative" : ".positive"}`;
+      case "total":
+        return "component.price.total";
+    }
+  };
+
   return (
     <Paragraph styles={styles}>
       {pipe(
@@ -32,8 +47,8 @@ export function Price({
           () => <>-</>,
           (value) => (
             <>
-              {t(`component.price.${type === "default" ? "value" : type}`, {
-                value,
+              {t(getTranslationKey(), {
+                value: value.startsWith("-") ? value.slice(1) : value,
               })}
             </>
           )

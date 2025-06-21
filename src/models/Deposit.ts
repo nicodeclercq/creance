@@ -7,5 +7,5 @@ export type Deposit = {
   to: User["_id"];
   note: string;
   updatedAt: Date;
-  createdAt: Date;
+  date: Date;
 };

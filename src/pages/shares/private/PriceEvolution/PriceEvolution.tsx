@@ -41,19 +41,16 @@ export function PriceEvolution({ children, total }: PriceEvolutionProps) {
       onRight={({ expensesAmount, participation, difference }) => (
         <Stack gap="s">
           <Grid columns={2} gap="s" align="center">
-            <Paragraph styles={{ font: "body-large", textAlign: "start" }}>
-              {t("component.priceEvolution.participation")}
-            </Paragraph>
-            <Price styles={{ font: "body-large" }} type="total">
-              {participation}
-            </Price>
-            <Paragraph styles={{ font: "body-small", textAlign: "start" }}>
+            <Paragraph styles={{ textAlign: "start" }}>
               {t("component.priceEvolution.total")}
             </Paragraph>
-            <Price styles={{ font: "body-small" }}>{expensesAmount}</Price>
+            <Price>{expensesAmount}</Price>
+            <Paragraph styles={{ textAlign: "start" }}>
+              {t("component.priceEvolution.participation")}
+            </Paragraph>
+            <Price>{participation}</Price>
             <Paragraph
               styles={{
-                font: "body-small",
                 textAlign: "start",
                 color: difference >= 0 ? "primary-default" : "failure-default",
               }}

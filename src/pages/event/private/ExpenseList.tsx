@@ -53,7 +53,7 @@ export function ExpenseList({
       ...expenses.map((expense) => ({ type: "expense", data: expense })),
       ...deposits.map((deposit) => ({ type: "deposit", data: deposit })),
     ] as Element[]
-  ).sort((a, b) => sort(a.data.createdAt, b.data.createdAt) * -1);
+  ).sort((a, b) => sort(a.data.date, b.data.date) * -1);
 
   return (
     <EventPageTemplate event={event}>

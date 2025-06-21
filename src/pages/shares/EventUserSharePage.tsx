@@ -10,6 +10,7 @@ export function EventUserSharePage() {
   const { eventId } = useParams();
   const [currentEvent] = useStore(`events.${eventId}`);
   const [expenses] = useStore("expenses");
+  const [deposits] = useStore("deposits");
   const [currentUserId] = useStore("currentUserId");
   const users = useEventUsers(eventId);
 
@@ -30,6 +31,7 @@ export function EventUserSharePage() {
       <UserShareList
         event={currentEvent}
         expenses={expenses}
+        deposits={deposits}
         users={users}
         currentUserId={currentUserId}
       />

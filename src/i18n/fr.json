@@ -151,7 +151,8 @@
   "page.event.list.actions.unlock": "Réouvrir la liste",
   "page.event.list.actions.delete": "Supprimer la liste",
   "component.price.value": "{value, number, ::currency/EUR}",
-  "component.price.sum": "+ {value, number, ::currency/EUR}",
+  "component.price.sum.positive": "+ {value, number, ::currency/EUR}",
+  "component.price.sum.negative": "⁃ {value, number, ::currency/EUR}",
   "component.price.total": "= {value, number, ::currency/EUR}",
   "page.event.total": "Total: {value, number, ::currency/EUR}",
   "page.event.expenseList.actions.more": "Afficher les actions",
@@ -240,6 +241,7 @@
   "depositForm.actions.submit": "Enregistrer l'acompte",
   "depositForm.actions.cancel": "Annuler",
   "depositForm.amount": "Montant déposé",
+  "depositForm.date": "Date",
   "depositForm.note": "Raison de l'acompte",
   "depositForm.amount.validation.isNumber": "Le montant doit être un nombre ou un calcule valide",
   "depositForm.amount.validation.positive": "Le montant doit être supérieur à 0",
@@ -260,5 +262,10 @@
   "page.event.depositItem.actions.delete.confirmation.title": "Supprimer l'acompte ?",
   "page.event.depositItem.actions.delete.confirmation.description": "Cette action supprimera définitivement l'acompte de {amount, number, ::currency/EUR} de {from} à {to}.",
   "page.event.depositItem.actions.delete.confirmation.cancel": "Annuler",
-  "page.event.depositItem.actions.delete.confirmation.submit": "Supprimer"
+  "page.event.depositItem.actions.delete.confirmation.submit": "Supprimer",
+  "deposit": "Acompte",
+  "category.unknwon": "Non classé",
+  "page.usershare.summary.title": "Résultat",
+  "page.usershare.expense.title": "Détail participation",
+  "page.usershare.deposit.title": "Acomptes"
 }

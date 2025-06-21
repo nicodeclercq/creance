@@ -1,6 +1,6 @@
 import {
-  getAmountByCategory,
-  getTotalAmount,
+  getExpenseAmountByCategory,
+  getTotalExpenseAmount,
 } from "../../../service/calculation";
 
 import { Card } from "../../../ui/Card/Card";
@@ -26,7 +26,7 @@ export function TotalAmount({ expenses, categories }: TotalAmountProps) {
     <Card>
       <Stack alignItems="center" gap="s">
         <Either
-          data={getTotalAmount(expenses)}
+          data={getTotalExpenseAmount(expenses)}
           onLeft={() => <Paragraph>-</Paragraph>}
           onRight={(totalAmount) => (
             <Paragraph styles={{ font: "body-large" }}>
@@ -35,7 +35,7 @@ export function TotalAmount({ expenses, categories }: TotalAmountProps) {
           )}
         />
         <Either
-          data={getAmountByCategory(expenses)}
+          data={getExpenseAmountByCategory(expenses)}
           onLeft={() => <Paragraph>-</Paragraph>}
           onRight={(amountByCategory) => (
             <PieChart

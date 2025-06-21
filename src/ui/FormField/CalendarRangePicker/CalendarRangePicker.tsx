@@ -82,7 +82,7 @@ export function CalendarRangePicker({
           </Button>
           <Heading className={styles.title} />
           <Button
-            slot="previous"
+            slot="next"
             className={classNames(
               styles.button,
               buttonStyles.button,

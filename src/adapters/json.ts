@@ -63,9 +63,6 @@ export const expenseSchema = z.strictObject({
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
-  createdAt: z
-    .string()
-    .transform((date) => (date == null ? new Date() : new Date(date))),
 });
 
 export const userSchema = z.strictObject({
@@ -100,7 +97,7 @@ export const depositSchema = z.strictObject({
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
-  createdAt: z
+  date: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
   from: z.string(),

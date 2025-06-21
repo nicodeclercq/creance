@@ -5,6 +5,7 @@ import { Avatar } from "../../../ui/Avatar/Avatar";
 import { Deposit } from "../../../models/Deposit";
 import { Event } from "../../../models/Event";
 import { Form } from "../../../ui/Form/Form";
+import { InputDate } from "../../../ui/FormField/InputDate/InputDate";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Select } from "../../../ui/FormField/Select/Select";
@@ -152,6 +153,20 @@ export function DepositForm({
               label: users[user]?.name ?? "deleted user",
               value: users[user]?._id ?? "deleted user",
             }))}
+          />
+        )}
+      />
+      <Controller
+        name="date"
+        control={control}
+        rules={{ required: true }}
+        render={({ field: { value, onChange } }) => (
+          <InputDate
+            type="date"
+            label={t("depositForm.date")}
+            isRequired
+            value={value}
+            onChange={onChange}
           />
         )}
       />

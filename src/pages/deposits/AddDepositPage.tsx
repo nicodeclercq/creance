@@ -24,8 +24,8 @@ export function AddDepositPage() {
     amount: "0",
     from: "",
     to: "",
+    date: new Date(),
     updatedAt: new Date(),
-    createdAt: new Date(),
     note: "",
   };
 

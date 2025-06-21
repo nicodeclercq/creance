@@ -19,6 +19,7 @@ export function DistributionPage() {
   const { eventId } = useParams();
   const [currentEvent] = useStore(`events.${eventId}`);
   const [expenses] = useStore("expenses");
+  const [deposits] = useStore("deposits");
   const [currentUserId] = useStore("currentUserId");
 
   if (!eventId || !currentEvent) {
@@ -35,7 +36,7 @@ export function DistributionPage() {
   }
 
   const distribution = pipe(
-    getEventDistribution(currentEvent, expenses, users),
+    getEventDistribution({ event: currentEvent, deposits, expenses, users }),
     Either.map((dist) => {
       const currentUserDistribution = dist[currentUserId];
       delete dist[currentUserId];
