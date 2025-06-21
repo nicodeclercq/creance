@@ -2,13 +2,12 @@ import { Controller, useForm } from "react-hook-form";
 
 import { CalendarRangePicker } from "../../../ui/FormField/CalendarRangePicker/CalendarRangePicker";
 import { Checkbox } from "../../../ui/FormField/Checkbox/Checkbox";
+import { DELAY_BEFORE_CLOSE } from "../../../models/Event";
 import { Form } from "../../../ui/Form/Form";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Select } from "../../../ui/FormField/Select/Select";
 import { useStore } from "../../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
-
-const DELAY_BEFORE_CLOSE = 7;
 
 export type Step1Data = {
   name: string;

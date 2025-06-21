@@ -1,5 +1,9 @@
+import { addDays, isBefore } from "../utils/date";
+
 import { Category } from "./Category";
 import { Period } from "./Period";
+
+export const DELAY_BEFORE_CLOSE = 7;
 
 export type DefaultUserShare = {
   type: "default";
@@ -55,4 +59,16 @@ export type Event = {
   categories: Record<string, Category>;
   participants: string[];
   updatedAt: Date;
+  isAutoClose?: boolean;
+};
+
+export const shouldCloseEvent = (event: Event): boolean => {
+  const now = new Date();
+  const canAutoClose = isBefore(now);
+
+  if (event.isAutoClose) {
+    const autoCloseDay = addDays(DELAY_BEFORE_CLOSE, event.period.end);
+    return canAutoClose(autoCloseDay);
+  }
+  return false;
 };

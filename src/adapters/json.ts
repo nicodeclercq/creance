@@ -119,6 +119,7 @@ export const eventSchema = z.strictObject({
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
+  isAutoClose: z.boolean().optional(),
 });
 
 const stateSchema = z.strictObject({
