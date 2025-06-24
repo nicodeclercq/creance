@@ -83,6 +83,8 @@
   "page.event.empty.title": "Vous n'avez rentré encore aucune dépense sur cette liste",
   "page.event.empty.description":
     "Pour commencer à ajouter des dépenses, cliquez sur le bouton ci-dessous.",
+  "page.event.empty.description.closed":
+    "Cette liste de créances est clôturée. Vous ne pouvez plus ajouter de dépenses.",
   "page.event.empty.actions.add": "Ajouter une dépense",
   "component.categoryIcon.axe": "Hache",
   "component.categoryIcon.ball": "Ballon",
