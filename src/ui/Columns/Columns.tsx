@@ -11,7 +11,13 @@ type ColumnsProps = {
   children: ReactNode;
   as?: "div" | "li";
   styles?: ContainerStyles<
-    ColorStyles | "position" | "padding" | "radius" | "overflow" | "flexGrow"
+    | ColorStyles
+    | "position"
+    | "padding"
+    | "radius"
+    | "overflow"
+    | "flexGrow"
+    | "width"
   >;
   template?: ContainerStyles["gridTemplateColumns"];
   gap?: ContainerStyles["gap"];

@@ -65,10 +65,9 @@ export type Event = {
 export const shouldCloseEvent = (event: Event): boolean => {
   const now = new Date();
   const canAutoClose = isBefore(now);
+  const autoCloseDay = addDays(DELAY_BEFORE_CLOSE, event.period.end);
 
-  if (event.isAutoClose) {
-    const autoCloseDay = addDays(DELAY_BEFORE_CLOSE, event.period.end);
-    return canAutoClose(autoCloseDay);
-  }
-  return false;
+  return event.isAutoClose && !event.isClosed
+    ? canAutoClose(autoCloseDay)
+    : false;
 };

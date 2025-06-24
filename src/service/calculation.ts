@@ -245,39 +245,6 @@ type ExpenseShare = Pick<
   shares: Record<string, number>;
 };
 
-type DepositShare = Pick<
-  Deposit,
-  "_id" | "from" | "to" | "note" | "date" | "amount"
-> & {
-  type: "deposit";
-};
-
-export function getDepositsShares({
-  event,
-  deposits,
-}: {
-  event: Event;
-  deposits: Record<string, Deposit>;
-}): Either.Either<Error, Readonly<DepositShare[]>> {
-  return pipe(
-    event.deposits
-      .map((depositId) => deposits[depositId])
-      .map(
-        ({ _id, from, to, amount, note, date }) =>
-          ({
-            type: "deposit" as const,
-            _id,
-            from,
-            to,
-            amount,
-            note,
-            date,
-          } as DepositShare)
-      ),
-    Either.right
-  );
-}
-
 function getEventShares({
   event,
   expenses,
@@ -308,57 +275,23 @@ function getEventShares({
   );
 }
 
-type ExpenseShareByUser = Omit<ExpenseShare, "shares"> & {
+export type ExpenseShareByUser = Omit<ExpenseShare, "shares"> & {
   type: "expense";
-  share: number;
-};
-
-type DepositShareByUser = DepositShare & {
   share: number;
 };
 
 export function getEventSharesByUser({
   event,
   expenses,
-  deposits,
   userId,
   users,
 }: {
   event: Event;
   expenses: Record<string, Expense>;
-  deposits: Record<string, Deposit>;
   userId: string;
   users: Record<string, User>;
-}): Either.Either<Error, Array<DepositShareByUser | ExpenseShareByUser>> {
-  const depositsShares = pipe(
-    getDepositsShares({
-      event,
-      deposits,
-    }),
-    Either.map((deposits) =>
-      deposits.filter(
-        (deposit) => deposit.from === userId || deposit.to === userId
-      )
-    ),
-    Either.chain((deposits) =>
-      pipe(
-        deposits,
-        ArrayFP.map((deposit) =>
-          pipe(
-            calculationAsNumber(deposit.amount),
-            Either.map((amount) => ({
-              ...deposit,
-              share: deposit.to === userId ? -amount : amount,
-            }))
-          )
-        ),
-        Either.sequenceArray,
-        (a) => a as Either.Either<Error, DepositShareByUser[]>
-      )
-    )
-  );
-
-  const expensesShares = pipe(
+}): Either.Either<Error, Array<ExpenseShareByUser>> {
+  return pipe(
     getEventShares({ event, expenses, users }),
     Either.map((expenses) =>
       expenses.map((expense) => ({
@@ -369,30 +302,17 @@ export function getEventSharesByUser({
     ),
     Either.map((expenses) => expenses.filter((expense) => expense.share > 0))
   );
-
-  return pipe(
-    [expensesShares, depositsShares],
-    Either.sequenceArray<Error, Array<DepositShareByUser | ExpenseShareByUser>>,
-    Either.map(([expensesShares, depositsShares]) => [
-      ...expensesShares,
-      ...depositsShares,
-    ])
-  );
 }
 
 export function getEventSharesByUserAndCategory({
   shares,
 }: {
-  shares: Either.Either<Error, Array<DepositShareByUser | ExpenseShareByUser>>;
+  shares: Either.Either<Error, Array<ExpenseShareByUser>>;
 }): Either.Either<Error, Record<string, number>> {
   return pipe(
     shares,
     Either.map((expenses) =>
       expenses.reduce((acc, expense) => {
-        if (expense.type === "deposit") {
-          return { ...acc, deposit: (acc.deposit || 0) + expense.share };
-        }
-
         const category = expense.category;
         const share = expense.share || 0;
         return { ...acc, [category]: (acc[category] || 0) + share };
@@ -401,29 +321,94 @@ export function getEventSharesByUserAndCategory({
   );
 }
 
-export function getUserTotalExpenseAmount({
+export type DepositShare = Pick<Deposit, "_id" | "date"> & {
+  userId: string;
+  share: number;
+};
+
+export function getDepositShares({
   event,
   deposits,
+  users,
+}: {
+  event: Event;
+  deposits: Record<string, Deposit>;
+  users: Record<string, User>;
+}): Either.Either<Error, Record<string, DepositShare[]>> {
+  const init = Object.keys(users).reduce(
+    (acc, userId) => ({ ...acc, [userId]: [] }),
+    {} as Record<string, DepositShare[]>
+  );
+
+  return pipe(
+    event.deposits,
+    ArrayFP.map((depositId) => deposits[depositId]),
+    ArrayFP.map((deposit) =>
+      pipe(
+        calculationAsNumber(deposit.amount),
+        Either.map((amount) => ({
+          _id: deposit._id,
+          date: deposit.date,
+          from: deposit.from,
+          to: deposit.to,
+          share: amount,
+        }))
+      )
+    ),
+    Either.sequenceArray,
+    Either.map((shares) =>
+      shares.reduce((acc, { to, from, ...share }) => {
+        if (!acc[from]) {
+          acc[from] = [];
+        }
+        if (!acc[to]) {
+          acc[to] = [];
+        }
+
+        acc[from].push({ ...share, userId: to });
+        acc[to].push({
+          ...share,
+          userId: from,
+          share: -share.share,
+        });
+
+        return acc;
+      }, init)
+    )
+  );
+}
+
+export function getDepositSharesByUsers({
+  event,
+  deposits,
+  users,
+  currentUserId,
+}: {
+  event: Event;
+  deposits: Record<string, Deposit>;
+  users: Record<string, User>;
+  currentUserId: string;
+}): Either.Either<Error, number> {
+  return pipe(
+    getDepositShares({ event, deposits, users }),
+    Either.map((shares) => getTotalDepositAmount(shares[currentUserId]))
+  );
+}
+
+export function getTotalDepositAmount(deposits: DepositShare[]): number {
+  return deposits.reduce((sum, deposit) => sum + deposit.share, 0);
+}
+
+export function getUserTotalExpenseAmount({
+  event,
   expenses,
   userId,
 }: {
   event: Event;
-  deposits: Record<string, Deposit>;
   expenses: Record<string, Expense>;
   userId: string;
 }): Either.Either<Error, number> {
-  const totalDeposit = pipe(
-    event.deposits.map((depositId) => deposits[depositId]),
-    ArrayFP.map((deposit) =>
-      pipe(
-        calculationAsNumber(deposit.amount),
-        Either.map((amount) => (deposit.to === userId ? -amount : amount))
-      )
-    ),
-    Either.sequenceArray,
-    Either.map((amounts) => amounts.reduce((sum, amount) => sum + amount, 0))
-  );
-  const totalExpense = pipe(
+  return pipe(
     event.expenses.map((expenseId) => expenses[expenseId]),
     ArrayFP.map((expense) =>
       expense.lender === userId
@@ -433,25 +418,14 @@ export function getUserTotalExpenseAmount({
     Either.sequenceArray,
     Either.map((amounts) => amounts.reduce((sum, amount) => sum + amount, 0))
   );
-
-  return pipe(
-    [totalDeposit, totalExpense],
-    Either.sequenceArray,
-    Either.map(([depositAmount, expenseAmount]) => {
-      return depositAmount + expenseAmount;
-    })
-  );
 }
 
 export function getUserTotalSharesAmount({
   shares,
 }: {
-  shares: Array<ExpenseShareByUser | DepositShareByUser>;
+  shares: ExpenseShareByUser[];
 }) {
-  return shares.reduce(
-    (sum, expense) => sum + (expense.type === "deposit" ? 0 : expense.share),
-    0
-  );
+  return shares.reduce((sum, { share }) => sum + share, 0);
 }
 
 export type Distribution = {
@@ -474,7 +448,7 @@ export function getEventDistribution({
   const usersTotalDueAmount = Object.keys(users).reduce(
     (acc, userId) =>
       pipe(
-        getEventSharesByUser({ event, expenses, deposits, userId, users }),
+        getEventSharesByUser({ event, expenses, userId, users }),
         Either.map((shares) => ({
           [userId]: getUserTotalSharesAmount({ shares }),
         })),
@@ -490,10 +464,30 @@ export function getEventDistribution({
       ),
     Either.right<Error, Record<string, number>>({})
   );
+  const usersTotalDepositAmount: Either.Either<
+    Error,
+    Record<string, number>
+  > = pipe(
+    Object.keys(users),
+    ArrayFP.map((userId) =>
+      pipe(
+        getDepositSharesByUsers({
+          event,
+          deposits,
+          users,
+          currentUserId: userId,
+        }),
+        Either.map((amount) => [userId, amount] as const)
+      )
+    ),
+    Either.sequenceArray,
+    Either.map(Object.fromEntries)
+  );
+
   const usersTotalPayedAmount = Object.keys(users).reduce(
     (acc, userId) =>
       pipe(
-        getUserTotalExpenseAmount({ event, expenses, deposits, userId }),
+        getUserTotalExpenseAmount({ event, expenses, userId }),
         Either.chain((userAmount) =>
           pipe(
             acc,
@@ -508,86 +502,95 @@ export function getEventDistribution({
   );
 
   return pipe(
-    sequence({ usersTotalDueAmount, usersTotalPayedAmount }),
-    Either.map(({ usersTotalDueAmount, usersTotalPayedAmount }) => {
-      const remainingDue = Object.keys(users).reduce(
-        (acc, userId) => ({
-          ...acc,
-          [userId]: usersTotalDueAmount[userId] - usersTotalPayedAmount[userId],
-        }),
-        {} as Record<string, number>
-      );
+    sequence({
+      usersTotalDueAmount,
+      usersTotalPayedAmount,
+      usersTotalDepositAmount,
+    }),
+    Either.map(
+      ({
+        usersTotalDueAmount,
+        usersTotalPayedAmount,
+        usersTotalDepositAmount,
+      }) => {
+        const mergedPayedAndDepositAmounts = Object.keys(users).reduce(
+          (acc, userId) => ({
+            ...acc,
+            [userId]:
+              (usersTotalPayedAmount[userId] || 0) +
+              usersTotalDepositAmount[userId],
+          }),
+          {} as Record<string, number>
+        );
 
-      const sortedUsers = Object.keys(remainingDue).sort(
-        (a, b) => remainingDue[b] - remainingDue[a]
-      );
+        const remainingDue = Object.keys(users).reduce(
+          (acc, userId) => ({
+            ...acc,
+            [userId]:
+              usersTotalDueAmount[userId] -
+              mergedPayedAndDepositAmounts[userId],
+          }),
+          {} as Record<string, number>
+        );
 
-      // create distribution array for each user least payed giving to most payed first
-      return sortedUsers.reduce(
-        ({ distributions, remainingDiff }, userId) => {
-          sortedUsers.reduceRight((remainingAmount, otherUserId) => {
-            if (remainingAmount <= 0) return remainingAmount;
+        const { owingUsers, owedUsers } = Object.keys(remainingDue)
+          .sort((a, b) => remainingDue[b] - remainingDue[a])
+          .reduce(
+            (acc, userId) => {
+              const amount = remainingDue[userId];
 
-            if (!(userId in distributions)) {
-              distributions[userId] = [];
-            }
-            if (!(otherUserId in distributions)) {
-              distributions[otherUserId] = [];
-            }
-
-            let newAmount = remainingAmount;
-            if (remainingAmount > 0) {
-              // user owes money
-              if (remainingDue[otherUserId] < 0) {
-                const exchangeAmount = Math.min(
-                  Math.abs(remainingDue[otherUserId]),
-                  remainingAmount
-                );
-                newAmount -= exchangeAmount;
-                // user gives money to other
-                distributions[userId].push({
-                  type: "give",
-                  amount: exchangeAmount,
-                  user: otherUserId,
+              if (amount < 0) {
+                acc.owedUsers.push({
+                  userId,
+                  amount: Math.abs(amount),
                 });
-                distributions[otherUserId].push({
-                  type: "receive",
-                  amount: exchangeAmount,
-                  user: userId,
-                });
-              }
-            } else {
-              // user is owed money
-              if (remainingDue[otherUserId] > 0) {
-                // user receives money from other
-                const exchangeAmount = Math.min(
-                  Math.abs(remainingDue[otherUserId]),
-                  remainingAmount
-                );
-                newAmount -= exchangeAmount;
-                // user gives money to other
-                distributions[userId].push({
-                  type: "receive",
-                  amount: exchangeAmount,
-                  user: otherUserId,
-                });
-                distributions[otherUserId].push({
-                  type: "give",
-                  amount: exchangeAmount,
-                  user: userId,
+              } else if (amount > 0) {
+                acc.owingUsers.push({
+                  userId,
+                  amount: Math.abs(amount),
                 });
               }
+              return acc;
+            },
+            {
+              owingUsers: [] as { userId: string; amount: number }[],
+              owedUsers: [] as { userId: string; amount: number }[],
             }
-            return newAmount;
-          }, remainingDue[userId]);
+          );
 
-          return { distributions, remainingDiff };
-        },
-        { distributions: {}, remainingDiff: remainingDue } as {
-          distributions: Record<string, Distribution[]>;
-          remainingDiff: Record<string, number>;
-        }
-      ).distributions;
-    })
+        return owedUsers.reduce((acc, owedUser) => {
+          let owedAmount = owedUser.amount;
+          if (!acc[owedUser.userId]) {
+            acc[owedUser.userId] = [];
+          }
+
+          owingUsers.forEach((owingUser) => {
+            if (!acc[owingUser.userId]) {
+              acc[owingUser.userId] = [];
+            }
+
+            if (owedAmount <= 0 || owingUser.amount <= 0) {
+              return;
+            }
+
+            const amountToTransfer = Math.min(owedAmount, owingUser.amount);
+            acc[owedUser.userId].push({
+              type: "receive",
+              amount: amountToTransfer,
+              user: owingUser.userId,
+            });
+            acc[owingUser.userId].push({
+              type: "give",
+              amount: amountToTransfer,
+              user: owedUser.userId,
+            });
+            owedAmount -= amountToTransfer;
+            owingUser.amount -= amountToTransfer;
+          });
+
+          return acc;
+        }, {} as Record<string, Distribution[]>);
+      }
+    )
   );
 }

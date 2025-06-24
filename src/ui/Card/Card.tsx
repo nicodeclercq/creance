@@ -7,7 +7,7 @@ type CardProps = {
   as?: "div" | "li";
   padding?: ContainerStyles["padding"];
   isInteractive?: boolean;
-  styles?: ContainerStyles<"padding" | "position" | "maxWidth">;
+  styles?: ContainerStyles<"padding" | "position" | "maxWidth" | "textAlign">;
 };
 
 export function Card({
