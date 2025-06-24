@@ -7,6 +7,7 @@ import { useStore } from "../../store/StoreProvider";
 import { useRoute } from "../../hooks/useRoute";
 import * as RecordFP from "fp-ts/Record";
 import { ROUTES } from "../../routes";
+import { exportData, toExportedData } from "../../service/export";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -17,7 +18,9 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const [_, setEvent] = useStore(`events.${event._id}`);
-  const [__, setExpenses] = useStore(`expenses`);
+  const [expenses, setExpenses] = useStore(`expenses`);
+  const [users] = useStore(`users`);
+  const [deposits] = useStore(`deposits`);
   const [___, setEvents] = useStore(`events`);
 
   const actions: Action[] = event.isClosed
@@ -104,9 +107,24 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
       }}
       rightActions={[
         {
+          label: t("settings.actions.exportEvent"),
+          icon: "download",
+          onClick: () => {
+            exportData(
+              event.name,
+              toExportedData({
+                event,
+                deposits,
+                users,
+                expenses,
+              })
+            );
+          },
+        },
+        {
           as: "link",
-          label: t("page.information.title"),
-          icon: "user",
+          label: t("settings.actions.information"),
+          icon: "help",
           to: ROUTES.INFORMATION,
         },
       ]}

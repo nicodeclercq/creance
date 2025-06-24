@@ -1,3 +1,5 @@
+import { exportData, toExportedData } from "../../service/export";
+
 import { Avatar } from "../../ui/Avatar/Avatar";
 import { Button } from "../../ui/Button/Button";
 import { COLLECTIONS } from "../../service/firebase";
@@ -37,6 +39,9 @@ export function InformationPage() {
 
   const [currentUserId] = useStore("currentUserId");
   const [users] = useStore("users");
+  const [events] = useStore("events");
+  const [expenses] = useStore("expenses");
+  const [deposits] = useStore("deposits");
 
   const reset = () => {
     goTo("ROOT");
@@ -48,6 +53,20 @@ export function InformationPage() {
   };
 
   const currentUser = users[currentUserId];
+
+  const doExportData = () => {
+    exportData(
+      "Créance",
+      Object.values(events).map((event) =>
+        toExportedData({
+          event,
+          deposits,
+          expenses,
+          users: users,
+        })
+      )
+    );
+  };
 
   return (
     <PageTemplate
@@ -95,6 +114,12 @@ export function InformationPage() {
             <Item
               label={COLLECTIONS.EXPENSES}
               date={lastUpdate.get(COLLECTIONS.EXPENSES)}
+            />
+            <Button
+              variant="secondary"
+              onClick={doExportData}
+              label="Exporter les données"
+              icon={{ name: "download", position: "end" }}
             />
             <ConfirmButton
               title={t("page.information.clear.confirmation.title")}

@@ -110,6 +110,8 @@
   "component.categoryIcon.wrench": "Outil",
   "component.pageTemplate.actions.more": "Paramètres",
   "page.information.title": "Informations",
+  "settings.actions.information": "Informations",
+  "settings.actions.exportEvent": "Exporter la liste de créances",
   "page.information.disconnected": "Vous n'êtes pas connecté",
   "page.information.actions.back": "Retour",
   "page.information.synchronization": "Dernières synchronisation:",

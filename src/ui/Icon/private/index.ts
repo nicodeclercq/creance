@@ -6,11 +6,13 @@ import { ChevronDownIcon } from "./ChevronDownIcon";
 import { ChevronLeftIcon } from "./ChevronLeftIcon";
 import { ChevronRightIcon } from "./ChevronRightIcon";
 import { CreditCardIcon } from "./CreditCardIcon";
+import { DownloadIcon } from "./DownloadIcon";
 import { EditIcon } from "./EditIcon";
 import { ErrorIcon } from "./ErrorIcon";
 import { ExchangeMoneyIcon } from "./ExchangeMoneyIcon";
 import { FolderIcon } from "./FolderIcon";
 import { GiveMoneyIcon } from "./GiveMoneyIcon";
+import { HelpIcon } from "./HelpIcon";
 import { HideIcon } from "./HideIcon";
 import { LockIcon } from "./LockIcon";
 import { MenuIcon } from "./MenuIcon";
@@ -35,11 +37,13 @@ export const ICONS = {
   "chevron-left": ChevronLeftIcon,
   "chevron-right": ChevronRightIcon,
   "credit-card": CreditCardIcon,
+  download: DownloadIcon,
   edit: EditIcon,
   error: ErrorIcon,
+  "exchange-money": ExchangeMoneyIcon,
   folder: FolderIcon,
   "give-money": GiveMoneyIcon,
-  "exchange-money": ExchangeMoneyIcon,
+  help: HelpIcon,
   hide: HideIcon,
   lock: LockIcon,
   menu: MenuIcon,
