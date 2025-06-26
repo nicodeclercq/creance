@@ -7,7 +7,7 @@ import { useStore } from "../../store/StoreProvider";
 import { useRoute } from "../../hooks/useRoute";
 import * as RecordFP from "fp-ts/Record";
 import { ROUTES } from "../../routes";
-import { exportData, toExportedData } from "../../service/export";
+import { exportData, toExportedData } from "../../service/importExport";
 
 type EventPageTemplateProps = {
   children: ReactNode;

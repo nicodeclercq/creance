@@ -99,4 +99,5 @@
 }
 .isLoading .content {
   visibility: hidden;
+  opacity: 0;
 }

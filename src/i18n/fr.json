@@ -112,6 +112,7 @@
   "page.information.title": "Informations",
   "settings.actions.information": "Informations",
   "settings.actions.exportEvent": "Exporter la liste de créances",
+  "settings.actions.importData": "Importer des données",
   "page.information.disconnected": "Vous n'êtes pas connecté",
   "page.information.actions.back": "Retour",
   "page.information.synchronization": "Dernières synchronisation:",
@@ -272,5 +273,6 @@
   "category.unknwon": "Non classé",
   "page.usershare.results.title": "Résultats",
   "page.usershare.shares.title": "Participation",
-  "page.usershare.deposit.title": "Avances"
+  "page.usershare.deposit.title": "Avances",
+  "page.information.import.error": "Les données du fichier n'ont pas pu être importées. Veuillez vérifier son format et réessayez."
 }

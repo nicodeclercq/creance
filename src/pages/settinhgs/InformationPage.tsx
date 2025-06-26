@@ -1,4 +1,10 @@
-import { exportData, toExportedData } from "../../service/export";
+import * as Either from "fp-ts/Either";
+
+import {
+  exportData,
+  importData,
+  toExportedData,
+} from "../../service/importExport";
 
 import { Avatar } from "../../ui/Avatar/Avatar";
 import { Button } from "../../ui/Button/Button";
@@ -9,6 +15,7 @@ import { ConfirmButton } from "../../ui/ConfirmButton/ConfirmButton";
 import { DateFormatter } from "../../ui/DateFormatter/DateFormatter";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
+import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
 import { lastUpdate } from "../../service/synchronize";
 import { resetStore } from "../../store/reset";
@@ -36,12 +43,13 @@ export function InformationPage() {
   const { t } = useTranslation();
   const [isDebug, setIsDebug] = useState(sessionStorage.getItem("debug"));
   const { goTo, back } = useRoute();
+  const [hasImportError, setHasImportError] = useState(false);
 
   const [currentUserId] = useStore("currentUserId");
-  const [users] = useStore("users");
-  const [events] = useStore("events");
-  const [expenses] = useStore("expenses");
-  const [deposits] = useStore("deposits");
+  const [users, setUsers] = useStore("users");
+  const [events, setEvents] = useStore("events");
+  const [expenses, setExpenses] = useStore("expenses");
+  const [deposits, setDeposits] = useStore("deposits");
 
   const reset = () => {
     goTo("ROOT");
@@ -64,6 +72,31 @@ export function InformationPage() {
           expenses,
           users: users,
         })
+      )
+    );
+  };
+  const doImportData = () => {
+    return importData({
+      events,
+      users,
+      expenses,
+      deposits,
+    }).then(
+      Either.fold(
+        (error) => {
+          console.error("Import failed:", error);
+          setHasImportError(true);
+        },
+        (data) => {
+          setHasImportError(false);
+          console.log("Import successful:", data);
+
+          setUsers((users) => ({ ...users, ...data.users }));
+          setEvents((events) => ({ ...events, ...data.events }));
+          setExpenses((expenses) => ({ ...expenses, ...data.expenses }));
+          setDeposits((deposits) => ({ ...deposits, ...data.deposits }));
+          goTo(ROUTES.ROOT);
+        }
       )
     );
   };
@@ -120,6 +153,17 @@ export function InformationPage() {
               onClick={doExportData}
               label="Exporter les données"
               icon={{ name: "download", position: "end" }}
+            />
+            {hasImportError && (
+              <Paragraph styles={{ color: "failure-default" }}>
+                {t("page.information.import.error")}
+              </Paragraph>
+            )}
+            <Button
+              variant="secondary"
+              onClick={doImportData}
+              label={t("settings.actions.importData")}
+              icon={{ name: "upload", position: "end" }}
             />
             <ConfirmButton
               title={t("page.information.clear.confirmation.title")}

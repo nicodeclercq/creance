@@ -9,3 +9,11 @@ export function removeFromObject<T extends Record<string, any>>(
     return acc;
   }, {} as Omit<T, typeof key>);
 }
+
+export const withoutKey = <K extends keyof T, T extends Record<string, any>>(
+  obj: T,
+  key: K
+): Omit<T, K> => {
+  const { [key]: _, ...rest } = obj;
+  return rest;
+};
