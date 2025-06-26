@@ -10,7 +10,6 @@ import {
   DataSnapshot,
   getDatabase,
   onValue,
-  get,
   ref,
   set,
 } from "firebase/database";
@@ -34,7 +33,6 @@ import {
 import { State } from "../store/state";
 import { Path, ValueFromPath } from "../store/store";
 import { synchronize } from "./synchronize";
-import { log } from "../ui/Debug/Debug";
 
 type Schema<Data> = ZodSchema<Data, any, any>;
 
@@ -69,68 +67,12 @@ export const $isAuthenticated = new RX.BehaviorSubject<AuthState>({
   type: "loading",
 });
 onAuthStateChanged(auth, (user) => {
-  log("firebase", "Auth state changed:", user);
   if (user === null) {
     $isAuthenticated.next({ type: "unauthenticated" });
   } else if (user.uid) {
     $isAuthenticated.next({ type: "authenticated", userId: user.uid });
   }
 });
-
-const getData =
-  <Data>(
-    collectionName: CollectionName,
-    adapter: (data: unknown) => Data = identity as (data: unknown) => Data
-  ): TaskEither.TaskEither<Error, Record<string, Data>> =>
-  () => {
-    log("firebase", `Getting data from collection ${collectionName}`);
-    const collectionRef = ref(db, collectionName);
-    return auth
-      .authStateReady()
-      .then(() => {
-        log("firebase", `Getting data from collection ${collectionName}`);
-      })
-      .then(() => get(collectionRef))
-      .then((snapshot) => {
-        log(
-          "firebase",
-          `Data received from collection ${collectionName}:`,
-          snapshot
-        );
-        return snapshot;
-      })
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const firebaseSchema = z.record(z.string(), z.unknown());
-          const result = firebaseSchema.safeParse(data);
-
-          if (result.success) {
-            const adaptedData = RecordFP.map(adapter)(result.data);
-            return Either.right(adaptedData);
-          } else {
-            return Either.left(new Error(result.error.message));
-          }
-        } else {
-          log(
-            "firebase",
-            `No data found in collection ${collectionName}. Returning empty object.`
-          );
-          return Either.right({});
-        }
-      })
-      .catch(() => {
-        return Either.left(
-          new Error(`Failed to get data from collection ${collectionName}`)
-        );
-      })
-      .finally(() => {
-        log(
-          "firebase",
-          `Finished getting data from collection ${collectionName}`
-        );
-      });
-  };
 
 const listenToRemoteChanges = <LocalData>(
   collectionName: CollectionName,
@@ -144,25 +86,12 @@ const listenToRemoteChanges = <LocalData>(
     const $value = new RX.Subject<
       Either.Either<Error, Record<string, LocalData>>
     >();
-    log(
-      "firebase",
-      `Listening to changes in Firebase for collection ${collectionName}`
-    );
-
     try {
       onValue(
         collectionRef,
         (snapshot) =>
           pipe(
             snapshot,
-            (a) => {
-              log(
-                "firebase",
-                `Data received from Firebase for collection ${collectionName}:`,
-                a
-              );
-              return a;
-            },
             Either.fromPredicate(
               (s: DataSnapshot) => s.exists(),
               () =>
@@ -180,8 +109,7 @@ const listenToRemoteChanges = <LocalData>(
             }),
             (value) => $value.next(value)
           ),
-        (error: Error) => {
-          log("Error", collectionName, error);
+        () => {
           $value.next(
             Either.left(
               new Error(
@@ -191,13 +119,7 @@ const listenToRemoteChanges = <LocalData>(
           );
         }
       );
-    } catch (error) {
-      log(
-        "firebase",
-        `Error setting up listener for collection ${collectionName}:`,
-        error
-      );
-    }
+    } catch (error) {}
     return $value;
   };
 
@@ -206,7 +128,10 @@ const listenToRemoteChanges = <LocalData>(
       onChange(data);
     },
     error: (error) => {
-      log("firebase", `Error in collection ${collectionName}:`, error);
+      console.error(
+        `Error listening to changes in Firebase for collection ${collectionName}:`,
+        error
+      );
     },
   });
 };
@@ -343,7 +268,6 @@ function getRemoteStore<Data>(
             `Error listening to changes in collection ${collectionName}:`,
             error
           );
-          log("firebase", `Error in collection ${collectionName}:`, error);
           $remoteStore.next({ type: "errored" });
         },
         (newRemoteData: Record<string, Data>) => {
@@ -366,8 +290,7 @@ function getRemoteStore<Data>(
       ([state, isAuthenticated]) =>
         (isLoaded(state) || isError(state)) && isAuthenticated
     ),
-    RX.map(([state]) => (isLoaded(state) ? (state as Loaded).data : {})),
-    RX.tap((state) => log("firebase", "Remote changed:", state))
+    RX.map(([state]) => (isLoaded(state) ? (state as Loaded).data : {}))
   );
 }
 
@@ -498,9 +421,5 @@ export function synchronizeFirebase({
       in: fromFirebaseData(depositSchema),
       out: toFirebaseData,
     },
-  });
-
-  getData(COLLECTIONS.USERS, fromFirebaseData(userSchema))().then((result) => {
-    log("firebase", "Initial data from USERS:", result);
   });
 }

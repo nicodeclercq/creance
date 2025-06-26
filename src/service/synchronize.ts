@@ -1,7 +1,6 @@
 import * as RX from "rxjs";
 import { type Observable } from "rxjs";
 import * as z from "zod";
-import { log } from "../ui/Debug/Debug";
 
 type Diff<Data> = {
   created: Record<string, Data>;
@@ -135,9 +134,6 @@ export function synchronize<Data extends { updatedAt: Date }>({
         (prev, cur) => JSON.stringify(prev) === JSON.stringify(cur)
       ),
       RX.debounceTime(100),
-      RX.tap((state) =>
-        log("synchronise", `Change in collection ${collectionName}:`, state)
-      ),
       RX.map(([localData, remoteData]) =>
         getMergeDiffs({
           local: localData,
@@ -148,7 +144,6 @@ export function synchronize<Data extends { updatedAt: Date }>({
     )
     .subscribe({
       next: ({ local, remote }) => {
-        log("synchronize", "local", local, "remote", remote);
         Promise.all([
           Promise.resolve(hasChanges(local)).then((changed) =>
             changed ? saveLocal(local) : undefined
@@ -165,7 +160,7 @@ export function synchronize<Data extends { updatedAt: Date }>({
           });
       },
       error: (error) => {
-        log("Error during synchronization:", error);
+        console.error("Error during synchronization:", error);
       },
     });
 }

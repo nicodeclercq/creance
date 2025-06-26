@@ -315,11 +315,9 @@ export function readData({
         }
       };
       reader.onabort = () => {
-        console.log("File reading was aborted.");
         resolve(Either.left(new Error("File reading was aborted.")));
       };
       reader.onerror = () => {
-        console.log("File reading failed.");
         resolve(Either.left(new Error("File reading failed.")));
       };
       reader.readAsText(file, "UTF-8");

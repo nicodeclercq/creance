@@ -89,7 +89,6 @@ export function InformationPage() {
         },
         (data) => {
           setHasImportError(false);
-          console.log("Import successful:", data);
 
           setUsers((users) => ({ ...users, ...data.users }));
           setEvents((events) => ({ ...events, ...data.events }));
