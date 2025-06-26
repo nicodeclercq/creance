@@ -14,7 +14,7 @@ import { EventUserSharePage } from "./pages/shares/EventUserSharePage";
 import { DistributionPage } from "./pages/distribution/DistributionPage";
 import { ValueOf } from "./utils/object";
 import { LoginPage } from "./pages/auth/LoginPage";
-import { InformationPage } from "./pages/settinhgs/InformationPage";
+import { InformationPage } from "./pages/settings/InformationPage";
 import { AddDepositPage } from "./pages/deposits/AddDepositPage";
 import { EditDepositPage } from "./pages/deposits/EditDepositPage";
 
