@@ -41,7 +41,6 @@ function Item({ label, date }: { label: string; date: Date }) {
 
 export function InformationPage() {
   const { t } = useTranslation();
-  const [isDebug, setIsDebug] = useState(sessionStorage.getItem("debug"));
   const { goTo, back } = useRoute();
   const [hasImportError, setHasImportError] = useState(false);
 
@@ -54,10 +53,6 @@ export function InformationPage() {
   const reset = () => {
     goTo("ROOT");
     resetStore();
-  };
-  const toggleDebug = () => {
-    setIsDebug(isDebug === "true" ? "false" : "true");
-    sessionStorage.setItem("debug", isDebug === "true" ? "false" : "true");
   };
 
   const currentUser = users[currentUserId];
@@ -181,17 +176,6 @@ export function InformationPage() {
               }}
             />
           </Stack>
-        </Card>
-        <Card>
-          <Button
-            variant="secondary"
-            onClick={toggleDebug}
-            label={
-              isDebug === "true"
-                ? t("page.information.actions.toggleDebug.off")
-                : t("page.information.actions.toggleDebug.on")
-            }
-          ></Button>
         </Card>
       </Stack>
     </PageTemplate>
