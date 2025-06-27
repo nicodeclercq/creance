@@ -5,7 +5,7 @@ import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
-import { uid } from "../../uid";
+import { uid } from "../../service/crypto";
 import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";
 import { useStore } from "../../store/StoreProvider";

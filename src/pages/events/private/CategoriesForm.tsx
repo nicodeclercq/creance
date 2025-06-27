@@ -14,7 +14,7 @@ import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Select } from "../../../ui/FormField/Select/Select";
 import styles from "./AddEventStep2.module.css";
-import { uid } from "../../../uid";
+import { uid } from "../../../service/crypto";
 import { useTranslation } from "react-i18next";
 
 type AddCategoryFormProps = {

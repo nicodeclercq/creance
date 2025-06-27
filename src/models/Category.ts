@@ -1,5 +1,5 @@
 import { CategoryIconName } from "../ui/CategoryIcon/private";
-import { uid } from "../uid";
+import { uid } from "../service/crypto";
 
 export type Category = {
   _id: string;

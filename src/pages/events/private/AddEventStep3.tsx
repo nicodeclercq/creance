@@ -10,7 +10,7 @@ import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { User } from "../../../models/User";
 import styles from "./AddEventStep3.module.css";
-import { uid } from "../../../uid";
+import { uid } from "../../../service/crypto";
 import { useStore } from "../../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 

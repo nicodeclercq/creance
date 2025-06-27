@@ -5,7 +5,7 @@ import { ExpenseForm } from "./private/ExpenseForm";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";
 import { Redirect } from "../../Redirect";
-import { uid } from "../../uid";
+import { uid } from "../../service/crypto";
 import { useEventUsers } from "../../hooks/useEventUsers";
 import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";

@@ -1,4 +1,12 @@
-import { decode, encode, exportKeys, getKeys, importKeys } from "./crypto";
+import {
+  decode,
+  decrypt,
+  encode,
+  encrypt,
+  exportKeys,
+  getKeys,
+  importKeys,
+} from "./crypto";
 import { describe, expect, it } from "vitest";
 
 describe("Crypto Service", () => {
@@ -33,6 +41,21 @@ describe("Crypto Service", () => {
 
     const encoded = await encode(originalText, importedKeys.publicKey);
     const decoded = await decode(encoded, importedKeys.privateKey);
+
+    expect(typeof encoded).toBe("string");
+    expect(decoded).toBe(originalText);
+  });
+});
+
+describe("encrypt/decrypt", () => {
+  it("should encrypt and decrypt a string", async () => {
+    const originalText = "Hello, World! Bonjour le monde!";
+    const key = Buffer.from(
+      crypto.getRandomValues(new Uint8Array(32))
+    ).toString("base64");
+
+    const encoded = await encrypt(originalText, key);
+    const decoded = await decrypt(encoded, key);
 
     expect(typeof encoded).toBe("string");
     expect(decoded).toBe(originalText);

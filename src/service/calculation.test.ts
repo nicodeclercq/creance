@@ -18,7 +18,7 @@ import { Deposit } from "../models/Deposit";
 import { Expense } from "../models/Expense";
 import { User } from "../models/User";
 import { pipe } from "fp-ts/function";
-import { uid } from "../uid";
+import { uid } from "./crypto";
 
 const createEvent = (defaultValues: Partial<Event> = {}): Event => ({
   _id: uid(),

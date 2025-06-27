@@ -8,8 +8,8 @@ import { AddEventStep3, Step3Data } from "./private/AddEventStep3";
 import { useStore } from "../../store/StoreProvider";
 import { Card } from "../../ui/Card/Card";
 import { useRoute } from "../../hooks/useRoute";
-import { uid } from "../../uid";
 import { useTranslation } from "react-i18next";
+import { uid } from "../../service/crypto";
 
 const now = new Date();
 
