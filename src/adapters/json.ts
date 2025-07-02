@@ -112,10 +112,9 @@ export const eventSchema = z.strictObject({
   shares: z.record(z.string(), userShareSchema),
   period: periodSchema,
   description: z.string(),
-  expenses: z.array(z.string()),
-  deposits: z.array(z.string()),
+  expenses: z.record(z.string(), expenseSchema),
+  deposits: z.record(z.string(), depositSchema),
   categories: z.record(z.string(), categorySchema),
-  participants: z.array(z.string()),
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
@@ -126,8 +125,6 @@ const stateSchema = z.strictObject({
   currentUserId: z.string(),
   users: z.record(z.string(), userSchema),
   events: z.record(z.string(), eventSchema),
-  expenses: z.record(z.string(), expenseSchema),
-  deposits: z.record(z.string(), depositSchema),
 });
 
 export const toState = (data: unknown): Either.Either<ZodError, State> => {

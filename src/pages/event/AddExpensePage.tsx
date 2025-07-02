@@ -17,7 +17,6 @@ export function AddExpensePage() {
   const { eventId } = useParams();
   const { goTo } = useRoute();
   const [currentEvent, setEvent] = useStore(`events.${eventId}`);
-  const [_expenses, setExpenses] = useStore("expenses");
   const users = useEventUsers(eventId);
   const [currentUserId] = useStore("currentUserId");
 
@@ -35,11 +34,10 @@ export function AddExpensePage() {
   const addExpense = (expense: Expense) => {
     setEvent((event) => ({
       ...event,
-      expenses: [...event.expenses, expense._id],
-    }));
-    setExpenses((expenses) => ({
-      ...expenses,
-      [expense._id]: expense,
+      expenses: {
+        ...event.expenses,
+        [expense._id]: expense,
+      },
     }));
     goTo(ROUTES.EVENT, { eventId: currentEvent._id });
   };

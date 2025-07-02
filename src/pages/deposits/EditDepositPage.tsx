@@ -14,12 +14,19 @@ export function EditDepositPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const { eventId, depositId } = useParams();
-  const [event] = useStore(`events.${eventId}`);
-  const [defaultValue, setDeposit] = useStore(`deposits.${depositId}`);
+  const [event, setEvent] = useStore(`events.${eventId}`);
   const [users] = useStore("users");
 
+  const defaultValue = event.deposits[depositId!];
+
   const submit = (deposit: Deposit) => {
-    setDeposit(() => deposit);
+    setEvent((currentEvent) => ({
+      ...currentEvent,
+      deposits: {
+        ...currentEvent.deposits,
+        [deposit._id]: deposit,
+      },
+    }));
     goTo(ROUTES.EVENT, { eventId: event._id });
   };
 

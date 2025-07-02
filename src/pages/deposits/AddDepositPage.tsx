@@ -16,7 +16,6 @@ export function AddDepositPage() {
   const { goTo } = useRoute();
   const { eventId } = useParams();
   const [event, setEvent] = useStore(`events.${eventId}`);
-  const [_, setDeposits] = useStore(`deposits`);
   const [users] = useStore("users");
 
   const defaultValue: Deposit = {
@@ -32,9 +31,11 @@ export function AddDepositPage() {
   const submit = (deposit: Deposit) => {
     setEvent((currentEvent) => ({
       ...currentEvent,
-      deposits: [...currentEvent.deposits, deposit._id],
+      deposits: {
+        ...currentEvent.deposits,
+        [deposit._id]: deposit,
+      },
     }));
-    setDeposits((deposits) => ({ ...deposits, [deposit._id]: deposit }));
     goTo(ROUTES.EVENT, { eventId: event._id });
   };
 

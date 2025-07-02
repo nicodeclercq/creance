@@ -2,7 +2,7 @@ import { Controller, useForm } from "react-hook-form";
 
 import { CalendarRangePicker } from "../../../ui/FormField/CalendarRangePicker/CalendarRangePicker";
 import { Checkbox } from "../../../ui/FormField/Checkbox/Checkbox";
-import { DELAY_BEFORE_CLOSE } from "../../../models/Event";
+import { DAYS_BEFORE_CLOSE } from "../../../models/Event";
 import { Form } from "../../../ui/Form/Form";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Select } from "../../../ui/FormField/Select/Select";
@@ -171,7 +171,7 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
         render={({ field: { onChange, value } }) => (
           <Checkbox
             label={t("page.events.add.form.field.isAutoClose.label", {
-              delay: DELAY_BEFORE_CLOSE,
+              delay: DAYS_BEFORE_CLOSE,
             })}
             value={value}
             onChange={onChange}

@@ -18,8 +18,6 @@ export function DistributionPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const [currentEvent] = useStore(`events.${eventId}`);
-  const [expenses] = useStore("expenses");
-  const [deposits] = useStore("deposits");
   const [currentUserId] = useStore("currentUserId");
 
   if (!eventId || !currentEvent) {
@@ -27,7 +25,7 @@ export function DistributionPage() {
   }
   const users = useEventUsers(eventId);
 
-  if (currentEvent.expenses.length === 0) {
+  if (Object.keys(currentEvent.expenses).length === 0) {
     return (
       <EventPageTemplate event={currentEvent}>
         <EmptyEvent event={currentEvent} />
@@ -36,7 +34,7 @@ export function DistributionPage() {
   }
 
   const distribution = pipe(
-    getEventDistribution({ event: currentEvent, deposits, expenses, users }),
+    getEventDistribution({ event: currentEvent, users }),
     Either.map((dist) => {
       const currentUserDistribution = dist[currentUserId];
       delete dist[currentUserId];

@@ -36,9 +36,8 @@ const createEvent = (defaultValues: Partial<Event> = {}): Event => ({
       icon: "axe",
     },
   },
-  deposits: [],
-  expenses: [],
-  participants: [],
+  deposits: {},
+  expenses: {},
   isClosed: false,
   period: {
     start: new Date("2025-01-01"), // x1
@@ -273,8 +272,7 @@ describe("calcultation", () => {
         lender: "user1",
       });
       const event = createEvent({
-        expenses: [expense._id],
-        participants: ["user1", "user2"],
+        expenses: { [expense._id]: expense },
         shares: {
           user1: { type: "default" },
           user2: { type: "default" },
@@ -316,8 +314,7 @@ describe("calcultation", () => {
         },
       });
       const event = createEvent({
-        expenses: [expense._id],
-        participants: ["user1", "user2"],
+        expenses: { [expense._id]: expense },
         shares: {
           user1: { type: "default" },
           user2: { type: "default" },
@@ -359,8 +356,7 @@ describe("calcultation", () => {
         },
       });
       const event = createEvent({
-        expenses: [expense._id],
-        participants: ["user1", "user2"],
+        expenses: { [expense._id]: expense },
         shares: {
           user1: { type: "default" },
           user2: { type: "default" },
@@ -440,27 +436,25 @@ describe("calcultation", () => {
       };
 
       const event = createEvent({
-        deposits: [
-          deposits.deposit1._id,
-          deposits.deposit2._id,
-          deposits.deposit3._id,
-        ],
-        expenses: [
-          expenses.expense1._id,
-          expenses.expense2._id,
-          expenses.expense3._id,
-        ],
+        deposits: {
+          [deposits.deposit1._id]: deposits.deposit1,
+          [deposits.deposit2._id]: deposits.deposit2,
+          [deposits.deposit3._id]: deposits.deposit3,
+        },
+        expenses: {
+          expense1: expenses.expense1,
+          expense2: expenses.expense2,
+          expense3: expenses.expense3,
+        },
         shares: {
           user1: { type: "default" },
           user2: { type: "default" },
           user3: { type: "default" },
         },
-        participants: ["user1", "user2", "user3"],
       });
 
       const user1Shares = getEventSharesByUser({
         event,
-        expenses,
         users,
         userId: "user1",
       });
@@ -504,7 +498,10 @@ describe("calcultation", () => {
       };
 
       const event = createEvent({
-        deposits: [deposits.deposit1._id, deposits.deposit2._id],
+        deposits: {
+          [deposits.deposit1._id]: deposits.deposit1,
+          [deposits.deposit2._id]: deposits.deposit2,
+        },
       });
 
       const users = {
@@ -514,7 +511,6 @@ describe("calcultation", () => {
 
       const shares = getDepositShares({
         event,
-        deposits,
         users,
       });
 
@@ -586,15 +582,19 @@ describe("calcultation", () => {
         }),
       };
       const event = createEvent({
-        deposits: [deposits.deposit1._id],
-        expenses: [expenses.expense1._id, expenses.expense2._id],
+        deposits: {
+          [deposits.deposit1._id]: deposits.deposit1,
+        },
+        expenses: {
+          expense1: expenses.expense1,
+          expense2: expenses.expense2,
+        },
         shares: {
           user1: { type: "default" },
           user2: { type: "default" },
           user3: { type: "default" },
           user4: { type: "default" },
         },
-        participants: ["user1", "user2", "user3", "user4"],
       });
 
       /*
@@ -619,8 +619,6 @@ describe("calcultation", () => {
 
       const distribution = getEventDistribution({
         event,
-        deposits,
-        expenses,
         users,
       });
 
@@ -688,15 +686,19 @@ describe("calcultation", () => {
         }),
       };
       const event = createEvent({
-        deposits: [deposits.deposit1._id],
-        expenses: [expenses.expense1._id, expenses.expense2._id],
+        deposits: {
+          [deposits.deposit1._id]: deposits.deposit1,
+        },
+        expenses: {
+          expense1: expenses.expense1,
+          expense2: expenses.expense2,
+        },
         shares: {
           user1: { type: "default" },
           user2: { type: "default" },
           user3: { type: "default" },
           user4: { type: "default" },
         },
-        participants: ["user1", "user2", "user3", "user4"],
       });
 
       /*
@@ -721,8 +723,6 @@ describe("calcultation", () => {
 
       const distribution = getEventDistribution({
         event,
-        deposits,
-        expenses,
         users,
       });
 

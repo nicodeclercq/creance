@@ -24,12 +24,7 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { pipe, flow } from "fp-ts/function";
-import {
-  depositSchema,
-  eventSchema,
-  expenseSchema,
-  userSchema,
-} from "../adapters/json";
+import { eventSchema, userSchema } from "../adapters/json";
 import { State } from "../store/state";
 import { Path, ValueFromPath } from "../store/store";
 import { synchronize } from "./synchronize";
@@ -38,9 +33,7 @@ type Schema<Data> = ZodSchema<Data, any, any>;
 
 export const COLLECTIONS = {
   EVENTS: "events",
-  EXPENSES: "expenses",
   USERS: "users",
-  DEPOSITS: "deposits",
 } as const;
 type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 
@@ -388,7 +381,7 @@ export function synchronizeFirebase({
       },
       out: (data) => ({
         data: toFirebaseData(data),
-        participants: data.participants,
+        participants: Object.keys(data.shares),
       }),
     },
   });
@@ -399,26 +392,6 @@ export function synchronizeFirebase({
     $localStore: $localStore.pipe(RX.map(({ users }) => users)),
     adapter: {
       in: fromFirebaseData(userSchema),
-      out: toFirebaseData,
-    },
-  });
-
-  synchronizeCollection({
-    collectionName: COLLECTIONS.EXPENSES,
-    updateLocalState: updateLocalState("expenses"),
-    $localStore: $localStore.pipe(RX.map(({ expenses }) => expenses)),
-    adapter: {
-      in: fromFirebaseData(expenseSchema),
-      out: toFirebaseData,
-    },
-  });
-
-  synchronizeCollection({
-    collectionName: COLLECTIONS.DEPOSITS,
-    updateLocalState: updateLocalState("deposits"),
-    $localStore: $localStore.pipe(RX.map(({ deposits }) => deposits)),
-    adapter: {
-      in: fromFirebaseData(depositSchema),
       out: toFirebaseData,
     },
   });

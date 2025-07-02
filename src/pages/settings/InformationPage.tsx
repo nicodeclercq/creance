@@ -47,8 +47,6 @@ export function InformationPage() {
   const [currentUserId] = useStore("currentUserId");
   const [users, setUsers] = useStore("users");
   const [events, setEvents] = useStore("events");
-  const [expenses, setExpenses] = useStore("expenses");
-  const [deposits, setDeposits] = useStore("deposits");
 
   const reset = () => {
     goTo("ROOT");
@@ -63,8 +61,6 @@ export function InformationPage() {
       Object.values(events).map((event) =>
         toExportedData({
           event,
-          deposits,
-          expenses,
           users: users,
         })
       )
@@ -74,8 +70,6 @@ export function InformationPage() {
     return importData({
       events,
       users,
-      expenses,
-      deposits,
     }).then(
       Either.fold(
         (error) => {
@@ -87,8 +81,6 @@ export function InformationPage() {
 
           setUsers((users) => ({ ...users, ...data.users }));
           setEvents((events) => ({ ...events, ...data.events }));
-          setExpenses((expenses) => ({ ...expenses, ...data.expenses }));
-          setDeposits((deposits) => ({ ...deposits, ...data.deposits }));
           goTo(ROUTES.ROOT);
         }
       )
@@ -137,10 +129,6 @@ export function InformationPage() {
             <Item
               label={COLLECTIONS.EVENTS}
               date={lastUpdate.get(COLLECTIONS.EVENTS)}
-            />
-            <Item
-              label={COLLECTIONS.EXPENSES}
-              date={lastUpdate.get(COLLECTIONS.EXPENSES)}
             />
             <Button
               variant="secondary"

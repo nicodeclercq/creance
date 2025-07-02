@@ -8,8 +8,6 @@ import { useStore } from "../../store/StoreProvider";
 export function EventPage() {
   const { eventId } = useParams();
   const [currentEvent, setEvent] = useStore(`events.${eventId}`);
-  const [expenses, setExpenses] = useStore("expenses");
-  const [deposits] = useStore("deposits");
 
   if (!eventId) {
     return <EventNotFoundPage />;
@@ -23,18 +21,23 @@ export function EventPage() {
   const deleteExpense = (expenseId: string) => {
     setEvent((event) => ({
       ...event,
-      expenses: event.expenses.filter((expense) => expense !== expenseId),
+      expenses: removeFromObject(event.expenses, expenseId),
     }));
-    setExpenses((expenses) => removeFromObject(expenses, expenseId));
+  };
+
+  const deleteDeposit = (depositId: string) => {
+    setEvent((event) => ({
+      ...event,
+      deposits: removeFromObject(event.deposits, depositId),
+    }));
   };
 
   return (
     <ExpenseList
       event={currentEvent}
-      expenses={expenses}
-      deposits={deposits}
       users={users}
       onDeleteExpense={deleteExpense}
+      onDeleteDeposit={deleteDeposit}
     />
   );
 }

@@ -15,10 +15,9 @@ import { useTranslation } from "react-i18next";
 
 type Props = {
   event: Event;
-  expenses: Record<string, Expense>;
-  deposits: Record<string, Deposit>;
   users: Record<string, User>;
   onDeleteExpense: (expenseId: string) => void;
+  onDeleteDeposit: (depositId: string) => void;
 };
 
 type ExpenseElement = { type: "expense"; data: Expense };
@@ -31,21 +30,20 @@ const isExpenseElement = (element: Element): element is ExpenseElement =>
 export function ExpenseList({
   event,
   users,
-  expenses: expensesCollection,
-  deposits: depositsCollection,
   onDeleteExpense,
+  onDeleteDeposit,
 }: Props) {
   const { t } = useTranslation();
-  const expenses = event.expenses
-    .map((id) => expensesCollection[id])
-    .filter(Boolean);
+  const expenses = Object.values(event.expenses);
 
-  const deposits = event.deposits
-    .map((id) => depositsCollection[id])
-    .filter(Boolean);
+  const deposits = Object.values(event.deposits);
 
   const deleteExpense = (expenseId: string) => () => {
     onDeleteExpense(expenseId);
+  };
+
+  const deleteDeposit = (depositId: string) => () => {
+    onDeleteDeposit(depositId);
   };
 
   const list = (
@@ -83,7 +81,7 @@ export function ExpenseList({
                       eventId={event._id}
                       deposit={element.data}
                       users={users}
-                      onDelete={deleteExpense(element.data._id)}
+                      onDelete={deleteDeposit(element.data._id)}
                     />
                   )
                 )}

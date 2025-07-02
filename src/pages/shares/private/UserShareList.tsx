@@ -13,10 +13,8 @@ import {
 import { Alert } from "../../../ui/Alert/Alert";
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import { Columns } from "../../../ui/Columns/Columns";
-import { Deposit } from "../../../models/Deposit";
 import { DepositsShare } from "./DepositsShare";
 import { Event } from "../../../models/Event";
-import { Expense } from "../../../models/Expense";
 import { ExpenseShare } from "./ExpenseShare";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Results } from "./Results";
@@ -30,16 +28,12 @@ import { useTranslation } from "react-i18next";
 
 type UserShareListProps = {
   event: Event;
-  expenses: Record<string, Expense>;
-  deposits: Record<string, Deposit>;
   users: Record<string, User>;
   currentUserId: string;
 };
 
 export function UserShareList({
   event,
-  expenses,
-  deposits,
   users,
   currentUserId,
 }: UserShareListProps) {
@@ -48,7 +42,6 @@ export function UserShareList({
 
   const eventSharesByUser = getEventSharesByUser({
     event,
-    expenses,
     users,
     userId,
   });
@@ -77,7 +70,7 @@ export function UserShareList({
   );
 
   const depositShares = pipe(
-    getDepositShares({ event, deposits, users }),
+    getDepositShares({ event, users }),
     Either.map((deposits) =>
       deposits[userId]
         ? deposits[userId].sort((a, b) => -1 * sort(a.date, b.date))
@@ -87,7 +80,6 @@ export function UserShareList({
 
   const totalExpenseAmount = getUserTotalExpenseAmount({
     event,
-    expenses,
     userId,
   });
 

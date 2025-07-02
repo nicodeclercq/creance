@@ -9,8 +9,6 @@ import { useStore } from "../../store/StoreProvider";
 export function EventUserSharePage() {
   const { eventId } = useParams();
   const [currentEvent] = useStore(`events.${eventId}`);
-  const [expenses] = useStore("expenses");
-  const [deposits] = useStore("deposits");
   const [currentUserId] = useStore("currentUserId");
   const users = useEventUsers(eventId);
 
@@ -18,7 +16,7 @@ export function EventUserSharePage() {
     return <EventNotFoundPage />;
   }
 
-  if (currentEvent.expenses.length === 0) {
+  if (Object.keys(currentEvent.expenses).length === 0) {
     return (
       <EventPageTemplate event={currentEvent}>
         <EmptyEvent event={currentEvent} />
@@ -30,8 +28,6 @@ export function EventUserSharePage() {
     <EventPageTemplate event={currentEvent}>
       <UserShareList
         event={currentEvent}
-        expenses={expenses}
-        deposits={deposits}
         users={users}
         currentUserId={currentUserId}
       />

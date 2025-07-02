@@ -9,7 +9,8 @@
     "build": "bash makeSecrets.sh && tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "type-check": "tsc"
   },
   "dependencies": {
     "@emotion/styled": "^11.14.0",

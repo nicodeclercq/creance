@@ -14,7 +14,7 @@ export function useEventUsers(
   if (!event) {
     return {};
   }
-  return event.participants.reduce(
+  return Object.keys(event.shares).reduce(
     (acc, userId) => ({ ...acc, [userId]: users[userId] }),
     {} as Record<string, User>
   );

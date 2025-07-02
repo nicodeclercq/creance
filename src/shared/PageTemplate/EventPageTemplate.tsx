@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Action, QuickActions } from "../../ui/QuickActions/QuickActions";
 import { useStore } from "../../store/StoreProvider";
 import { useRoute } from "../../hooks/useRoute";
-import * as RecordFP from "fp-ts/Record";
 import { ROUTES } from "../../routes";
 import { exportData, toExportedData } from "../../service/importExport";
 
@@ -18,9 +17,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const [_, setEvent] = useStore(`events.${event._id}`);
-  const [expenses, setExpenses] = useStore(`expenses`);
   const [users] = useStore(`users`);
-  const [deposits] = useStore(`deposits`);
   const [___, setEvents] = useStore(`events`);
 
   const actions: Action[] = event.isClosed
@@ -29,11 +26,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           label: t("page.event.list.actions.delete"),
           icon: "trash",
           onClick: () => {
-            setExpenses(
-              RecordFP.filter(
-                (expense) => !event.expenses.includes(expense._id)
-              )
-            );
+            // No need to clean up global expenses since they're embedded in events
             setEvents((currentEvents) => {
               const updatedEvents = { ...currentEvents };
               delete updatedEvents[event._id];
@@ -114,9 +107,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
               event.name,
               toExportedData({
                 event,
-                deposits,
                 users,
-                expenses,
               })
             );
           },

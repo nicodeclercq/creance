@@ -28,12 +28,11 @@ const depositSchema = defaultDepositSchema.omit({
 const eventSchema = defaultEventSchema
   .omit({
     updatedAt: true,
-    participants: true,
     expenses: true,
     deposits: true,
   })
   .extend({
-    participants: z.array(userSchema),
+    users: z.array(userSchema),
     expenses: z.array(expenseSchema),
     deposits: z.array(depositSchema),
   });
@@ -43,24 +42,20 @@ type ExportedData = z.infer<typeof eventSchema>;
 export function toExportedData({
   event,
   users,
-  expenses,
-  deposits,
 }: {
   event: Event;
-  deposits: Record<string, Deposit>;
-  expenses: Record<string, Expense>;
   users: Record<string, User>;
 }): ExportedData {
   return {
     ...withoutKey(event, "updatedAt"),
-    participants: event.participants.map((userId) =>
+    users: Object.keys(event.shares).map((userId) =>
       withoutKey(users[userId], "updatedAt")
     ),
-    expenses: event.expenses.map((expenseId) =>
-      withoutKey(expenses[expenseId], "updatedAt")
+    expenses: Object.values(event.expenses).map((expense) =>
+      withoutKey(expense, "updatedAt")
     ),
-    deposits: event.deposits.map((depositId) =>
-      withoutKey(deposits[depositId], "updatedAt")
+    deposits: Object.values(event.deposits).map((deposit) =>
+      withoutKey(deposit, "updatedAt")
     ),
   };
 }
@@ -70,29 +65,11 @@ export function fromExportedData(data: ExportedData): Either.Either<
   {
     event: Event;
     users: Record<string, User>;
-    expenses: Record<string, Expense>;
-    deposits: Record<string, Deposit>;
   }
 > {
   const now = new Date();
-  const { participants, expenses, deposits, ...eventData } = data;
-  const event: Event = {
-    ...eventData,
-    updatedAt: now,
-    participants: participants.map((user) => user._id),
-    expenses: expenses.map((expense) => expense._id),
-    deposits: deposits.map((deposit) => deposit._id),
-  };
-  const users: Record<string, User> = participants.reduce(
-    (acc, user) => ({
-      ...acc,
-      [user._id]: {
-        ...user,
-        updatedAt: now,
-      },
-    }),
-    {}
-  );
+  const { users: dataUsers, expenses, deposits, ...eventData } = data;
+
   const expensesMap: Record<string, Expense> = expenses.reduce(
     (acc, expense) => ({
       ...acc,
@@ -103,6 +80,7 @@ export function fromExportedData(data: ExportedData): Either.Either<
     }),
     {}
   );
+
   const depositsMap: Record<string, Deposit> = deposits.reduce(
     (acc, deposit) => ({
       ...acc,
@@ -114,11 +92,27 @@ export function fromExportedData(data: ExportedData): Either.Either<
     {}
   );
 
+  const event: Event = {
+    ...eventData,
+    updatedAt: now,
+    expenses: expensesMap,
+    deposits: depositsMap,
+  };
+
+  const users: Record<string, User> = dataUsers.reduce(
+    (acc, user) => ({
+      ...acc,
+      [user._id]: {
+        ...user,
+        updatedAt: now,
+      },
+    }),
+    {}
+  );
+
   return Either.right({
     event,
     users,
-    expenses: expensesMap,
-    deposits: depositsMap,
   });
 }
 
@@ -146,16 +140,12 @@ function getEventModifications({
   currentState: {
     events: Record<string, Event>;
     users: Record<string, User>;
-    expenses: Record<string, Expense>;
-    deposits: Record<string, Deposit>;
   };
 }): Either.Either<
   Error,
   {
     events: Record<string, Event>;
     users: Record<string, User>;
-    expenses: Record<string, Expense>;
-    deposits: Record<string, Deposit>;
   }
 > {
   const areEqual = <T extends { updatedAt: Date }>(
@@ -177,13 +167,9 @@ function getEventModifications({
       const result: {
         events: Record<string, Event>;
         users: Record<string, User>;
-        expenses: Record<string, Expense>;
-        deposits: Record<string, Deposit>;
       } = {
         events: {},
         users: {},
-        expenses: {},
-        deposits: {},
       };
 
       if (!areEqual(currentEvent, formattedData.event)) {
@@ -199,31 +185,6 @@ function getEventModifications({
 
         return acc;
       }, {} as Record<string, User>);
-      result.expenses = Object.values(formattedData.expenses).reduce(
-        (acc, expense) => {
-          if (
-            !currentState.expenses[expense._id] ||
-            !areEqual(currentState.expenses[expense._id], expense)
-          ) {
-            acc[expense._id] = expense;
-          }
-
-          return acc;
-        },
-        {} as Record<string, Expense>
-      );
-      result.deposits = Object.values(formattedData.deposits).reduce(
-        (acc, deposit) => {
-          if (
-            !currentState.deposits[deposit._id] ||
-            !areEqual(currentState.deposits[deposit._id], deposit)
-          ) {
-            acc[deposit._id] = deposit;
-          }
-          return acc;
-        },
-        {} as Record<string, Deposit>
-      );
 
       return result;
     })
@@ -238,16 +199,12 @@ function getArrayOfEventsModifications({
   currentState: {
     events: Record<string, Event>;
     users: Record<string, User>;
-    expenses: Record<string, Expense>;
-    deposits: Record<string, Deposit>;
   };
 }): Either.Either<
   Error,
   {
     events: Record<string, Event>;
     users: Record<string, User>;
-    expenses: Record<string, Expense>;
-    deposits: Record<string, Deposit>;
   }
 > {
   return pipe(
@@ -261,21 +218,15 @@ function getArrayOfEventsModifications({
         (acc, modification) => {
           acc.events = { ...acc.events, ...modification.events };
           acc.users = { ...acc.users, ...modification.users };
-          acc.expenses = { ...acc.expenses, ...modification.expenses };
-          acc.deposits = { ...acc.deposits, ...modification.deposits };
 
           return acc;
         },
         {
           events: {},
           users: {},
-          expenses: {},
-          deposits: {},
         } as {
           events: Record<string, Event>;
           users: Record<string, User>;
-          expenses: Record<string, Expense>;
-          deposits: Record<string, Deposit>;
         }
       )
     )
@@ -290,8 +241,6 @@ export function readData({
   currentState: {
     events: Record<string, Event>;
     users: Record<string, User>;
-    expenses: Record<string, Expense>;
-    deposits: Record<string, Deposit>;
   };
 }): Promise<
   Either.Either<
@@ -299,8 +248,6 @@ export function readData({
     {
       events: Record<string, Event>;
       users: Record<string, User>;
-      expenses: Record<string, Expense>;
-      deposits: Record<string, Deposit>;
     }
   >
 > {
@@ -353,13 +300,9 @@ export function readData({
 export function importData({
   events,
   users,
-  expenses,
-  deposits,
 }: {
   events: Record<string, Event>;
   users: Record<string, User>;
-  expenses: Record<string, Expense>;
-  deposits: Record<string, Deposit>;
 }) {
   return new Promise<
     Either.Either<
@@ -367,8 +310,6 @@ export function importData({
       {
         events: Record<string, Event>;
         users: Record<string, User>;
-        expenses: Record<string, Expense>;
-        deposits: Record<string, Deposit>;
       }
     >
   >((resolve) => {
@@ -383,8 +324,6 @@ export function importData({
         currentState: {
           events,
           users,
-          expenses,
-          deposits,
         },
       })
         .then((data) => {

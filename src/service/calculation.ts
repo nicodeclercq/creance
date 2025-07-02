@@ -247,15 +247,13 @@ type ExpenseShare = Pick<
 
 function getEventShares({
   event,
-  expenses,
   users,
 }: {
   event: Event;
-  expenses: Record<string, Expense>;
   users: Record<string, User>;
 }): Either.Either<Error, Readonly<ExpenseShare[]>> {
   return pipe(
-    event.expenses.map((expenseId) => expenses[expenseId]),
+    Object.values(event.expenses),
     (expenses) =>
       expenses.map((expense) =>
         pipe(
@@ -282,17 +280,15 @@ export type ExpenseShareByUser = Omit<ExpenseShare, "shares"> & {
 
 export function getEventSharesByUser({
   event,
-  expenses,
   userId,
   users,
 }: {
   event: Event;
-  expenses: Record<string, Expense>;
   userId: string;
   users: Record<string, User>;
 }): Either.Either<Error, Array<ExpenseShareByUser>> {
   return pipe(
-    getEventShares({ event, expenses, users }),
+    getEventShares({ event, users }),
     Either.map((expenses) =>
       expenses.map((expense) => ({
         ...expense,
@@ -328,11 +324,9 @@ export type DepositShare = Pick<Deposit, "_id" | "date"> & {
 
 export function getDepositShares({
   event,
-  deposits,
   users,
 }: {
   event: Event;
-  deposits: Record<string, Deposit>;
   users: Record<string, User>;
 }): Either.Either<Error, Record<string, DepositShare[]>> {
   const init = Object.keys(users).reduce(
@@ -341,8 +335,7 @@ export function getDepositShares({
   );
 
   return pipe(
-    event.deposits,
-    ArrayFP.map((depositId) => deposits[depositId]),
+    Object.values(event.deposits),
     ArrayFP.map((deposit) =>
       pipe(
         calculationAsNumber(deposit.amount),
@@ -380,17 +373,15 @@ export function getDepositShares({
 
 export function getDepositSharesByUsers({
   event,
-  deposits,
   users,
   currentUserId,
 }: {
   event: Event;
-  deposits: Record<string, Deposit>;
   users: Record<string, User>;
   currentUserId: string;
 }): Either.Either<Error, number> {
   return pipe(
-    getDepositShares({ event, deposits, users }),
+    getDepositShares({ event, users }),
     Either.map((shares) => getTotalDepositAmount(shares[currentUserId]))
   );
 }
@@ -401,15 +392,13 @@ export function getTotalDepositAmount(deposits: DepositShare[]): number {
 
 export function getUserTotalExpenseAmount({
   event,
-  expenses,
   userId,
 }: {
   event: Event;
-  expenses: Record<string, Expense>;
   userId: string;
 }): Either.Either<Error, number> {
   return pipe(
-    event.expenses.map((expenseId) => expenses[expenseId]),
+    Object.values(event.expenses),
     ArrayFP.map((expense) =>
       expense.lender === userId
         ? calculationAsNumber(expense.amount)
@@ -428,6 +417,25 @@ export function getUserTotalSharesAmount({
   return shares.reduce((sum, { share }) => sum + share, 0);
 }
 
+export function getUserTotalExpensesAmount({
+  event,
+  userId,
+}: {
+  event: Event;
+  userId: string;
+}): Either.Either<Error, number> {
+  return pipe(
+    Object.values(event.expenses),
+    ArrayFP.map((expense) =>
+      expense.lender === userId
+        ? calculationAsNumber(expense.amount)
+        : Either.right(0)
+    ),
+    Either.sequenceArray,
+    Either.map((amounts) => amounts.reduce((sum, amount) => sum + amount, 0))
+  );
+}
+
 export type Distribution = {
   type: "give" | "receive";
   amount: number;
@@ -436,19 +444,15 @@ export type Distribution = {
 
 export function getEventDistribution({
   event,
-  expenses,
-  deposits,
   users,
 }: {
   event: Event;
-  expenses: Record<string, Expense>;
-  deposits: Record<string, Deposit>;
   users: Record<string, User>;
 }): Either.Either<Error, Record<string, Distribution[]>> {
   const usersTotalDueAmount = Object.keys(users).reduce(
     (acc, userId) =>
       pipe(
-        getEventSharesByUser({ event, expenses, userId, users }),
+        getEventSharesByUser({ event, userId, users }),
         Either.map((shares) => ({
           [userId]: getUserTotalSharesAmount({ shares }),
         })),
@@ -473,7 +477,6 @@ export function getEventDistribution({
       pipe(
         getDepositSharesByUsers({
           event,
-          deposits,
           users,
           currentUserId: userId,
         }),
@@ -487,7 +490,7 @@ export function getEventDistribution({
   const usersTotalPayedAmount = Object.keys(users).reduce(
     (acc, userId) =>
       pipe(
-        getUserTotalExpenseAmount({ event, expenses, userId }),
+        getUserTotalExpenseAmount({ event, userId }),
         Either.chain((userAmount) =>
           pipe(
             acc,
