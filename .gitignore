@@ -27,3 +27,5 @@ dist-ssr
 *.tmp
 secrets.tmp.ts
 secrets.ts
+
+.llm/

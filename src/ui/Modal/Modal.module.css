@@ -1,0 +1,48 @@
+.overlay{
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100000;
+  background: hsl(from var(--ui-primitive-grey-200) h s l / 0.1);
+  backdrop-filter: blur(0.4rem);
+  animation: appear1 0.4s ease-in-out forwards;
+}
+
+.modal{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100001;
+  min-width: min-content;
+  width: max-content;
+  max-width: 90vw;
+  padding: var(--ui-semantic-padding-l);
+  background-color: var(--ui-background-default);
+  border-radius: var(--ui-semantic-radius-m);
+  box-shadow: var(--ui-shadow-default);
+  animation: appear2 0.2s ease-in-out forwards;
+  transform-origin: top center;
+}
+@keyframes appear1 {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(0.4rem);
+  }
+}
+@keyframes appear2 {
+  from {
+    opacity: 0;
+    transform: scale(0.4)translate(-50%, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}

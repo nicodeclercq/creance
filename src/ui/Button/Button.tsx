@@ -92,6 +92,7 @@ export function Button(props: ButtonProps) {
   ) : (
     <button
       {...commonProps}
+      type={props.type || "button"}
       onClick={click}
       disabled={props.isDisabled || props.isLoading || isLoading}
     >

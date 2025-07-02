@@ -19,6 +19,56 @@ type FormProps<TFieldValues extends FieldValues, TTransformedValues> = {
   cancel?: DistributiveOmit<ButtonProps, "variant">;
 };
 
+type FormLayoutProps = {
+  children: ReactNode;
+  steps?: {
+    current: number;
+    total: number;
+  };
+  cancel?: DistributiveOmit<ButtonProps, "variant">;
+  submit: DistributiveOmit<ButtonProps<AsButton>, "variant" | "onClick"> & {
+    onClick: () => void;
+  };
+  isLoading: boolean;
+  hasError: boolean;
+};
+
+export function FormLayout({
+  children,
+  steps,
+  cancel,
+  submit,
+  hasError,
+  isLoading,
+}: FormLayoutProps) {
+  return (
+    <Stack padding="l" gap="m" alignItems="stretch">
+      {children}
+      {steps && (
+        <div>
+          Étape {steps.current} sur {steps.total}
+        </div>
+      )}
+      <div className={styles.formActions}>
+        {cancel && (
+          <Button
+            {...cancel}
+            type={(cancel.as === "button" ? "button" : undefined) as undefined}
+            variant="secondary"
+          />
+        )}
+        <Button
+          {...submit}
+          type="submit"
+          variant="primary"
+          isLoading={isLoading}
+          isDisabled={hasError}
+        />
+      </div>
+    </Stack>
+  );
+}
+
 export function Form<TFieldValues extends FieldValues, TTransformedValues>({
   hasError,
   handleSubmit,
@@ -46,33 +96,15 @@ export function Form<TFieldValues extends FieldValues, TTransformedValues>({
         }
       })}
     >
-      <Stack padding="l" gap="m" alignItems="stretch">
+      <FormLayout
+        hasError={hasError}
+        isLoading={isLoading}
+        submit={{ ...submit, onClick: submitForm }}
+        cancel={cancel}
+        steps={steps}
+      >
         {children}
-        {steps && (
-          <div>
-            Étape {steps.current} sur {steps.total}
-          </div>
-        )}
-        <div className={styles.formActions}>
-          {cancel && (
-            <Button
-              {...cancel}
-              type={
-                (cancel.as === "button" ? "button" : undefined) as undefined
-              }
-              variant="secondary"
-            />
-          )}
-          <Button
-            {...submit}
-            type="submit"
-            variant="primary"
-            isLoading={isLoading}
-            isDisabled={hasError}
-            onClick={submitForm}
-          />
-        </div>
-      </Stack>
+      </FormLayout>
     </form>
   );
 }

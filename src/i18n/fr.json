@@ -21,7 +21,7 @@
   "page.events.add.form.step3.description":
     "Sélectionnez les participants qui seront invités à cette liste. Vous pourrez par la suite ajuster les détails pour chaque participant (nombre de parts, date d'arrivée ou de départ, etc.).",
   "page.events.add.form.submit": "Suivant",
-  "page.events.add.form.previous": "Previous",
+  "page.events.add.form.previous": "Retour",
   "page.events.add.form.cancel": "Annuler",
   "page.events.add.form.field.name.label": "Nom de la liste",
   "page.events.add.form.field.name.validation.required":
@@ -48,6 +48,7 @@
     "page.events.add.form.field.period.offsets.arrival": "Arrivée {arrival, select, AM {le matin} PM {l'après-midi} other {-}}",
     "page.events.add.form.field.period.offsets.departure": "Départ {departure, select, AM {le matin} PM {l'après-midi} other {-}}",
     "page.events.add.form.category.submit": "Ajouter la catégorie",
+    "page.events.add.form.category.cancel": "Annuler",
     "page.events.add.form.category.remove": "Supprimer la catégorie \"{name}\"",
     "page.events.add.form.user.name.label": "Nom du participant",
     "page.events.add.form.user.name.validation.required":
@@ -135,6 +136,7 @@
   "page.event.add.form.actions.cancel": "Annuler",
   "page.event.add.form.field.amount.validation.isNumber": "Le montant doit être un nombre ou un calcule valide",
   "page.event.add.form.field.amount.validation.positive": "Le montant doit être supérieur à 0{isCalculated, select, true { ({calculation} = {result})} other {}}",
+  "page.events.add.form.category.add": "Ajouter une catégorie",
   "page.event.add.form.field.share.percentage.validation.positive": "Le nombre de parts doit être supérieur ou égal à 0",
   "page.event.add.form.field.share.percentage.validation.sum": "La somme des parts doit être supérieur à 0",
   "page.event.add.form.field.share.fixed.validation.positive": "Le montant doit être supérieur à 0{isCalculated, select, true { ({calculation} = {result})} other {}}",

@@ -55,6 +55,28 @@ export function ExpenseForm({
     resolver: (data) => {
       const errors: Record<string, { message: string }> = {};
 
+      if (!isValidCalculation(data.amount)) {
+        errors.amount = {
+          message: t("page.event.add.form.field.amount.validation.isNumber"),
+        };
+      }
+      const amount = asNumber(data.amount);
+      if (amount <= 0) {
+        const params = /[+*-/]/.test(data.amount)
+          ? {
+              isCalculated: true,
+              result: amount,
+              calculation: data.amount,
+            }
+          : { isCalculated: false };
+        errors.amount = {
+          message: t(
+            "page.event.add.form.field.amount.validation.positive",
+            params
+          ),
+        };
+      }
+
       if (data.share.type === "percentage") {
         const sum = Object.values(data.share.percentageUser).reduce(
           (acc, val) => acc + asNumber(val),
@@ -82,6 +104,29 @@ export function ExpenseForm({
             }),
           };
         }
+
+        Object.values(users).forEach((user) => {
+          if (data.share.type === "fixed") {
+            const value = asNumber(data.share.fixedUser[user._id]);
+            if (value < 0) {
+              errors.share = {
+                message: t(
+                  "page.event.add.form.field.share.fixed.validation.positive"
+                ),
+              };
+            }
+          }
+          if (data.share.type === "percentage") {
+            const value = asNumber(data.share.percentageUser[user._id]);
+            if (value < 0) {
+              errors.share = {
+                message: t(
+                  "page.event.add.form.field.share.fixed.validation.positive"
+                ),
+              };
+            }
+          }
+        });
       }
 
       return { values: data, errors };
@@ -271,14 +316,6 @@ export function ExpenseForm({
             control={control}
             rules={{
               required: true,
-              validate: (value) => {
-                const result = asNumber(value);
-                if (result < 0) {
-                  return t(
-                    "page.event.add.form.field.share.percentage.validation.positive"
-                  );
-                }
-              },
             }}
             render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Columns gap="m">
@@ -312,14 +349,6 @@ export function ExpenseForm({
             control={control}
             rules={{
               required: true,
-              validate: (value) => {
-                const result = asNumber(value);
-                if (result < 0) {
-                  return t(
-                    "page.event.add.form.field.share.fixed.validation.positive"
-                  );
-                }
-              },
             }}
             render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Columns gap="m">

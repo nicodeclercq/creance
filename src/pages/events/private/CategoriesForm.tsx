@@ -1,113 +1,17 @@
-import {
-  CATEGORY_ICONS,
-  CategoryIconName,
-} from "../../../ui/CategoryIcon/private";
-import { Category, DEFAULT_CATEGORY_ICON } from "../../../models/Category";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 
+import { AddCategoryForm } from "./AddCategoryForm";
+import { Button } from "../../../ui/Button/Button";
+import { Category } from "../../../models/Category";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
-import { Form } from "../../../ui/Form/Form";
+import { FormLayout } from "../../../ui/Form/Form";
 import { Fragment } from "react/jsx-runtime";
 import { Grid } from "../../../ui/Grid/Grid";
 import { IconButton } from "../../../ui/IconButton/IconButton";
-import { InputText } from "../../../ui/FormField/InputText/InputText";
+import { Modal } from "../../../ui/Modal/Modal";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { Select } from "../../../ui/FormField/Select/Select";
-import styles from "./AddEventStep2.module.css";
-import { uid } from "../../../service/crypto";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-
-type AddCategoryFormProps = {
-  categories: Category[];
-  onAdd: (category: Category) => void;
-};
-
-function AddCategoryForm({ onAdd, categories }: AddCategoryFormProps) {
-  const { t } = useTranslation();
-  const { control, handleSubmit, reset } = useForm<Omit<Category, "id">>({
-    defaultValues: {
-      name: "",
-      icon: DEFAULT_CATEGORY_ICON,
-    },
-  });
-
-  const addCategory = (data: Omit<Category, "_id">) => {
-    const newCategory = {
-      _id: uid(),
-      ...data,
-    };
-    onAdd(newCategory);
-    reset();
-  };
-
-  return (
-    <div className={styles.addCategoryForm}>
-      <Controller
-        control={control}
-        name="icon"
-        render={({ field: { value, onChange } }) => (
-          <Select
-            variant="grid"
-            label={t("page.events.add.form.field.categoryIcon.label")}
-            valueRenderer={({ value, label }) => (
-              <CategoryIcon
-                name={value as CategoryIconName}
-                size="m"
-                label={label}
-              />
-            )}
-            options={Object.entries(CATEGORY_ICONS).map(([key, { name }]) => ({
-              id: key,
-              label: t(name),
-              value: key,
-            }))}
-            value={value}
-            onChange={onChange}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        rules={{
-          required: t(
-            "page.events.add.form.field.categoryName.validation.required"
-          ),
-          validate: {
-            isUnique: (value) => {
-              const isUnique = !categories.some(
-                (category) => category.name === value
-              );
-              return (
-                isUnique ||
-                t("page.events.add.form.field.categoryName.validation.isUnique")
-              );
-            },
-          },
-        }}
-        name="name"
-        render={({ field: { value, onChange }, fieldState: { error } }) => (
-          <InputText
-            type="text"
-            value={value}
-            onChange={onChange}
-            label={t("page.events.add.form.field.categoryName.label")}
-            isRequired
-            error={error?.message}
-          />
-        )}
-      />
-      <div>
-        <div style={{ font: "var(--ui-semantic-font-body-small)" }}>&nbsp;</div>
-        <IconButton
-          icon="add"
-          label={t("page.events.add.form.category.submit")}
-          onClick={handleSubmit(addCategory)}
-          variant="tertiary"
-        />
-      </div>
-    </div>
-  );
-}
 
 export type CategoriesForm = {
   defaultCategories: Category[];
@@ -126,8 +30,9 @@ export function CategoriesForm({
   submit,
   cancel,
 }: CategoriesForm) {
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const { t } = useTranslation();
-  const { control, watch, handleSubmit, formState, getValues } = useForm<{
+  const { control, watch, formState, getValues } = useForm<{
     categories: Category[];
   }>({
     defaultValues: {
@@ -146,13 +51,15 @@ export function CategoriesForm({
     remove(index);
   };
   const hasError = Object.keys(formState.errors).length > 0;
+  const categories = watch("categories");
+
   return (
-    <Form
+    <FormLayout
       hasError={hasError}
-      handleSubmit={handleSubmit}
+      isLoading={formState.isSubmitting}
       submit={{
         label: submit.label,
-        onClick: ({ categories }) => submit.onClick(categories),
+        onClick: () => submit.onClick(categories),
       }}
       cancel={
         cancel
@@ -187,11 +94,24 @@ export function CategoriesForm({
             )}
           </Fragment>
         ))}
-        <AddCategoryForm
-          onAdd={(category: Category) => append(category)}
-          categories={watch("categories")}
+        <span></span>
+        <Button
+          icon={{ name: "add", position: "start" }}
+          variant="tertiary"
+          onClick={() => setIsFormOpen(true)}
+          label={t("page.events.add.form.category.add")}
         />
       </Grid>
-    </Form>
+      <Modal title={t("page.events.add.form.category.add")} isOpen={isFormOpen}>
+        <AddCategoryForm
+          onAdd={(category: Category) => {
+            append(category);
+            setIsFormOpen(false);
+          }}
+          categories={categories}
+          onCancel={() => setIsFormOpen(false)}
+        />
+      </Modal>
+    </FormLayout>
   );
 }
