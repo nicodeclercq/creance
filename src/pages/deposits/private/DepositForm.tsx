@@ -8,8 +8,8 @@ import { Form } from "../../../ui/Form/Form";
 import { InputDate } from "../../../ui/FormField/InputDate/InputDate";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
+import { Participant } from "../../../models/Participant";
 import { Select } from "../../../ui/FormField/Select/Select";
-import { User } from "../../../models/User";
 import { useTranslation } from "react-i18next";
 
 type DepositFormProps = {
@@ -18,7 +18,7 @@ type DepositFormProps = {
   onCancel: () => void;
   submitLabel: string;
   onSubmit: (deposit: Deposit) => void;
-  users: Record<string, User>;
+  participants: Record<string, Participant>;
   event: Event;
 };
 
@@ -28,7 +28,7 @@ export function DepositForm({
   onSubmit,
   cancelLabel,
   submitLabel,
-  users,
+  participants,
   event,
 }: DepositFormProps) {
   const { t } = useTranslation();
@@ -118,13 +118,17 @@ export function DepositForm({
               trigger("to");
             }}
             valueRenderer={({ value }) => (
-              <Avatar label={users[value]?.name} size="m" />
+              <Avatar label={participants[value]?.name} size="m" />
             )}
-            options={Object.keys(event.shares).map((user, index) => ({
-              id: user ?? index,
-              label: users[user]?.name ?? "deleted user",
-              value: users[user]?._id ?? "deleted user",
-            }))}
+            options={Object.keys(event.participants).map(
+              (participant, index) => ({
+                id: participant ?? index,
+                label:
+                  participants[participant]?.name ?? t("participant.unknown"),
+                value:
+                  participants[participant]?._id ?? t("participant.unknown"),
+              })
+            )}
           />
         )}
       />
@@ -146,13 +150,17 @@ export function DepositForm({
               trigger("from");
             }}
             valueRenderer={({ value }) => (
-              <Avatar label={users[value]?.name} size="m" />
+              <Avatar label={participants[value]?.name} size="m" />
             )}
-            options={Object.keys(event.shares).map((user, index) => ({
-              id: user ?? index,
-              label: users[user]?.name ?? "deleted user",
-              value: users[user]?._id ?? "deleted user",
-            }))}
+            options={Object.keys(event.participants).map(
+              (participant, index) => ({
+                id: participant ?? index,
+                label:
+                  participants[participant]?.name ?? t("participant.unknown"),
+                value:
+                  participants[participant]?._id ?? t("participant.unknown"),
+              })
+            )}
           />
         )}
       />

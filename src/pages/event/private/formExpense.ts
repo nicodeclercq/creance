@@ -7,8 +7,8 @@ import {
   PercentageShare,
 } from "../../../models/Expense";
 
+import { Participant } from "../../../models/Participant";
 import { UseFormSetError } from "react-hook-form";
-import { User } from "../../../models/User";
 import { calculationAsNumber } from "../../../helpers/Number";
 import { i18n } from "i18next";
 import { pipe } from "fp-ts/function";
@@ -18,32 +18,32 @@ export type FormExpense = Omit<Expense, "amount" | "share" | "date"> & {
   date: Date;
   share: {
     type: "default" | "percentage" | "fixed";
-    percentageUser: Record<string, string>;
-    fixedUser: Record<string, string>;
+    percentageParticipant: Record<string, string>;
+    fixedParticipant: Record<string, string>;
   };
 };
 export const fromExpense = (
   expense: Expense,
-  users: Record<string, User>
+  participants: Record<string, Participant>
 ): FormExpense => {
   const share = {
     type: expense.share.type,
-    percentageUser: Object.keys(users).reduce(
-      (acc, user) => ({
+    percentageParticipant: Object.keys(participants).reduce(
+      (acc, participant) => ({
         ...acc,
-        [user]:
+        [participant]:
           expense.share.type === "percentage"
-            ? expense.share.distribution[user]
+            ? expense.share.distribution[participant]
             : "0",
       }),
       {} as Record<string, string>
     ),
-    fixedUser: Object.keys(users).reduce(
-      (acc, user) => ({
+    fixedParticipant: Object.keys(participants).reduce(
+      (acc, participant) => ({
         ...acc,
-        [user]:
+        [participant]:
           expense.share.type === "fixed"
-            ? expense.share.distribution[user]
+            ? expense.share.distribution[participant]
             : "0",
       }),
       {} as Record<string, string>
@@ -81,10 +81,12 @@ export const toExpense = (
         updatedAt: new Date(),
       });
     case "fixed":
-      const fixedDistribution = Object.entries(data.share.fixedUser).reduce(
+      const fixedDistribution = Object.entries(
+        data.share.fixedParticipant
+      ).reduce(
         (
           acc: Either.Either<Error, FixedShare["distribution"]>,
-          [userId, value]
+          [participantId, value]
         ) => {
           const calculation = calculationAsNumber(value);
           if (Either.isLeft(calculation)) {
@@ -95,7 +97,7 @@ export const toExpense = (
             acc,
             Either.map((acc) => ({
               ...acc,
-              [userId]: value,
+              [participantId]: value,
             }))
           );
         },
@@ -115,11 +117,11 @@ export const toExpense = (
       );
     case "percentage":
       const percentageDistribution = Object.entries(
-        data.share.percentageUser
+        data.share.percentageParticipant
       ).reduce(
         (
           acc: Either.Either<Error, PercentageShare["distribution"]>,
-          [userId, value]
+          [participantId, value]
         ) => {
           const calculation = calculationAsNumber(value);
           if (Either.isLeft(calculation)) {
@@ -131,7 +133,7 @@ export const toExpense = (
             acc,
             Either.map((acc) => ({
               ...acc,
-              [userId]: value,
+              [participantId]: value,
             }))
           );
         },

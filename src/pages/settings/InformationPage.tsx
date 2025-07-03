@@ -6,7 +6,6 @@ import {
   toExportedData,
 } from "../../service/importExport";
 
-import { Avatar } from "../../ui/Avatar/Avatar";
 import { Button } from "../../ui/Button/Button";
 import { COLLECTIONS } from "../../service/firebase";
 import { Card } from "../../ui/Card/Card";
@@ -44,8 +43,7 @@ export function InformationPage() {
   const { goTo, back } = useRoute();
   const [hasImportError, setHasImportError] = useState(false);
 
-  const [currentUserId] = useStore("currentUserId");
-  const [users, setUsers] = useStore("users");
+  const [currentParticipantId] = useStore("currentParticipantId");
   const [events, setEvents] = useStore("events");
 
   const reset = () => {
@@ -53,15 +51,12 @@ export function InformationPage() {
     resetStore();
   };
 
-  const currentUser = users[currentUserId];
-
   const doExportData = () => {
     exportData(
       "Créance",
       Object.values(events).map((event) =>
         toExportedData({
           event,
-          users: users,
         })
       )
     );
@@ -69,7 +64,6 @@ export function InformationPage() {
   const doImportData = () => {
     return importData({
       events,
-      users,
     }).then(
       Either.fold(
         (error) => {
@@ -79,7 +73,6 @@ export function InformationPage() {
         (data) => {
           setHasImportError(false);
 
-          setUsers((users) => ({ ...users, ...data.users }));
           setEvents((events) => ({ ...events, ...data.events }));
           goTo(ROUTES.ROOT);
         }
@@ -99,21 +92,11 @@ export function InformationPage() {
       <Stack gap="m" alignItems="center">
         <Card>
           <Stack gap="s" alignItems="center">
-            {!currentUserId && (
+            {!currentParticipantId && (
               <Paragraph>{t("page.information.disconnected")}</Paragraph>
             )}
-            {currentUser ? (
-              <>
-                <Avatar label={currentUser.name} size="l" />
-                <Paragraph styles={{ font: "body-large" }}>
-                  {currentUser.name}
-                </Paragraph>
-              </>
-            ) : (
-              <Paragraph>{t("page.information.noUser")}</Paragraph>
-            )}
             <Paragraph styles={{ font: "body-smaller", color: "neutral-weak" }}>
-              {currentUserId}
+              {currentParticipantId}
             </Paragraph>
           </Stack>
         </Card>
@@ -122,10 +105,6 @@ export function InformationPage() {
             <Paragraph styles={{ font: "body-large" }}>
               {t("page.information.synchronization")}
             </Paragraph>
-            <Item
-              label={COLLECTIONS.USERS}
-              date={lastUpdate.get(COLLECTIONS.USERS)}
-            />
             <Item
               label={COLLECTIONS.EVENTS}
               date={lastUpdate.get(COLLECTIONS.EVENTS)}

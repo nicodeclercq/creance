@@ -13,8 +13,8 @@ const getRandomNb = ({
 
 const toStr = (cipher: ArrayBuffer, iv: Uint8Array<ArrayBuffer>): string => {
   const elements = {
-    cipher: Buffer.from(cipher).toString("base64"),
-    iv: Buffer.from(iv).toString("base64"),
+    cipher: btoa(String.fromCharCode(...new Uint8Array(cipher))),
+    iv: btoa(String.fromCharCode(...new Uint8Array(iv))),
   };
   const index = getRandomNb({ min: 0, max: 9 });
   const [A, rest] = split(elements.cipher, 2);
@@ -32,9 +32,20 @@ const fromStr = (
   const [iv, C] = split(rest3, 16);
   const cipher = `${A}${B}${C}`;
 
+  const ivArray = new Uint8Array(
+    atob(iv)
+      .split("")
+      .map((c) => c.charCodeAt(0))
+  );
+  const cipherArray = new Uint8Array(
+    atob(cipher)
+      .split("")
+      .map((c) => c.charCodeAt(0))
+  );
+
   return {
-    iv: Buffer.from(iv, "base64"),
-    cipher: Buffer.from(cipher, "base64"),
+    iv: ivArray,
+    cipher: cipherArray.buffer,
   };
 };
 
@@ -57,14 +68,22 @@ export function exportKeys(keyPair: CryptoKeyPair) {
     crypto.subtle.exportKey("spki", keyPair.publicKey),
     crypto.subtle.exportKey("pkcs8", keyPair.privateKey),
   ])
-    .then((keys) => keys.map((key) => Buffer.from(key).toString("base64url")))
+    .then((keys) =>
+      keys.map((key) => btoa(String.fromCharCode(...new Uint8Array(key))))
+    )
     .then(([publicKey, privateKey]) => ({ publicKey, privateKey }));
 }
 
 export function importPublicKey(publicKey: string): Promise<CryptoKey> {
+  const binaryString = atob(publicKey);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
   return crypto.subtle.importKey(
     "spki",
-    Buffer.from(publicKey, "base64url"),
+    bytes.buffer,
     {
       name: "RSA-OAEP",
       hash: "SHA-256",
@@ -75,9 +94,15 @@ export function importPublicKey(publicKey: string): Promise<CryptoKey> {
 }
 
 export function importPrivateKey(privateKey: string): Promise<CryptoKey> {
+  const binaryString = atob(privateKey);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
   return crypto.subtle.importKey(
     "pkcs8",
-    Buffer.from(privateKey, "base64url"),
+    bytes.buffer,
     {
       name: "RSA-OAEP",
       hash: "SHA-256",
@@ -112,27 +137,54 @@ export function encode(str: string, publicKey: CryptoKey): Promise<string> {
       publicKey,
       new TextEncoder().encode(str)
     )
-    .then((buffer) => Buffer.from(buffer).toString("base64url"));
+    .then((buffer) => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 }
 
 export function decode(str: string, privateKey: CryptoKey): Promise<string> {
+  const binaryString = atob(str);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
   return crypto.subtle
     .decrypt(
       {
         name: "RSA-OAEP",
       },
       privateKey,
-      Buffer.from(str, "base64")
+      bytes.buffer
     )
     .then((buffer) => new TextDecoder().decode(buffer));
+}
+
+export function generateKey(): Promise<string> {
+  return crypto.subtle
+    .generateKey(
+      {
+        name: "AES-GCM",
+        length: 256,
+      },
+      true,
+      ["encrypt", "decrypt"]
+    )
+    .then((key) => crypto.subtle.exportKey("raw", key))
+    .then((exported) => btoa(String.fromCharCode(...new Uint8Array(exported))));
 }
 
 export const encrypt = async (plaintext: string, key: string) => {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encodedPlaintext = new TextEncoder().encode(plaintext);
+
+  const binaryString = atob(key);
+  const keyBytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    keyBytes[i] = binaryString.charCodeAt(i);
+  }
+
   const secretKey = await crypto.subtle.importKey(
     "raw",
-    Buffer.from(key, "base64"),
+    keyBytes.buffer,
     {
       name: "AES-GCM",
       length: 256,
@@ -153,9 +205,16 @@ export const encrypt = async (plaintext: string, key: string) => {
 
 export const decrypt = async (str: string, key: string) => {
   const { cipher, iv } = fromStr(str);
+
+  const binaryString = atob(key);
+  const keyBytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    keyBytes[i] = binaryString.charCodeAt(i);
+  }
+
   const secretKey = await crypto.subtle.importKey(
     "raw",
-    Buffer.from(key, "base64"),
+    keyBytes.buffer,
     {
       name: "AES-GCM",
       length: 256,

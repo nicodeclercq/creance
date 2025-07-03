@@ -1,7 +1,7 @@
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
 import { ExpenseList } from "./private/ExpenseList";
 import { removeFromObject } from "../../helpers/object";
-import { useEventUsers } from "../../hooks/useEventUsers";
+import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router";
 import { useStore } from "../../store/StoreProvider";
 
@@ -12,7 +12,7 @@ export function EventPage() {
   if (!eventId) {
     return <EventNotFoundPage />;
   }
-  const users = useEventUsers(eventId);
+  const participants = useEventParticipants(eventId);
 
   if (!currentEvent) {
     return <EventNotFoundPage />;
@@ -35,7 +35,7 @@ export function EventPage() {
   return (
     <ExpenseList
       event={currentEvent}
-      users={users}
+      participants={participants}
       onDeleteExpense={deleteExpense}
       onDeleteDeposit={deleteDeposit}
     />

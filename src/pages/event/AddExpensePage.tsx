@@ -6,7 +6,7 @@ import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";
 import { Redirect } from "../../Redirect";
 import { uid } from "../../service/crypto";
-import { useEventUsers } from "../../hooks/useEventUsers";
+import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";
 import { useStore } from "../../store/StoreProvider";
@@ -17,13 +17,13 @@ export function AddExpensePage() {
   const { eventId } = useParams();
   const { goTo } = useRoute();
   const [currentEvent, setEvent] = useStore(`events.${eventId}`);
-  const users = useEventUsers(eventId);
-  const [currentUserId] = useStore("currentUserId");
+  const participants = useEventParticipants(eventId);
+  const [currentParticipantId] = useStore("currentParticipantId");
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
-  const currentUser = users[currentUserId];
+  const currentParticipant = participants[currentParticipantId];
 
   if (currentEvent.isClosed) {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
@@ -55,22 +55,22 @@ export function AddExpensePage() {
       <Card>
         <ExpenseForm
           event={currentEvent}
-          users={users}
+          participants={participants}
           defaultValues={{
             _id: uid(),
             reason: "",
             category: defaultCategory._id,
-            lender: currentUser._id,
+            lender: currentParticipant._id,
             amount: "0",
             date: new Date(),
             share: {
               type: "default" as const,
-              percentageUser: Object.keys(users).reduce(
-                (acc, user) => ({ ...acc, [user]: "0" }),
+              percentageParticipant: Object.keys(participants).reduce(
+                (acc, participant) => ({ ...acc, [participant]: "0" }),
                 {} as Record<string, string>
               ),
-              fixedUser: Object.keys(users).reduce(
-                (acc, user) => ({ ...acc, [user]: "0" }),
+              fixedParticipant: Object.keys(participants).reduce(
+                (acc, participant) => ({ ...acc, [participant]: "0" }),
                 {} as Record<string, string>
               ),
             },

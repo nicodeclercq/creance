@@ -3,11 +3,11 @@ import * as Either from "fp-ts/Either";
 import { Either as EitherComponent, sequence } from "../../../ui/Either";
 import {
   getDepositShares,
-  getEventSharesByUser,
-  getEventSharesByUserAndCategory,
+  getEventSharesByParticipant,
+  getEventSharesByParticipantAndCategory,
+  getParticipantTotalExpenseAmount,
+  getParticipantTotalSharesAmount,
   getTotalDepositAmount,
-  getUserTotalExpenseAmount,
-  getUserTotalSharesAmount,
 } from "../../../service/calculation";
 
 import { Alert } from "../../../ui/Alert/Alert";
@@ -17,38 +17,38 @@ import { DepositsShare } from "./DepositsShare";
 import { Event } from "../../../models/Event";
 import { ExpenseShare } from "./ExpenseShare";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
+import { Participant } from "../../../models/Participant";
 import { Results } from "./Results";
 import { Select } from "../../../ui/FormField/Select/Select";
 import { Stack } from "../../../ui/Stack/Stack";
-import { User } from "../../../models/User";
 import { pipe } from "fp-ts/function";
 import { sort } from "../../../utils/date";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-type UserShareListProps = {
+type ParticipantShareListProps = {
   event: Event;
-  users: Record<string, User>;
-  currentUserId: string;
+  participants: Record<string, Participant>;
+  currentParticipantId: string;
 };
 
-export function UserShareList({
+export function ParticipantShareList({
   event,
-  users,
-  currentUserId,
-}: UserShareListProps) {
+  participants,
+  currentParticipantId,
+}: ParticipantShareListProps) {
   const { t } = useTranslation();
-  const [userId, setUserId] = useState<string>(currentUserId);
+  const [participantId, setParticipantId] =
+    useState<string>(currentParticipantId);
 
-  const eventSharesByUser = getEventSharesByUser({
+  const eventSharesByParticipant = getEventSharesByParticipant({
     event,
-    users,
-    userId,
+    participantId,
   });
 
   const sharesByCategory = pipe(
-    getEventSharesByUserAndCategory({
-      shares: eventSharesByUser,
+    getEventSharesByParticipantAndCategory({
+      shares: eventSharesByParticipant,
     }),
     Either.map((shares) => {
       if (shares.deposit < 0) {
@@ -60,27 +60,27 @@ export function UserShareList({
   );
 
   const totalShares = pipe(
-    eventSharesByUser,
-    Either.map((shares) => getUserTotalSharesAmount({ shares }))
+    eventSharesByParticipant,
+    Either.map((shares) => getParticipantTotalSharesAmount({ shares }))
   );
 
   const expenseShares = pipe(
-    eventSharesByUser,
+    eventSharesByParticipant,
     Either.map((expenses) => expenses.sort((a, b) => -1 * sort(a.date, b.date)))
   );
 
   const depositShares = pipe(
-    getDepositShares({ event, users }),
+    getDepositShares({ event, participants: event.participants }),
     Either.map((deposits) =>
-      deposits[userId]
-        ? deposits[userId].sort((a, b) => -1 * sort(a.date, b.date))
+      deposits[participantId]
+        ? deposits[participantId].sort((a, b) => -1 * sort(a.date, b.date))
         : []
     )
   );
 
-  const totalExpenseAmount = getUserTotalExpenseAmount({
+  const totalExpenseAmount = getParticipantTotalExpenseAmount({
     event,
-    userId,
+    participantId,
   });
 
   const totalDepositsAmount = pipe(
@@ -98,7 +98,7 @@ export function UserShareList({
         sharesByCategory,
         totalExpenseAmount,
       })}
-      onLeft={() => <Paragraph>{t("page.usershare.error")}</Paragraph>}
+      onLeft={() => <Paragraph>{t("page.participantshare.error")}</Paragraph>}
       onRight={({
         expenses,
         deposits,
@@ -112,13 +112,13 @@ export function UserShareList({
             <Alert>{t("component.priceEvolution.difference.warning")}</Alert>
           )}
           <Select
-            label={t("page.usershare.select.label")}
-            onChange={(value) => setUserId(value)}
-            value={userId}
-            options={Object.entries(users).map(([id, user]) => ({
+            label={t("page.participantshare.select.label")}
+            onChange={(value) => setParticipantId(value)}
+            value={participantId}
+            options={Object.entries(participants).map(([id, participant]) => ({
               value: id,
-              label: user.name,
-              id: user._id,
+              label: participant.name,
+              id: participant._id,
             }))}
             valueRenderer={(option) => (
               <div>
@@ -135,11 +135,11 @@ export function UserShareList({
           <ExpenseShare
             total={total}
             event={event}
-            users={users}
+            participants={participants}
             expenses={expenses}
             sharesByCategory={sharesByCategory}
           />
-          <DepositsShare deposits={deposits} users={users} />
+          <DepositsShare deposits={deposits} participants={participants} />
           <Results total={total} deposits={totalDepositsAmount}>
             {totalExpenseAmount}
           </Results>

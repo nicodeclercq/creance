@@ -16,12 +16,15 @@ export type FormData = {
   };
 };
 
-type UserFormProps = {
+type ParticipantFormProps = {
   submitLabel: string;
   onSubmit: (data: FormData) => void;
 };
 
-export function UserForm({ submitLabel, onSubmit }: UserFormProps) {
+export function ParticipantForm({
+  submitLabel,
+  onSubmit,
+}: ParticipantFormProps) {
   const { t } = useTranslation();
   const {
     control,
@@ -68,7 +71,7 @@ export function UserForm({ submitLabel, onSubmit }: UserFormProps) {
         render={({ field: { value, onChange } }) => (
           <InputText
             type="text"
-            label={t("userForm.name.label")}
+            label={t("participantForm.name.label")}
             value={value}
             onChange={onChange}
             isRequired
@@ -79,15 +82,15 @@ export function UserForm({ submitLabel, onSubmit }: UserFormProps) {
         control={control}
         name="share.adults"
         rules={{
-          required: t("userForm.adults.validation.required"),
+          required: t("participantForm.adults.validation.required"),
           min: {
             value: 0,
-            message: t("userForm.adults.validation.min"),
+            message: t("participantForm.adults.validation.min"),
           },
           validate: (value) => {
             const children = getValues("share.children");
             if (value + children === 0) {
-              return t("userForm.multipliers.validation.min");
+              return t("participantForm.multipliers.validation.min");
             }
           },
         }}
@@ -95,7 +98,7 @@ export function UserForm({ submitLabel, onSubmit }: UserFormProps) {
           <InputNumber
             type="number"
             as="number"
-            label={t("userForm.adults.label")}
+            label={t("participantForm.adults.label")}
             value={value}
             isRequired
             onChange={(a) => {
@@ -110,15 +113,15 @@ export function UserForm({ submitLabel, onSubmit }: UserFormProps) {
         control={control}
         name="share.children"
         rules={{
-          required: t("userForm.multipliers.validation.min"),
+          required: t("participantForm.multipliers.validation.min"),
           min: {
             value: 0,
-            message: t("userForm.children.validation.required"),
+            message: t("participantForm.children.validation.required"),
           },
           validate: (value) => {
             const adults = getValues("share.adults");
             if (value + adults === 0) {
-              return t("userForm.multipliers.validation.min");
+              return t("participantForm.multipliers.validation.min");
             }
           },
         }}
@@ -126,7 +129,7 @@ export function UserForm({ submitLabel, onSubmit }: UserFormProps) {
           <InputNumber
             type="number"
             as="number"
-            label={t("userForm.children.label")}
+            label={t("participantForm.children.label")}
             value={value}
             isRequired
             onChange={(a) => {

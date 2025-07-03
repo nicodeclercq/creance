@@ -5,11 +5,11 @@ import { CATEGORY_ICONS_NAMES } from "../ui/CategoryIcon/private";
 import { State } from "../store/state";
 import type { ZodError } from "zod";
 
-const defaultUserShareSchema = z.strictObject({
+const defaultParticipantShareSchema = z.strictObject({
   type: z.literal("default"),
 });
 
-const customUserShareSchema = z.strictObject({
+const customParticipantShareSchema = z.strictObject({
   type: z.literal("custom"),
   shares: z.array(
     z.strictObject({
@@ -28,9 +28,9 @@ const customUserShareSchema = z.strictObject({
   ),
 });
 
-export const userShareSchema = z.union([
-  defaultUserShareSchema,
-  customUserShareSchema,
+export const participantShareSchema = z.union([
+  defaultParticipantShareSchema,
+  customParticipantShareSchema,
 ]);
 
 const defaultExpenseShareSchema = z.strictObject({
@@ -65,7 +65,7 @@ export const expenseSchema = z.strictObject({
     .transform((date) => (date == null ? new Date() : new Date(date))),
 });
 
-export const userSchema = z.strictObject({
+export const participantSchema = z.strictObject({
   _id: z.string(),
   name: z.string(),
   avatar: z.string().optional(),
@@ -73,6 +73,7 @@ export const userSchema = z.strictObject({
     adults: z.number(),
     children: z.number(),
   }),
+  participantShare: participantShareSchema,
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
@@ -109,7 +110,7 @@ export const eventSchema = z.strictObject({
   _id: z.string(),
   isClosed: z.boolean().optional(),
   name: z.string(),
-  shares: z.record(z.string(), userShareSchema),
+  participants: z.record(z.string(), participantSchema),
   period: periodSchema,
   description: z.string(),
   expenses: z.record(z.string(), expenseSchema),
@@ -122,8 +123,7 @@ export const eventSchema = z.strictObject({
 });
 
 const stateSchema = z.strictObject({
-  currentUserId: z.string(),
-  users: z.record(z.string(), userSchema),
+  currentParticipantId: z.string(),
   events: z.record(z.string(), eventSchema),
 });
 

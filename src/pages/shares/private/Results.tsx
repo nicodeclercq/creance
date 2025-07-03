@@ -78,7 +78,7 @@ export function Results({ children, total, deposits }: ResultsProps) {
               </Paragraph>
               <Price>{expensesAmount}</Price>
               <Paragraph styles={{ textAlign: "start" }}>
-                {t("page.usershare.deposit")}
+                {t("page.participantshare.deposit")}
               </Paragraph>
               <Price type="sum">{deposits}</Price>
               <Paragraph styles={{ textAlign: "start" }}>

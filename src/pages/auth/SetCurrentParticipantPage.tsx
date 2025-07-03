@@ -3,14 +3,19 @@ import { Container } from "../../ui/Container/Container";
 import { Heading } from "../../ui/Heading/Heading";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { Stack } from "../../ui/Stack/Stack";
-import { UserForm, type FormData } from "../users/UserForm";
+import {
+  ParticipantForm,
+  type FormData,
+} from "../participants/ParticipantForm";
 import { useTranslation } from "react-i18next";
 
-type SetCurrentUserPageProps = {
+type SetCurrentParticipantPageProps = {
   onSubmit: (data: FormData) => void;
 };
 
-export function SetCurrentUserPage({ onSubmit }: SetCurrentUserPageProps) {
+export function SetCurrentParticipantPage({
+  onSubmit,
+}: SetCurrentParticipantPageProps) {
   const { t } = useTranslation();
 
   return (
@@ -29,14 +34,14 @@ export function SetCurrentUserPage({ onSubmit }: SetCurrentUserPageProps) {
         <Card>
           <Stack alignItems="center" gap="m">
             <Heading styles={{ font: "body-larger" }}>
-              {t("page.setCurrentUser.title")}
+              {t("page.setCurrentParticipant.title")}
             </Heading>
             <Paragraph styles={{ font: "body-default", textAlign: "center" }}>
-              {t("page.setCurrentUser.description")}
+              {t("page.setCurrentParticipant.description")}
             </Paragraph>
-            <UserForm
+            <ParticipantForm
               onSubmit={onSubmit}
-              submitLabel={t("page.setCurrentUser.actions.submit")}
+              submitLabel={t("page.setCurrentParticipant.actions.submit")}
             />
           </Stack>
         </Card>

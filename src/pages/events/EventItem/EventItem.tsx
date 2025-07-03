@@ -4,18 +4,21 @@ import { Columns } from "../../../ui/Columns/Columns";
 import { Event } from "../../../models/Event";
 import { IconButton } from "../../../ui/IconButton/IconButton";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
+import { Participant } from "../../../models/Participant";
 import { Stack } from "../../../ui/Stack/Stack";
-import { User } from "../../../models/User";
 import { useTranslation } from "react-i18next";
 
-type EventItemProps = { event: Event; users: Record<string, User> };
+type EventItemProps = {
+  event: Event;
+  participants: Record<string, Participant>;
+};
 
 export function EventItem({
-  event: { name, _id, shares, isClosed = false },
-  users,
+  event: { name, _id, participants: eventParticipants, isClosed = false },
+  participants,
 }: EventItemProps) {
   const { t } = useTranslation();
-  const eventUsers = Object.keys(shares);
+  const eventParticipantIds = Object.keys(eventParticipants);
 
   return (
     <Columns
@@ -33,13 +36,13 @@ export function EventItem({
       <Avatar label={name} statusIcon={isClosed ? "lock" : undefined} />
       <Stack>
         <Paragraph styles={{ flexGrow: true }}>
-          {name} {isClosed && t("page.events.list.closed")}
+          {name} {isClosed && t("page.events.list.closed")}
         </Paragraph>
         <Columns gap="s" align="center">
           <AvatarGroup
             size="s"
-            avatars={eventUsers.map((userId) => ({
-              label: users[userId].name,
+            avatars={eventParticipantIds.map((participantId) => ({
+              label: participants[participantId].name,
             }))}
           />
         </Columns>

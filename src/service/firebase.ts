@@ -24,7 +24,7 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { pipe, flow } from "fp-ts/function";
-import { eventSchema, userSchema } from "../adapters/json";
+import { eventSchema } from "../adapters/json";
 import { State } from "../store/state";
 import { Path, ValueFromPath } from "../store/store";
 import { synchronize } from "./synchronize";
@@ -33,7 +33,6 @@ type Schema<Data> = ZodSchema<Data, any, any>;
 
 export const COLLECTIONS = {
   EVENTS: "events",
-  USERS: "users",
 } as const;
 type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 
@@ -46,7 +45,7 @@ type LoadtingState = {
 };
 type AuthenticatedState = {
   type: "authenticated";
-  userId: string;
+  participantId: string;
 };
 type UnauthenticatedState = {
   type: "unauthenticated";
@@ -59,11 +58,14 @@ export type AuthState =
 export const $isAuthenticated = new RX.BehaviorSubject<AuthState>({
   type: "loading",
 });
-onAuthStateChanged(auth, (user) => {
-  if (user === null) {
+onAuthStateChanged(auth, (participant) => {
+  if (participant === null) {
     $isAuthenticated.next({ type: "unauthenticated" });
-  } else if (user.uid) {
-    $isAuthenticated.next({ type: "authenticated", userId: user.uid });
+  } else if (participant.uid) {
+    $isAuthenticated.next({
+      type: "authenticated",
+      participantId: participant.uid,
+    });
   }
 });
 
@@ -152,7 +154,7 @@ const fromFirebaseData =
     }
   };
 
-export function signUpUser({
+export function signUpParticipant({
   email,
   password,
 }: {
@@ -166,12 +168,14 @@ export function signUpUser({
         const errorCode = error.code;
         const errorMessage = error.message;
         return Either.left(
-          new Error(`Failed to create user: ${errorCode} - ${errorMessage}`)
+          new Error(
+            `Failed to create participant: ${errorCode} - ${errorMessage}`
+          )
         );
       });
 }
 
-export function loginUser({
+export function loginParticipant({
   email,
   password,
 }: {
@@ -185,12 +189,14 @@ export function loginUser({
         const errorCode = error.code;
         const errorMessage = error.message;
         return Either.left(
-          new Error(`Failed to create user: ${errorCode} - ${errorMessage}`)
+          new Error(
+            `Failed to create participant: ${errorCode} - ${errorMessage}`
+          )
         );
       });
 }
 
-export function logoutUser() {
+export function logoutParticipant() {
   auth.signOut().then(() => {
     Object.values(COLLECTIONS).forEach((collectionName) => {
       localStorage.getItem(`lastUpdate_${collectionName}`);
@@ -367,7 +373,6 @@ export function synchronizeFirebase({
       in: (d) => {
         const schema = z.object({
           data: z.string(),
-          participants: z.array(z.string()),
         });
         const parsed = schema.safeParse(d);
 
@@ -381,18 +386,7 @@ export function synchronizeFirebase({
       },
       out: (data) => ({
         data: toFirebaseData(data),
-        participants: Object.keys(data.shares),
       }),
-    },
-  });
-
-  synchronizeCollection({
-    collectionName: COLLECTIONS.USERS,
-    updateLocalState: updateLocalState("users"),
-    $localStore: $localStore.pipe(RX.map(({ users }) => users)),
-    adapter: {
-      in: fromFirebaseData(userSchema),
-      out: toFirebaseData,
     },
   });
 }

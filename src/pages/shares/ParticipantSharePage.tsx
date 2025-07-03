@@ -1,29 +1,29 @@
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
+import { ParticipantShare } from "../../models/ParticipantShare";
 import { Redirect } from "../../Redirect";
 import { ShareForm } from "./private/ShareForm";
 import { ShareNotFoundPage } from "./private/ShareNotFoundPage";
-import { UserShare } from "../../models/Event";
-import { useEventUsers } from "../../hooks/useEventUsers";
+import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";
 import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
-export function UserSharePage() {
+export function ParticipantSharePage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const { eventId, shareId } = useParams();
   const [currentEvent, setEvent] = useStore(`events.${eventId}`);
-  const users = useEventUsers(eventId);
+  const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 
-  const currentUser = users[shareId ?? ""];
+  const currentParticipant = participants[shareId ?? ""];
 
-  if (!shareId || !currentUser) {
+  if (!shareId || !currentParticipant) {
     return <ShareNotFoundPage eventId={currentEvent._id} />;
   }
 
@@ -31,14 +31,17 @@ export function UserSharePage() {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
   }
 
-  const share = currentEvent.shares[shareId];
+  const share = currentEvent.participants[shareId].participantShare;
 
-  const saveShare = (data: UserShare) => {
+  const saveShare = (data: ParticipantShare) => {
     setEvent((event) => ({
       ...event,
-      shares: {
-        ...currentEvent.shares,
-        [shareId]: data,
+      participants: {
+        ...event.participants,
+        [shareId]: {
+          ...event.participants[shareId],
+          participantShare: data,
+        },
       },
     }));
     goTo("SHARES", { eventId: currentEvent._id });
@@ -46,7 +49,9 @@ export function UserSharePage() {
 
   return (
     <PageTemplate
-      title={t("page.share.edit.title", { user: currentUser.name })}
+      title={t("page.share.edit.title", {
+        participant: currentParticipant.name,
+      })}
       leftAction={{
         as: "link",
         icon: "chevron-left",
@@ -57,7 +62,7 @@ export function UserSharePage() {
     >
       <ShareForm
         event={currentEvent}
-        user={currentUser}
+        participant={currentParticipant}
         defaultValues={share}
         submitLabel={t("page.share.form.actions.submit")}
         onSubmit={saveShare}

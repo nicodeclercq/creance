@@ -16,7 +16,6 @@ export function AddDepositPage() {
   const { goTo } = useRoute();
   const { eventId } = useParams();
   const [event, setEvent] = useStore(`events.${eventId}`);
-  const [users] = useStore("users");
 
   const defaultValue: Deposit = {
     _id: uid(),
@@ -45,13 +44,13 @@ export function AddDepositPage() {
         <Stack>
           <Paragraph>{t("page.addDeposit.description")}</Paragraph>
           <DepositForm
-            onCancel={() => goTo(ROUTES.EVENT, { eventId: event._id })}
-            cancelLabel={t("page.addDeposit.actions.cancel")}
+            event={event}
+            participants={event.participants}
             defaultValue={defaultValue}
             onSubmit={submit}
             submitLabel={t("page.addDeposit.actions.submit")}
-            event={event}
-            users={users}
+            cancelLabel={t("page.addDeposit.actions.cancel")}
+            onCancel={() => goTo(ROUTES.EVENT, { eventId: event._id })}
           />
         </Stack>
       </Card>

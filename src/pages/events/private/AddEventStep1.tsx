@@ -62,7 +62,7 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
           validate: {
             isUnique: (value) => {
               const isUnique = !Object.values(events).some(
-                (events) => events.name === value
+                (events) => events.name.toLowerCase() === value.toLowerCase()
               );
               return (
                 isUnique ||

@@ -4,6 +4,7 @@ import {
   encode,
   encrypt,
   exportKeys,
+  generateKey,
   getKeys,
   importKeys,
 } from "./crypto";
@@ -59,5 +60,13 @@ describe("encrypt/decrypt", () => {
 
     expect(typeof encoded).toBe("string");
     expect(decoded).toBe(originalText);
+  });
+});
+
+describe("generateKey", () => {
+  it("should generate a key", async () => {
+    const key = await generateKey();
+    expect(typeof key).toBe("string");
+    expect(key.length).toBeGreaterThan(0);
   });
 });

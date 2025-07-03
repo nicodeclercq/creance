@@ -7,28 +7,28 @@ import { Container } from "../../../ui/Container/Container";
 import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
 import { Divider } from "../../../ui/Divider/Divider";
 import { Event } from "../../../models/Event";
-import { ExpenseShareByUser } from "../../../service/calculation";
+import { ExpenseShareByParticipant } from "../../../service/calculation";
 import { Heading } from "../../../ui/Heading/Heading";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
+import { Participant } from "../../../models/Participant";
 import { PieChart } from "../../../ui/Pie/PieChart";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
-import { User } from "../../../models/User";
 import { centToDecimal } from "../../../helpers/Number";
 import { useTranslation } from "react-i18next";
 
 type ExpenseShareProps = {
   total: number;
   sharesByCategory: Record<string, number>;
-  users: Record<string, User>;
-  expenses: ExpenseShareByUser[];
+  participants: Record<string, Participant>;
+  expenses: ExpenseShareByParticipant[];
   event: Event;
 };
 
 export function ExpenseShare({
   total,
   event,
-  users,
+  participants,
   expenses,
   sharesByCategory,
 }: ExpenseShareProps) {
@@ -39,7 +39,7 @@ export function ExpenseShare({
       <Stack gap="m" justifyContent="stretch">
         <Columns gap="m">
           <Heading level={2} styles={{ font: "body-large", flexGrow: true }}>
-            {t("page.usershare.shares.title")}
+            {t("page.participantshare.shares.title")}
           </Heading>
           <Price type="total">{total}</Price>
         </Columns>
@@ -71,9 +71,9 @@ export function ExpenseShare({
               <Stack>
                 <DateFormatter>{expense.date}</DateFormatter>
                 <Columns align="center" gap="s">
-                  <Avatar label={users[expense.lender].name} size="s" />
+                  <Avatar label={participants[expense.lender].name} size="s" />
                   <Paragraph styles={{ font: "body-small" }}>
-                    {users[expense.lender].name}
+                    {participants[expense.lender].name}
                   </Paragraph>
                 </Columns>
               </Stack>

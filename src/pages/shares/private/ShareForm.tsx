@@ -3,7 +3,8 @@ import * as Either from "fp-ts/Either";
 import { Button, ButtonProps } from "../../../ui/Button/Button";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { CustomShare, FormShare, fromShare, toShare } from "./formShare";
-import { type Event, type UserShare } from "../../../models/Event";
+import { type Event } from "../../../models/Event";
+import { type ParticipantShare } from "../../../models/ParticipantShare";
 
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import { CalendarRangePicker } from "../../../ui/FormField/CalendarRangePicker/CalendarRangePicker";
@@ -18,7 +19,7 @@ import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { RadioGroup } from "../../../ui/Form/RadioGroup/RadioGroup";
 import { Stack } from "../../../ui/Stack/Stack";
 import { Switch } from "../../../ui/Switch";
-import { User } from "../../../models/User";
+import { Participant } from "../../../models/Participant";
 import styles from "./ShareForm.module.css";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
@@ -29,10 +30,10 @@ import { Select } from "../../../ui/FormField/Select/Select";
 
 type ShareFormProps = {
   event: Event;
-  user: User;
-  defaultValues: UserShare;
+  participant: Participant;
+  defaultValues: ParticipantShare;
   submitLabel: string;
-  onSubmit: (data: UserShare) => void;
+  onSubmit: (data: ParticipantShare) => void;
   cancel: DistributiveOmit<ButtonProps, "variant">;
 };
 
@@ -313,7 +314,7 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
 
 export function ShareForm({
   event,
-  user,
+  participant,
   defaultValues,
   submitLabel,
   onSubmit,
@@ -374,8 +375,8 @@ export function ShareForm({
         <Stack gap="m">
           <Columns align="center" justify="center">
             <Stack width="auto" gap="s" alignItems="center">
-              <Avatar label={user.name} size="l" />
-              <Paragraph>{user.name}</Paragraph>
+              <Avatar label={participant.name} size="l" />
+              <Paragraph>{participant.name}</Paragraph>
             </Stack>
           </Columns>
           <Controller

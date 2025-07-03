@@ -1,9 +1,9 @@
 import { Container } from "./ui/Container/Container";
-import { FormData } from "./pages/users/UserForm";
+import { FormData } from "./pages/participants/ParticipantForm";
 import { LoadingIcon } from "./ui/Button/LoadingIcon";
 import { ReactNode } from "react";
 import { Redirect } from "./Redirect";
-import { SetCurrentUserPage } from "./pages/auth/SetCurrentUserPage";
+import { SetCurrentParticipantPage } from "./pages/auth/SetCurrentParticipantPage";
 import { useAuthentication } from "./hooks/useAnthentication";
 import { useStore } from "./store/StoreProvider";
 
@@ -13,12 +13,13 @@ type Props = {
 
 export function PrivatePage({ children }: Props) {
   const { state } = useAuthentication();
-  const [currentUserId] = useStore("currentUserId");
-  const [currentUser, setCurrentUser] = useStore(`users.${currentUserId}`);
+  const [currentParticipantId] = useStore("currentParticipantId");
+  const [account, setAccount] = useStore("account");
 
   const submit = (data: FormData) => {
-    setCurrentUser(() => ({
-      _id: currentUserId,
+    setAccount(() => ({
+      _id: currentParticipantId,
+      eventKeys: {},
       updatedAt: new Date(),
       ...data,
     }));
@@ -45,8 +46,8 @@ export function PrivatePage({ children }: Props) {
     case "unauthenticated":
       return <Redirect to="LOGIN" />;
     case "authenticated":
-      return currentUser == null ? (
-        <SetCurrentUserPage onSubmit={submit} />
+      return !currentParticipantId || !account?._id ? (
+        <SetCurrentParticipantPage onSubmit={submit} />
       ) : (
         <>{children}</>
       );

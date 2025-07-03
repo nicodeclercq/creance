@@ -9,7 +9,7 @@ import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";
 import { Stack } from "../../ui/Stack/Stack";
 import { getEventDistribution } from "../../service/calculation";
 import { pipe } from "fp-ts/function";
-import { useEventUsers } from "../../hooks/useEventUsers";
+import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
 import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
@@ -18,12 +18,12 @@ export function DistributionPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const [currentEvent] = useStore(`events.${eventId}`);
-  const [currentUserId] = useStore("currentUserId");
+  const [currentParticipantId] = useStore("currentParticipantId");
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
-  const users = useEventUsers(eventId);
+  const participants = useEventParticipants(eventId);
 
   if (Object.keys(currentEvent.expenses).length === 0) {
     return (
@@ -34,14 +34,14 @@ export function DistributionPage() {
   }
 
   const distribution = pipe(
-    getEventDistribution({ event: currentEvent, users }),
+    getEventDistribution({ event: currentEvent }),
     Either.map((dist) => {
-      const currentUserDistribution = dist[currentUserId];
-      delete dist[currentUserId];
+      const currentParticipantDistribution = dist[currentParticipantId];
+      delete dist[currentParticipantId];
 
       return {
-        currentUserDistribution,
-        otherUsersDistribution: dist,
+        currentParticipantDistribution,
+        otherParticipantsDistribution: dist,
       };
     })
   );
@@ -51,26 +51,29 @@ export function DistributionPage() {
       <EitherComponent
         data={distribution}
         onLeft={() => <>Error</>}
-        onRight={({ currentUserDistribution, otherUsersDistribution }) => (
+        onRight={({
+          currentParticipantDistribution,
+          otherParticipantsDistribution,
+        }) => (
           <Stack gap="m">
             {!currentEvent.isClosed && (
               <Alert>{t("page.distribution.warning.notClosed")}</Alert>
             )}
             <DistributionItem
-              isCurrentUser
-              key={currentUserId}
-              userId={currentUserId}
-              distributions={currentUserDistribution}
-              users={users}
+              isCurrentParticipant
+              key={currentParticipantId}
+              participantId={currentParticipantId}
+              distributions={currentParticipantDistribution}
+              participants={participants}
             />
-            {Object.entries(otherUsersDistribution).map(
-              ([userId, distributions]) => (
+            {Object.entries(otherParticipantsDistribution).map(
+              ([participantId, distributions]) => (
                 <DistributionItem
-                  isCurrentUser={false}
-                  key={userId}
-                  userId={userId}
+                  isCurrentParticipant={false}
+                  key={participantId}
+                  participantId={participantId}
                   distributions={distributions}
-                  users={users}
+                  participants={participants}
                 />
               )
             )}

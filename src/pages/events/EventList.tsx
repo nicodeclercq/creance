@@ -6,16 +6,22 @@ import { EventItem } from "./EventItem/EventItem";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
-import { User } from "../../models/User";
+import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
-type EventListProps = {
-  events: Event[];
-  users: Record<string, User>;
+type Props = {
+  events: Record<string, Event>;
 };
 
-export function EventList({ events, users }: EventListProps) {
+export function EventList({ events }: Props) {
   const { t } = useTranslation();
+  const eventsValues = Object.values(events);
+  const [currentParticipantId] = useStore("currentParticipantId");
+
+  const filteredEvents = eventsValues.filter((event) => {
+    const eventParticipants = Object.keys(event.participants);
+    return eventParticipants.includes(currentParticipantId);
+  });
 
   return (
     <PageTemplate
@@ -29,14 +35,18 @@ export function EventList({ events, users }: EventListProps) {
         },
       ]}
     >
-      {events.length === 0 ? (
+      {filteredEvents.length === 0 ? (
         <EmptyEventList />
       ) : (
         <Card>
           <Stack gap="s" alignItems="stretch">
             <Stack as="ol" gap="none">
-              {events.map((event) => (
-                <EventItem key={event._id} event={event} users={users} />
+              {filteredEvents.map((event) => (
+                <EventItem
+                  key={event._id}
+                  event={event}
+                  participants={event.participants}
+                />
               ))}
             </Stack>
             <Button

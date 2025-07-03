@@ -8,14 +8,15 @@ import { IconButton } from "../../../ui/IconButton/IconButton";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { User } from "../../../models/User";
+import { Participant } from "../../../models/Participant";
+import { ParticipantShare } from "../../../models/ParticipantShare";
 import styles from "./AddEventStep3.module.css";
 import { uid } from "../../../service/crypto";
 import { useStore } from "../../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export type Step3Data = {
-  users: User[];
+  participants: Participant[];
 };
 type AddEventStep3Props = {
   data: Step3Data;
@@ -23,28 +24,32 @@ type AddEventStep3Props = {
   onPrevious: (data: Step3Data) => void;
 };
 
-type AddUsersFormProps = {
-  users: User[];
-  onAdd: (user: User) => void;
+type AddParticipantsFormProps = {
+  participants: Participant[];
+  onAdd: (participant: Participant) => void;
 };
 
-type AddUsersFormData = {
+type AddParticipantsFormData = {
   name: string;
   adults: number;
   children: number;
 };
-function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
+function AddParticipantsForm({
+  onAdd,
+  participants: participants,
+}: AddParticipantsFormProps) {
   const { t } = useTranslation();
-  const { control, handleSubmit, watch, reset } = useForm<AddUsersFormData>({
-    defaultValues: {
-      name: "",
-      adults: 1,
-      children: 0,
-    },
-  });
+  const { control, handleSubmit, watch, reset } =
+    useForm<AddParticipantsFormData>({
+      defaultValues: {
+        name: "",
+        adults: 1,
+        children: 0,
+      },
+    });
 
-  const addUser = (data: AddUsersFormData) => {
-    const newUser: User = {
+  const addParticipant = (data: AddParticipantsFormData) => {
+    const newParticipant: Participant = {
       _id: uid(),
       name: data.name,
       avatar: data.name,
@@ -52,14 +57,15 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
         adults: data.adults,
         children: data.children,
       },
+      participantShare: { type: "default" } as ParticipantShare,
       updatedAt: new Date(),
     };
-    onAdd(newUser);
+    onAdd(newParticipant);
     reset();
   };
 
   return (
-    <div className={styles.addUserForm}>
+    <div className={styles.addParticipantForm}>
       <div>
         <div style={{ font: "var(--ui-semantic-font-body-small)" }}>&nbsp;</div>
         <Avatar label={watch("name")} size="m" />
@@ -67,13 +73,17 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
       <Controller
         control={control}
         rules={{
-          required: t("page.events.add.form.user.name.validation.required"),
+          required: t(
+            "page.events.add.form.participant.name.validation.required"
+          ),
           validate: {
             isUnique: (value) => {
-              const isUnique = !users.some((user) => user.name === value);
+              const isUnique = !participants.some(
+                (participant) => participant.name === value
+              );
               return (
                 isUnique ||
-                t("page.events.add.form.user.name.validation.isUnique")
+                t("page.events.add.form.participant.name.validation.isUnique")
               );
             },
           },
@@ -85,7 +95,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
               type="text"
               value={value}
               onChange={onChange}
-              label={t("page.events.add.form.user.name.label")}
+              label={t("page.events.add.form.participant.name.label")}
               isRequired
               error={error?.message}
             />
@@ -96,20 +106,22 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
         <div style={{ font: "var(--ui-semantic-font-body-small)" }}>&nbsp;</div>
         <IconButton
           icon="add"
-          label={t("page.events.add.form.user.share.submit")}
-          onClick={handleSubmit(addUser)}
+          label={t("page.events.add.form.participant.share.submit")}
+          onClick={handleSubmit(addParticipant)}
           variant="tertiary"
         />
       </div>
       <div className={styles.fieldLegend}>
-        {t("page.events.add.form.user.share.label")}
+        {t("page.events.add.form.participant.share.label")}
       </div>
       <Controller
         control={control}
         rules={{
           min: {
             value: 0,
-            message: t("page.events.add.form.user.share.adults.validation.min"),
+            message: t(
+              "page.events.add.form.participant.share.adults.validation.min"
+            ),
           },
         }}
         name="adults"
@@ -119,7 +131,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
             type="number"
             value={value}
             onChange={onChange}
-            label={t("page.events.add.form.user.share.adults.label")}
+            label={t("page.events.add.form.participant.share.adults.label")}
             isRequired
             error={error?.message}
           />
@@ -131,7 +143,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
           min: {
             value: 0,
             message: t(
-              "page.events.add.form.user.share.children.validation.min"
+              "page.events.add.form.participant.share.children.validation.min"
             ),
           },
         }}
@@ -142,7 +154,7 @@ function AddUsersForm({ onAdd, users }: AddUsersFormProps) {
             type="number"
             value={value}
             onChange={onChange}
-            label={t("page.events.add.form.user.share.children.label")}
+            label={t("page.events.add.form.participant.share.children.label")}
             isRequired
             error={error?.message}
           />
@@ -158,7 +170,7 @@ export function AddEventStep3({
   onPrevious,
 }: AddEventStep3Props) {
   const { t } = useTranslation();
-  const [currentUserId] = useStore("currentUserId");
+  const [currentParticipantId] = useStore("currentParticipantId");
   const { control, handleSubmit, watch, formState, getValues } =
     useForm<Step3Data>({
       defaultValues: data,
@@ -167,10 +179,10 @@ export function AddEventStep3({
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "users",
+    name: "participants",
   });
 
-  const removeUser = (id: string) => () => {
+  const removeParticipant = (id: string) => () => {
     const index = fields.findIndex((item) => item._id === id);
     remove(index);
   };
@@ -200,30 +212,30 @@ export function AddEventStep3({
             <div>
               <Paragraph styles={{ flexGrow: true }}>{item.name}</Paragraph>
               <Paragraph styles={{ font: "body-smaller" }}>
-                {t("page.events.add.form.user.share.count", {
+                {t("page.events.add.form.participant.share.count", {
                   adults: item.share.adults,
                   children: item.share.children,
                 })}
               </Paragraph>
             </div>
-            {item._id === currentUserId ? (
+            {item._id === currentParticipantId ? (
               <span></span>
             ) : (
               <IconButton
                 variant="tertiary"
                 icon="trash"
-                label={t("page.events.add.form.user.remove", {
+                label={t("page.events.add.form.participant.remove", {
                   name: item.name,
                 })}
-                onClick={removeUser(item._id)}
+                onClick={removeParticipant(item._id)}
               />
             )}
           </Fragment>
         ))}
       </Grid>
-      <AddUsersForm
-        onAdd={(user: User) => append(user)}
-        users={watch("users")}
+      <AddParticipantsForm
+        onAdd={(participant: Participant) => append(participant)}
+        participants={watch("participants")}
       />
     </Form>
   );

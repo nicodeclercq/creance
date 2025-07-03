@@ -15,7 +15,6 @@ export function EditDepositPage() {
   const { goTo } = useRoute();
   const { eventId, depositId } = useParams();
   const [event, setEvent] = useStore(`events.${eventId}`);
-  const [users] = useStore("users");
 
   const defaultValue = event.deposits[depositId!];
 
@@ -42,7 +41,7 @@ export function EditDepositPage() {
             onSubmit={submit}
             submitLabel={t("page.editDeposit.actions.submit")}
             event={event}
-            users={users}
+            participants={event.participants}
           />
         </Stack>
       </Card>

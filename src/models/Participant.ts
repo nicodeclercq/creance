@@ -1,4 +1,6 @@
-export type User = {
+import { ParticipantShare } from "./ParticipantShare";
+
+export type Participant = {
   _id: string;
   name: string;
   avatar?: string;
@@ -6,5 +8,6 @@ export type User = {
     adults: number;
     children: number;
   };
+  participantShare: ParticipantShare;
   updatedAt: Date;
 };

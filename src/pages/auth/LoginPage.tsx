@@ -9,7 +9,7 @@ import { InputText } from "../../ui/FormField/InputText/InputText";
 import { PigImage } from "../../ui/Pig";
 import { Redirect } from "../../Redirect";
 import { Stack } from "../../ui/Stack/Stack";
-import { loginUser } from "../../service/firebase";
+import { loginParticipant } from "../../service/firebase";
 import styles from "./LoginPage.module.css";
 import { useAuthentication } from "../../hooks/useAnthentication";
 import { useRoute } from "../../hooks/useRoute";
@@ -33,7 +33,7 @@ export function LoginPage() {
   const hasError = Object.keys(formState.errors).length > 0;
 
   const submit = (data: { email: string; password: string }) =>
-    loginUser(data)().then(() => {
+    loginParticipant(data)().then(() => {
       goTo("EVENT_LIST");
     });
 

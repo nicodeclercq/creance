@@ -9,8 +9,8 @@ import { AddExpensePage } from "./pages/event/AddExpensePage";
 import { EditExpensePage } from "./pages/event/EditExpensePage";
 import { CategoriesPage } from "./pages/categories/CategoriesPage";
 import { SharesPage } from "./pages/shares/SharesPage";
-import { UserSharePage } from "./pages/shares/UserSharePage";
-import { EventUserSharePage } from "./pages/shares/EventUserSharePage";
+import { ParticipantSharePage } from "./pages/shares/ParticipantSharePage";
+import { EventParticipantSharePage } from "./pages/shares/EventParticipantSharePage";
 import { DistributionPage } from "./pages/distribution/DistributionPage";
 import { ValueOf } from "./utils/object";
 import { LoginPage } from "./pages/auth/LoginPage";
@@ -71,11 +71,11 @@ export const ROUTES_DEFINITION = {
   },
   SHARES_EDIT: {
     path: "/events/:eventId/shares/:shareId/edit",
-    component: UserSharePage,
+    component: ParticipantSharePage,
   },
-  EVENT_USER_SHARE: {
-    path: "/events/:eventId/usershare",
-    component: EventUserSharePage,
+  EVENT_PARTICIPANT_SHARE: {
+    path: "/events/:eventId/participantshare",
+    component: EventParticipantSharePage,
   },
   EVENT_DISTRIBUTION: {
     path: "/events/:eventId/distribution",
@@ -100,7 +100,7 @@ export const ROUTES_DEFINITION = {
   EXPENSE_EDIT: "/creances/:creanceId/expenses/:id/edit",
   DISTRIBUTION: "/creances/:creanceId/distribution",
   RESULTS: "/creances/:creanceId/summary",
-  USER_LIST: "/creances/:creanceId/users",
+  PARTICIPANT_LIST: "/creances/:creanceId/participants",
   CATEGORIES_LIST: "/creances/:creanceId/categories",
   EXPORT: "/creances/:creanceId/export",
   */

@@ -1,10 +1,10 @@
-import { User } from "./User";
+import { Participant } from "./Participant";
 
 export type Deposit = {
   _id: string;
   amount: string;
-  from: User["_id"];
-  to: User["_id"];
+  from: Participant["_id"];
+  to: Participant["_id"];
   note: string;
   updatedAt: Date;
   date: Date;

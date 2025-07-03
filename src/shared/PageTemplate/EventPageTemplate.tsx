@@ -17,7 +17,6 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const [_, setEvent] = useStore(`events.${event._id}`);
-  const [users] = useStore(`users`);
   const [___, setEvents] = useStore(`events`);
 
   const actions: Action[] = event.isClosed
@@ -67,7 +66,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           params: { eventId: event._id },
         },
         {
-          label: t("page.event.list.actions.updateUsers"),
+          label: t("page.event.list.actions.updateParticipants"),
           icon: "user-group",
           as: "link",
           to: "SHARES",
@@ -107,7 +106,6 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
               event.name,
               toExportedData({
                 event,
-                users,
               })
             );
           },
@@ -131,7 +129,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           label: t("page.menu.shares"),
           icon: "user-share",
           as: "link",
-          to: "EVENT_USER_SHARE",
+          to: "EVENT_PARTICIPANT_SHARE",
           params: { eventId: event._id },
         },
         {

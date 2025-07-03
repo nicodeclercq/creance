@@ -1,59 +1,19 @@
 import { addDays, isBefore } from "../utils/date";
 
-import { Category } from "./Category";
-import { Deposit } from "./Deposit";
-import { Expense } from "./Expense";
-import { Period } from "./Period";
+import type { Category } from "./Category";
+import type { Deposit } from "./Deposit";
+import type { Expense } from "./Expense";
+import type { Participant } from "./Participant";
+import type { Period } from "./Period";
+import { foldParticipantShare } from "./ParticipantShare";
 
 export const DAYS_BEFORE_CLOSE = 7;
-
-export type DefaultUserShare = {
-  type: "default";
-};
-
-export type CustomUserShareType = {
-  label: string;
-  multiplier: {
-    adults: number;
-    children: number;
-  };
-  period: {
-    start: Date;
-    end: Date;
-    arrival: "AM" | "PM";
-    departure: "AM" | "PM";
-  };
-};
-
-export type CustomUserShare = {
-  type: "custom";
-  shares: CustomUserShareType[];
-};
-
-export type UserShare = DefaultUserShare | CustomUserShare;
-
-export const foldUserShare =
-  <T>({
-    onDefault,
-    onCustom,
-  }: {
-    onDefault: (share: DefaultUserShare) => T;
-    onCustom: (share: CustomUserShare) => T;
-  }) =>
-  (share: UserShare) => {
-    switch (share.type) {
-      case "default":
-        return onDefault(share);
-      case "custom":
-        return onCustom(share);
-    }
-  };
 
 export type Event = {
   _id: string;
   isClosed?: boolean;
   name: string;
-  shares: Record<string, UserShare>;
+  participants: Record<string, Participant>;
   period: Period;
   description: string;
   expenses: Record<string, Expense>;
@@ -72,3 +32,5 @@ export const shouldCloseEvent = (event: Event): boolean => {
     ? canAutoClose(autoCloseDay)
     : false;
 };
+
+export { foldParticipantShare };

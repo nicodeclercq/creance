@@ -18,14 +18,14 @@ import { InputDate } from "../../../ui/FormField/InputDate/InputDate";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
+import { Participant } from "../../../models/Participant";
 import { RadioGroup } from "../../../ui/Form/RadioGroup/RadioGroup";
 import { Select } from "../../../ui/FormField/Select/Select";
-import { User } from "../../../models/User";
 import { useTranslation } from "react-i18next";
 
 export type Props = {
   event: Event;
-  users: Record<string, User>;
+  participants: Record<string, Participant>;
   defaultValues: FormExpense;
   submitLabel: string;
   onSubmit: (expense: Expense) => void;
@@ -34,7 +34,7 @@ export type Props = {
 
 export function ExpenseForm({
   event,
-  users,
+  participants,
   defaultValues,
   onSubmit,
   submitLabel,
@@ -78,7 +78,7 @@ export function ExpenseForm({
       }
 
       if (data.share.type === "percentage") {
-        const sum = Object.values(data.share.percentageUser).reduce(
+        const sum = Object.values(data.share.percentageParticipant).reduce(
           (acc, val) => acc + asNumber(val),
           0
         );
@@ -91,7 +91,7 @@ export function ExpenseForm({
           };
         }
       } else if (data.share.type === "fixed") {
-        const sum = Object.values(data.share.fixedUser).reduce(
+        const sum = Object.values(data.share.fixedParticipant).reduce(
           (acc, val) => acc + asNumber(val),
           0
         );
@@ -105,9 +105,11 @@ export function ExpenseForm({
           };
         }
 
-        Object.values(users).forEach((user) => {
+        Object.values(participants).forEach((participant) => {
           if (data.share.type === "fixed") {
-            const value = asNumber(data.share.fixedUser[user._id]);
+            const value = asNumber(
+              data.share.fixedParticipant[participant._id]
+            );
             if (value < 0) {
               errors.share = {
                 message: t(
@@ -117,7 +119,9 @@ export function ExpenseForm({
             }
           }
           if (data.share.type === "percentage") {
-            const value = asNumber(data.share.percentageUser[user._id]);
+            const value = asNumber(
+              data.share.percentageParticipant[participant._id]
+            );
             if (value < 0) {
               errors.share = {
                 message: t(
@@ -165,13 +169,17 @@ export function ExpenseForm({
             value={value}
             onChange={onChange}
             valueRenderer={({ value }) => (
-              <Avatar label={users[value]?.name} size="m" />
+              <Avatar label={participants[value]?.name} size="m" />
             )}
-            options={Object.keys(event.shares).map((user, index) => ({
-              id: user ?? index,
-              label: users[user]?.name ?? "deleted user",
-              value: users[user]?._id ?? "deleted user",
-            }))}
+            options={Object.keys(event.participants).map(
+              (participant, index) => ({
+                id: participant ?? index,
+                label:
+                  participants[participant]?.name ?? t("participant.unknown"),
+                value:
+                  participants[participant]?._id ?? t("participant.unknown"),
+              })
+            )}
           />
         )}
       />
@@ -309,10 +317,10 @@ export function ExpenseForm({
         {t(`page.event.add.form.field.share.type.${currentType}.description`)}
       </Paragraph>
       {currentType === "percentage" &&
-        Object.values(users).map((user) => (
+        Object.values(participants).map((participant) => (
           <Controller
-            key={user._id}
-            name={`share.percentageUser.${user._id}`}
+            key={participant._id}
+            name={`share.percentageParticipant.${participant._id}`}
             control={control}
             rules={{
               required: true,
@@ -320,8 +328,8 @@ export function ExpenseForm({
             render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Columns gap="m">
                 <Columns align="center" gap="s" styles={{ flexGrow: true }}>
-                  <Avatar label={user.name} />
-                  <Paragraph>{user.name}</Paragraph>
+                  <Avatar label={participant.name} />
+                  <Paragraph>{participant.name}</Paragraph>
                 </Columns>
                 <InputNumber
                   as="string"
@@ -342,10 +350,10 @@ export function ExpenseForm({
           />
         ))}
       {watch("share.type") === "fixed" &&
-        Object.values(users).map((user) => (
+        Object.values(participants).map((participant) => (
           <Controller
-            key={user._id}
-            name={`share.fixedUser.${user._id}`}
+            key={participant._id}
+            name={`share.fixedParticipant.${participant._id}`}
             control={control}
             rules={{
               required: true,
@@ -353,8 +361,8 @@ export function ExpenseForm({
             render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Columns gap="m">
                 <Columns align="center" gap="s" styles={{ flexGrow: true }}>
-                  <Avatar label={user.name} />
-                  <Paragraph>{user.name}</Paragraph>
+                  <Avatar label={participant.name} />
+                  <Paragraph>{participant.name}</Paragraph>
                 </Columns>
                 <InputNumber
                   as="string"

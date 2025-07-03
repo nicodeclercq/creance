@@ -9,7 +9,8 @@ import { useStore } from "../../store/StoreProvider";
 import { Card } from "../../ui/Card/Card";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
-import { uid } from "../../service/crypto";
+import { generateKey, uid } from "../../service/crypto";
+import { Participant } from "../../models/Participant";
 
 const now = new Date();
 
@@ -28,9 +29,9 @@ const initialStateStep1 = {
 export function AddEventPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const [users, setUsers] = useStore("users");
   const [_, setEvents] = useStore("events");
   const [currentStep, setCurrentStep] = useState(0);
+  const [account, setAccount] = useStore("account");
   const [step1Data, setStep1Data] = useState<Step1Data>(initialStateStep1);
   const [step2Data, setStep2Data] = useState<Step2Data>({
     categories: DEFAULT_CATEGORIES.map((category) => ({
@@ -39,7 +40,7 @@ export function AddEventPage() {
     })),
   });
   const [step3Data, setStep3Data] = useState<Step3Data>({
-    users: Object.values(users),
+    participants: [{ ...account, participantShare: { type: "default" } }],
   });
 
   const goToStep2 = (data: Step1Data) => {
@@ -51,21 +52,24 @@ export function AddEventPage() {
     setStep2Data(data);
   };
   const goToStep4 = (data: Step3Data) => {
-    setStep3Data(data);
-    setEvents((events) => {
-      const id = uid();
-
-      return {
+    generateKey().then((key) => {
+      const eventId = uid();
+      setStep3Data(data);
+      setEvents((events) => ({
         ...events,
-        [id]: {
-          _id: id,
+        [eventId]: {
+          _id: eventId,
           name: step1Data.name,
-          shares: data.users.reduce(
-            (acc, user) => ({
+          participants: data.participants.reduce(
+            (acc, participant) => ({
               ...acc,
-              [user._id]: { type: "default" },
+              [participant._id]: {
+                ...participant,
+                updatedAt: new Date(),
+                participantShare: { type: "default" },
+              },
             }),
-            {}
+            {} as Record<string, Participant>
           ),
           period: {
             start: step1Data.dates.start,
@@ -82,21 +86,14 @@ export function AddEventPage() {
           ),
           updatedAt: new Date(),
         },
-      };
+      }));
+      setAccount((account) => ({
+        ...account,
+        eventKeys: { ...account.eventKeys, [eventId]: key },
+      }));
+
+      goTo("EVENT_LIST");
     });
-    setUsers((currentUsers) => {
-      const additionalUsers = data.users
-        .filter((user) => user._id in currentUsers === false)
-        .reduce(
-          (acc, user) => ({
-            ...acc,
-            [user._id]: { ...user, updatedAt: new Date() },
-          }),
-          {}
-        );
-      return { ...currentUsers, ...additionalUsers };
-    });
-    goTo("EVENT_LIST");
   };
 
   return (

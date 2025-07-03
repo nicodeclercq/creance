@@ -6,7 +6,7 @@ import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";
 import { Redirect } from "../../Redirect";
 import { fromExpense } from "./private/formExpense";
-import { useEventUsers } from "../../hooks/useEventUsers";
+import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";
 import { useStore } from "../../store/StoreProvider";
@@ -17,7 +17,7 @@ export function EditExpensePage() {
   const { eventId, expenseId } = useParams();
   const { goTo } = useRoute();
   const [currentEvent, setEvent] = useStore(`events.${eventId}`);
-  const users = useEventUsers(eventId);
+  const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
@@ -35,7 +35,7 @@ export function EditExpensePage() {
     return <>Expense not found</>;
   }
 
-  const defaultValues = fromExpense(currentExpense, users);
+  const defaultValues = fromExpense(currentExpense, participants);
 
   const editExpense = (expense: Expense) => {
     setEvent((event) => ({
@@ -61,7 +61,7 @@ export function EditExpensePage() {
       <Card>
         <ExpenseForm
           event={currentEvent}
-          users={users}
+          participants={participants}
           defaultValues={defaultValues}
           submitLabel={t("page.event.edit.form.actions.submit")}
           onSubmit={editExpense}

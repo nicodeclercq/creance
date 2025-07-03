@@ -1,6 +1,6 @@
 import * as Either from "fp-ts/Either";
 
-import { UserShare } from "../../../models/Event";
+import { ParticipantShare } from "../../../models/ParticipantShare";
 
 export type CustomShare = {
   label: string;
@@ -33,7 +33,9 @@ export type FormShare = {
   }[];
 };
 
-export const toShare = (data: FormShare): Either.Either<Error, UserShare> => {
+export const toShare = (
+  data: FormShare
+): Either.Either<Error, ParticipantShare> => {
   switch (data.type) {
     case "default":
       return Either.right({
@@ -60,7 +62,7 @@ export const toShare = (data: FormShare): Either.Either<Error, UserShare> => {
   }
 };
 
-export const fromShare = (data: UserShare): FormShare => {
+export const fromShare = (data: ParticipantShare): FormShare => {
   return {
     type: data.type,
     shares:

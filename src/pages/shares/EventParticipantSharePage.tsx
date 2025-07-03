@@ -1,16 +1,16 @@
 import { EmptyEvent } from "../event/EmptyEvent";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";
-import { UserShareList } from "./private/UserShareList";
-import { useEventUsers } from "../../hooks/useEventUsers";
+import { ParticipantShareList } from "./private/ParticipantShareList";
+import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
 import { useStore } from "../../store/StoreProvider";
 
-export function EventUserSharePage() {
+export function EventParticipantSharePage() {
   const { eventId } = useParams();
   const [currentEvent] = useStore(`events.${eventId}`);
-  const [currentUserId] = useStore("currentUserId");
-  const users = useEventUsers(eventId);
+  const [currentParticipantId] = useStore("currentParticipantId");
+  const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
@@ -26,10 +26,10 @@ export function EventUserSharePage() {
 
   return (
     <EventPageTemplate event={currentEvent}>
-      <UserShareList
+      <ParticipantShareList
         event={currentEvent}
-        users={users}
-        currentUserId={currentUserId}
+        participants={participants}
+        currentParticipantId={currentParticipantId}
       />
     </EventPageTemplate>
   );

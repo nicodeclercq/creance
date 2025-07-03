@@ -1,22 +1,22 @@
 import * as Either from "fp-ts/Either";
 
-import { CustomUserShare, Event } from "../models/Event";
 import { describe, expect, it } from "vitest";
 import {
-  getCustomUserShareCount,
-  getDefaultUserShareCount,
-  getDepositShares,
+  getCustomParticipantShareCount,
+  getDefaultParticipantShareCount,
   getEventDistribution,
-  getEventSharesByUser,
+  getEventSharesByParticipant,
   getExpenseAmountByCategory,
   getExpenseShares,
   getHalfDaysCount,
   getTotalExpenseAmount,
 } from "./calculation";
 
+import { CustomParticipantShare } from "../models/ParticipantShare";
 import { Deposit } from "../models/Deposit";
+import { Event } from "../models/Event";
 import { Expense } from "../models/Expense";
-import { User } from "../models/User";
+import { Participant } from "../models/Participant";
 import { pipe } from "fp-ts/function";
 import { uid } from "./crypto";
 
@@ -24,6 +24,7 @@ const createEvent = (defaultValues: Partial<Event> = {}): Event => ({
   _id: uid(),
   name: "Event Name",
   description: "",
+  participants: {},
   categories: {
     Food: {
       _id: uid(),
@@ -45,7 +46,6 @@ const createEvent = (defaultValues: Partial<Event> = {}): Event => ({
     end: new Date("2025-01-01"),
     departure: "PM",
   },
-  shares: {},
   updatedAt: new Date(),
   ...defaultValues,
 });
@@ -60,13 +60,16 @@ const createExpense = (defaultValues: Partial<Expense> = {}): Expense => ({
   share: { type: "default" },
   ...defaultValues,
 });
-const createUser = (defaultValues: Partial<User> = {}): User => ({
+const createParticipant = (
+  defaultValues: Partial<Participant> = {}
+): Participant => ({
   _id: uid(),
-  name: "User Name",
+  name: "Participant Name",
   share: {
     adults: 1,
     children: 0,
   },
+  participantShare: { type: "default" },
   updatedAt: new Date("2025-01-01"),
   ...defaultValues,
 });
@@ -163,16 +166,16 @@ describe("calcultation", () => {
     });
   });
 
-  describe("getDefaultUserShareCount", () => {
+  describe("getDefaultParticipantShareCount", () => {
     it("should return the default share count for a child (*1)", () => {
-      const share = getDefaultUserShareCount(
+      const share = getDefaultParticipantShareCount(
         {
           start: new Date("2025-01-01"),
           arrival: "PM",
           end: new Date("2025-01-05"),
           departure: "AM",
         },
-        createUser({
+        createParticipant({
           share: { adults: 0, children: 1 },
         })
       );
@@ -180,29 +183,29 @@ describe("calcultation", () => {
       expect(share).toBe(8 * 1);
     });
     it("should return the default share count for an adult (*2)", () => {
-      const share = getDefaultUserShareCount(
+      const share = getDefaultParticipantShareCount(
         {
           start: new Date("2025-01-01"),
           arrival: "PM",
           end: new Date("2025-01-05"),
           departure: "AM",
         },
-        createUser({
+        createParticipant({
           share: { adults: 1, children: 0 },
         })
       );
 
       expect(share).toBe(8 * 2);
     });
-    it("should return the default share count for a group of users", () => {
-      const share = getDefaultUserShareCount(
+    it("should return the default share count for a group of participants", () => {
+      const share = getDefaultParticipantShareCount(
         {
           start: new Date("2025-01-01"),
           arrival: "PM",
           end: new Date("2025-01-05"),
           departure: "AM",
         },
-        createUser({
+        createParticipant({
           share: { adults: 2, children: 1 },
         })
       );
@@ -211,9 +214,9 @@ describe("calcultation", () => {
     });
   });
 
-  describe("getCustomUserShareCount", () => {
-    it("should return the custom share count for a user", () => {
-      const customShares: CustomUserShare = {
+  describe("getCustomParticipantShareCount", () => {
+    it("should return the custom share count for a participant", () => {
+      const customShares: CustomParticipantShare = {
         type: "custom",
         shares: [
           {
@@ -249,34 +252,32 @@ describe("calcultation", () => {
         ],
       };
 
-      const share = getCustomUserShareCount(customShares);
+      const share = getCustomParticipantShareCount(customShares);
 
-      expect(share).toBe(36);
+      expect(share).toBe(8 * 2 + 2 * 1 + 6 * 3);
     });
   });
 
   describe("getExpenseShares", () => {
-    it("should return the default shares by user", () => {
-      const users = {
-        user1: createUser({
-          _id: "user1",
-          share: { adults: 2, children: 4 }, // x8
-        }),
-        user2: createUser({
-          _id: "user2",
-          share: { adults: 1, children: 2 }, // x4
-        }),
-      };
+    it("should return the default shares by participant", () => {
       const expense = createExpense({
         amount: "300",
-        lender: "user1",
+        lender: "participant1",
       });
       const event = createEvent({
-        expenses: { [expense._id]: expense },
-        shares: {
-          user1: { type: "default" },
-          user2: { type: "default" },
+        participants: {
+          participant1: createParticipant({
+            _id: "participant1",
+            share: { adults: 2, children: 0 },
+            participantShare: { type: "default" },
+          }),
+          participant2: createParticipant({
+            _id: "participant2",
+            share: { adults: 0, children: 1 },
+            participantShare: { type: "default" },
+          }),
         },
+        expenses: { [expense._id]: expense },
         period: {
           start: new Date("2025-01-01"), // x2
           arrival: "AM",
@@ -285,40 +286,38 @@ describe("calcultation", () => {
         },
       });
 
-      expect(getExpenseShares({ expense, users, event })).toStrictEqual(
+      expect(getExpenseShares({ expense, event })).toStrictEqual(
         Either.right({
-          user1: 20000,
-          user2: 10000,
+          participant1: 24000,
+          participant2: 6000,
         })
       );
     });
 
-    it("should return the proportianal shares by user", () => {
-      const users = {
-        user1: createUser({
-          _id: "user1",
-        }),
-        user2: createUser({
-          _id: "user2",
-        }),
-      };
+    it("should return the proportianal shares by participant", () => {
       const expense = createExpense({
         amount: "80",
-        lender: "user1",
+        lender: "participant1",
         share: {
           type: "percentage",
           distribution: {
-            user1: "25",
-            user2: "75",
+            participant1: "25",
+            participant2: "75",
           },
         },
       });
       const event = createEvent({
-        expenses: { [expense._id]: expense },
-        shares: {
-          user1: { type: "default" },
-          user2: { type: "default" },
+        participants: {
+          participant1: createParticipant({
+            _id: "participant1",
+            participantShare: { type: "default" },
+          }),
+          participant2: createParticipant({
+            _id: "participant2",
+            participantShare: { type: "default" },
+          }),
         },
+        expenses: { [expense._id]: expense },
         period: {
           start: new Date("2025-01-01"), // x2
           arrival: "AM",
@@ -327,40 +326,38 @@ describe("calcultation", () => {
         },
       });
 
-      expect(getExpenseShares({ expense, users, event })).toStrictEqual(
+      expect(getExpenseShares({ expense, event })).toStrictEqual(
         Either.right({
-          user1: 2000,
-          user2: 6000,
+          participant1: 2000,
+          participant2: 6000,
         })
       );
     });
 
-    it("should return the fixed shares by user", () => {
-      const users = {
-        user1: createUser({
-          _id: "user1",
-        }),
-        user2: createUser({
-          _id: "user2",
-        }),
-      };
+    it("should return the fixed shares by participant", () => {
       const expense = createExpense({
         amount: "100",
-        lender: "user1",
+        lender: "participant1",
         share: {
           type: "fixed",
           distribution: {
-            user1: "25",
-            user2: "75",
+            participant1: "25",
+            participant2: "75",
           },
         },
       });
       const event = createEvent({
-        expenses: { [expense._id]: expense },
-        shares: {
-          user1: { type: "default" },
-          user2: { type: "default" },
+        participants: {
+          participant1: createParticipant({
+            _id: "participant1",
+            participantShare: { type: "default" },
+          }),
+          participant2: createParticipant({
+            _id: "participant2",
+            participantShare: { type: "default" },
+          }),
         },
+        expenses: { [expense._id]: expense },
         period: {
           start: new Date("2025-01-01"), // x2
           arrival: "AM",
@@ -369,45 +366,48 @@ describe("calcultation", () => {
         },
       });
 
-      expect(getExpenseShares({ expense, users, event })).toStrictEqual(
+      expect(getExpenseShares({ expense, event })).toStrictEqual(
         Either.right({
-          user1: 2500,
-          user2: 7500,
+          participant1: 2500,
+          participant2: 7500,
         })
       );
     });
   });
 
-  describe("getEventSharesByUser", () => {
+  describe("getEventSharesByParticipant", () => {
     it("should add the deposit as an expense for the donator and as a negative expense for the reciever", () => {
-      const users = {
-        user1: createUser({
-          _id: "user1",
+      const participants = {
+        participant1: createParticipant({
+          _id: "participant1",
+          participantShare: { type: "default" },
         }),
-        user2: createUser({
-          _id: "user2",
+        participant2: createParticipant({
+          _id: "participant2",
+          participantShare: { type: "default" },
         }),
-        user3: createUser({
-          _id: "user3",
+        participant3: createParticipant({
+          _id: "participant3",
+          participantShare: { type: "default" },
         }),
       };
       const deposits = {
         deposit1: createDeposit({
           _id: "deposit1",
-          from: "user1",
-          to: "user2",
+          from: "participant1",
+          to: "participant2",
           amount: "100",
         }),
         deposit2: createDeposit({
           _id: "deposit2",
-          from: "user2",
-          to: "user3",
+          from: "participant2",
+          to: "participant3",
           amount: "50",
         }),
         deposit3: createDeposit({
           _id: "deposit3",
-          from: "user3",
-          to: "user1",
+          from: "participant3",
+          to: "participant1",
           amount: "25",
         }),
       };
@@ -415,27 +415,28 @@ describe("calcultation", () => {
         expense1: createExpense({
           _id: "expense1",
           category: "Transport",
-          lender: "user1",
+          lender: "participant1",
           amount: "100",
           share: { type: "default" },
         }),
         expense2: createExpense({
           _id: "expense2",
           category: "Food",
-          lender: "user2",
+          lender: "participant2",
           amount: "50",
           share: { type: "default" },
         }),
         expense3: createExpense({
           _id: "expense3",
           category: "Food",
-          lender: "user3",
+          lender: "participant3",
           amount: "25",
           share: { type: "default" },
         }),
       };
 
       const event = createEvent({
+        participants,
         deposits: {
           [deposits.deposit1._id]: deposits.deposit1,
           [deposits.deposit2._id]: deposits.deposit2,
@@ -446,22 +447,16 @@ describe("calcultation", () => {
           expense2: expenses.expense2,
           expense3: expenses.expense3,
         },
-        shares: {
-          user1: { type: "default" },
-          user2: { type: "default" },
-          user3: { type: "default" },
-        },
       });
 
-      const user1Shares = getEventSharesByUser({
+      const participant1Shares = getEventSharesByParticipant({
         event,
-        users,
-        userId: "user1",
+        participantId: "participant1",
       });
 
       expect(
         pipe(
-          user1Shares,
+          participant1Shares,
           Either.map((shares) =>
             shares.map((share) => ({
               type: share.type,
@@ -472,298 +467,592 @@ describe("calcultation", () => {
         )
       ).toStrictEqual(
         Either.right([
-          { type: "expense", amount: "100", category: "Transport" }, // expense1
-          { type: "expense", amount: "50", category: "Food" }, // expense2
-          { type: "expense", amount: "25", category: "Food" }, // expense2
+          {
+            type: "expense",
+            amount: "100",
+            category: "Transport",
+          },
+          {
+            type: "expense",
+            amount: "50",
+            category: "Food",
+          },
+          {
+            type: "expense",
+            amount: "25",
+            category: "Food",
+          },
+        ])
+      );
+    });
+
+    it("should filter out the expenses that the participant does not have to pay", () => {
+      const participants = {
+        participant1: createParticipant({
+          _id: "participant1",
+          participantShare: { type: "default" },
+        }),
+        participant2: createParticipant({
+          _id: "participant2",
+          participantShare: { type: "default" },
+        }),
+        participant3: createParticipant({
+          _id: "participant3",
+          participantShare: { type: "default" },
+        }),
+      };
+      const expenses = {
+        expense1: createExpense({
+          _id: "expense1",
+          category: "Transport",
+          lender: "participant1",
+          amount: "100",
+          share: {
+            type: "fixed",
+            distribution: {
+              participant1: "50",
+              participant2: "0",
+              participant3: "50",
+            },
+          },
+        }),
+        expense2: createExpense({
+          _id: "expense2",
+          category: "Food",
+          lender: "participant2",
+          amount: "50",
+          share: {
+            type: "fixed",
+            distribution: {
+              participant1: "0",
+              participant2: "0",
+              participant3: "50",
+            },
+          },
+        }),
+        expense3: createExpense({
+          _id: "expense3",
+          category: "Food",
+          lender: "participant3",
+          amount: "25",
+          share: {
+            type: "fixed",
+            distribution: {
+              participant1: "25",
+              participant2: "0",
+              participant3: "0",
+            },
+          },
+        }),
+      };
+
+      const event = createEvent({
+        participants,
+        expenses: {
+          expense1: expenses.expense1,
+          expense2: expenses.expense2,
+          expense3: expenses.expense3,
+        },
+      });
+
+      const participant1Shares = getEventSharesByParticipant({
+        event,
+        participantId: "participant1",
+      });
+
+      expect(
+        pipe(
+          participant1Shares,
+          Either.map((shares) =>
+            shares.map((share) => ({
+              type: share.type,
+              amount: share.amount,
+              category: share.category,
+            }))
+          )
+        )
+      ).toStrictEqual(
+        Either.right([
+          {
+            type: "expense",
+            amount: "100",
+            category: "Transport",
+          },
+          {
+            type: "expense",
+            amount: "25",
+            category: "Food",
+          },
         ])
       );
     });
   });
 
-  describe("getDepositSharesByUsers", () => {
-    it("shoult give negative share for receiver", () => {
-      const deposits = {
-        deposit1: createDeposit({
-          _id: "deposit1",
-          from: "user1",
-          to: "user2",
-          amount: "100",
-        }),
-        deposit2: createDeposit({
-          _id: "deposit2",
-          from: "user2",
-          to: "user1",
-          amount: "200",
-        }),
-      };
-
-      const event = createEvent({
-        deposits: {
-          [deposits.deposit1._id]: deposits.deposit1,
-          [deposits.deposit2._id]: deposits.deposit2,
-        },
-      });
-
-      const users = {
-        user1: createUser({ _id: "user1" }),
-        user2: createUser({ _id: "user2" }),
-      };
-
-      const shares = getDepositShares({
-        event,
-        users,
-      });
-
-      expect(shares).toStrictEqual(
-        Either.right({
-          user1: [
-            {
-              _id: "deposit1",
-              date: new Date("2025-01-01"),
-              userId: "user2",
-              share: 10000,
-            },
-            {
-              _id: "deposit2",
-              date: new Date("2025-01-01"),
-              userId: "user2",
-              share: -20000,
-            },
-          ],
-          user2: [
-            {
-              _id: "deposit1",
-              date: new Date("2025-01-01"),
-              userId: "user1",
-              share: -10000,
-            },
-            {
-              _id: "deposit2",
-              date: new Date("2025-01-01"),
-              userId: "user1",
-              share: 20000,
-            },
-          ],
-        })
-      );
-    });
-  });
-
   describe("getEventDistribution", () => {
-    it("should distribute the expenses and deposits to users, case 1", () => {
-      const users = {
-        user1: createUser({ _id: "user1", share: { adults: 4, children: 0 } }),
-        user2: createUser({ _id: "user2", share: { adults: 1, children: 0 } }),
-        user3: createUser({ _id: "user3", share: { adults: 2, children: 0 } }),
-        user4: createUser({ _id: "user4", share: { adults: 1, children: 0 } }),
-      };
-      const deposits = {
-        deposit1: createDeposit({
-          _id: "deposit1",
-          from: "user1",
-          to: "user2",
-          amount: "100",
+    it("should return the distribution of the event", () => {
+      const participants = {
+        participant1: createParticipant({
+          _id: "participant1",
+          participantShare: { type: "default" },
+        }),
+        participant2: createParticipant({
+          _id: "participant2",
+          participantShare: { type: "default" },
+        }),
+        participant3: createParticipant({
+          _id: "participant3",
+          participantShare: { type: "default" },
+        }),
+        participant4: createParticipant({
+          _id: "participant4",
+          participantShare: { type: "default" },
         }),
       };
       const expenses = {
         expense1: createExpense({
           _id: "expense1",
-          category: "Food",
-          lender: "user2",
-          amount: "300",
-          share: { type: "default" },
+          category: "Transport",
+          lender: "participant1",
+          amount: "100",
+          share: {
+            type: "fixed",
+            distribution: {
+              participant1: "40",
+              participant2: "10",
+              participant3: "20",
+              participant4: "30",
+            },
+          },
         }),
         expense2: createExpense({
           _id: "expense2",
-          category: "Transport",
-          lender: "user1",
-          amount: "100",
-          share: { type: "default" },
+          category: "Food",
+          lender: "participant2",
+          amount: "50",
+          share: {
+            type: "fixed",
+            distribution: {
+              participant1: "10",
+              participant2: "10",
+              participant3: "10",
+              participant4: "20",
+            },
+          },
+        }),
+        expense3: createExpense({
+          _id: "expense3",
+          category: "Food",
+          lender: "participant3",
+          amount: "25",
+          share: {
+            type: "fixed",
+            distribution: {
+              participant1: "5",
+              participant2: "5",
+              participant3: "5",
+              participant4: "10",
+            },
+          },
         }),
       };
+
       const event = createEvent({
-        deposits: {
-          [deposits.deposit1._id]: deposits.deposit1,
-        },
+        participants,
         expenses: {
           expense1: expenses.expense1,
           expense2: expenses.expense2,
-        },
-        shares: {
-          user1: { type: "default" },
-          user2: { type: "default" },
-          user3: { type: "default" },
-          user4: { type: "default" },
+          expense3: expenses.expense3,
         },
       });
 
-      /*
-      Total Expenses: 400
-      Shares: 8 (4+1+2+1)
-      Total Payed:
-      - user1 100 expense + 100 deposit = 200
-      - user2 300 expense - 100 deposit = 200
-      - user3 0 expense + 0 deposit = 0
-      - user4 0 expense + 0 deposit = 0
-      Total Due:
-      - user1 400 / 8 * 4 = 200
-      - user2 400 / 8 * 1 = 50
-      - user3 400 / 8 * 2 = 100
-      - user4 400 / 8 * 1 = 50
-      Distribution:
-      - user1: receive 0, pay 0
-      - user2: receive 150 from user3 and user4
-      - user3: pay 100 to user2
-      - user4: pay 50 to user2
-      */
-
       const distribution = getEventDistribution({
         event,
-        users,
       });
 
       expect(distribution).toStrictEqual(
         Either.right({
-          user2: [
+          participant1: [
             {
               type: "receive",
-              amount: 10000,
-              user: "user3",
+              amount: 3500,
+              participant: "participant4",
             },
             {
               type: "receive",
-              amount: 5000,
-              user: "user4",
+              amount: 1000,
+              participant: "participant3",
             },
           ],
-          user3: [
+          participant2: [
             {
-              type: "give",
-              amount: 10000,
-              user: "user2",
+              type: "receive",
+              amount: 2500,
+              participant: "participant4",
             },
           ],
-          user4: [
+          participant3: [
             {
               type: "give",
-              amount: 5000,
-              user: "user2",
+              amount: 1000,
+              participant: "participant1",
+            },
+          ],
+          participant4: [
+            {
+              type: "give",
+              amount: 2500,
+              participant: "participant2",
+            },
+            {
+              type: "give",
+              amount: 3500,
+              participant: "participant1",
             },
           ],
         })
       );
     });
 
-    it("should distribute the expenses and deposits to users, case 2", () => {
-      const users = {
-        user1: createUser({ _id: "user1", share: { adults: 4, children: 0 } }), // 8
-        user2: createUser({ _id: "user2", share: { adults: 1, children: 1 } }), // 3
-        user3: createUser({ _id: "user3", share: { adults: 1, children: 0 } }), // 2
-        user4: createUser({ _id: "user4", share: { adults: 1, children: 1 } }), // 3
-      };
-      const deposits = {
-        deposit1: createDeposit({
-          _id: "deposit1",
-          from: "user1",
-          to: "user2",
-          amount: "100",
+    it("should return the distribution of the event with default shares", () => {
+      /*
+       * participant1 has 4 shares (adults: 2, children: 0)
+       * participant2 has 1 share (adults: 0, children: 1)
+       * participant3 has 2 shares (adults: 1, children: 0)
+       * participant4 has 3 shares (adults: 1, children: 1)
+       * Total: 10 shares
+       *
+       * participant1 pays 100 and consumes 40 (4/10 * 100) → should receive 60
+       * participant2 pays 50 and consumes 10 (1/10 * 100) → should receive 40
+       * participant3 pays 25 and consumes 20 (2/10 * 100) → should give 5
+       * participant4 pays 0 and consumes 30 (3/10 * 100) → should give 30
+       *
+       * Shares: 8 (4+1+2+1)
+       * Period: 2 half-days
+       * participant1: 4 * 2 = 8 shares
+       * participant2: 1 * 2 = 2 shares
+       * participant3: 2 * 2 = 4 shares
+       * participant4: 3 * 2 = 6 shares
+       * Total: 20 shares
+       *
+       * participant1 pays 100 and consumes 70 (8/20 * 175) → should receive 30
+       * participant2 pays 50 and consumes 17.5 (2/20 * 175) → should receive 32.5
+       * participant3 pays 25 and consumes 35 (4/20 * 175) → should give 10
+       * participant4 pays 0 and consumes 52.5 (6/20 * 175) → should give 52.5
+       */
+      const participants = {
+        participant1: createParticipant({
+          _id: "participant1",
+          share: { adults: 2, children: 0 },
+          participantShare: { type: "default" },
+        }),
+        participant2: createParticipant({
+          _id: "participant2",
+          share: { adults: 0, children: 1 },
+          participantShare: { type: "default" },
+        }),
+        participant3: createParticipant({
+          _id: "participant3",
+          share: { adults: 1, children: 0 },
+          participantShare: { type: "default" },
+        }),
+        participant4: createParticipant({
+          _id: "participant4",
+          share: { adults: 1, children: 1 },
+          participantShare: { type: "default" },
         }),
       };
       const expenses = {
         expense1: createExpense({
           _id: "expense1",
-          category: "Food",
-          lender: "user2",
-          amount: "300",
+          category: "Transport",
+          lender: "participant1",
+          amount: "100",
           share: { type: "default" },
         }),
         expense2: createExpense({
           _id: "expense2",
-          category: "Transport",
-          lender: "user1",
-          amount: "150",
+          category: "Food",
+          lender: "participant2",
+          amount: "50",
+          share: { type: "default" },
+        }),
+        expense3: createExpense({
+          _id: "expense3",
+          category: "Food",
+          lender: "participant3",
+          amount: "25",
           share: { type: "default" },
         }),
       };
+
       const event = createEvent({
-        deposits: {
-          [deposits.deposit1._id]: deposits.deposit1,
-        },
+        participants,
         expenses: {
           expense1: expenses.expense1,
           expense2: expenses.expense2,
+          expense3: expenses.expense3,
         },
-        shares: {
-          user1: { type: "default" },
-          user2: { type: "default" },
-          user3: { type: "default" },
-          user4: { type: "default" },
+        period: {
+          start: new Date("2025-01-01"),
+          arrival: "AM",
+          end: new Date("2025-01-01"),
+          departure: "PM",
         },
       });
 
-      /*
-      Total Expenses: 450 (300+150)
-      Shares: 16 (8+3+2+3)
-      Total Payed:
-      - user1 150 expense + 100 deposit = 250
-      - user2 300 expense - 100 deposit = 200
-      - user3 0 expense + 0 deposit = 0
-      - user4 0 expense + 0 deposit = 0
-      Total Due:
-      - user1 450 / 16 * 8 = 225
-      - user2 450 / 16 * 3 = 84.375
-      - user3 450 / 16 * 2 = 56.25
-      - user4 450 / 16 * 3 = 84.375
-      Distribution:
-      - user1: receive 25
-      - user2: receive 115.625
-      - user3: pay 56.25 to user2
-      - user4: pay 25 to user1, 59.375 to user2 (total 84.375)
-      */
-
       const distribution = getEventDistribution({
         event,
-        users,
       });
 
       expect(distribution).toStrictEqual(
         Either.right({
-          user1: [
+          participant1: [
             {
               type: "receive",
-              amount: 2500,
-              user: "user4",
+              amount: 3000,
+              participant: "participant4",
             },
           ],
-          user2: [
+          participant2: [
             {
               type: "receive",
-              amount: 5938,
-              user: "user4",
+              amount: 2250,
+              participant: "participant4",
             },
             {
               type: "receive",
-              amount: 5624,
-              user: "user3",
+              amount: 1000,
+              participant: "participant3",
             },
           ],
-          user3: [
+          participant3: [
             {
               type: "give",
-              amount: 5624,
-              user: "user2",
+              amount: 1000,
+              participant: "participant2",
             },
           ],
-          user4: [
+          participant4: [
             {
               type: "give",
-              amount: 2500,
-              user: "user1",
+              amount: 3000,
+              participant: "participant1",
             },
             {
               type: "give",
-              amount: 5938,
-              user: "user2",
+              amount: 2250,
+              participant: "participant2",
+            },
+          ],
+        })
+      );
+    });
+
+    it("should return the distribution of the event with custom shares", () => {
+      /*
+       * participant1 has a custom share period: 16 shares (8 * 2)
+       * participant2 has a custom share period: 3 shares (2 * 1 + 1 * 1)
+       * participant3 has a custom share period: 2 shares (1 * 2)
+       * participant4 has a custom share period: 3 shares (1 * 1 + 1 * 2)
+       * Total: 24 shares
+       *
+       * participant1 pays 100 and consumes 116.67 (16/24 * 175) → should give 16.67
+       * participant2 pays 50 and consumes 21.88 (3/24 * 175) → should receive 28.13
+       * participant3 pays 25 and consumes 14.58 (2/24 * 175) → should receive 10.42
+       * participant4 pays 0 and consumes 21.88 (3/24 * 175) → should give 21.88
+       *
+       * Shares: 16 (8+3+2+3)
+       * Period: 2 half-days
+       * participant1: 8 * 2 = 16 shares
+       * participant2: 3 shares
+       * participant3: 2 shares
+       * participant4: 3 shares
+       * Total: 24 shares
+       *
+       * participant1 pays 100 and consumes 116.67 (16/24 * 175) → should give 16.67
+       * participant2 pays 50 and consumes 21.88 (3/24 * 175) → should receive 28.13
+       * participant3 pays 25 and consumes 14.58 (2/24 * 175) → should receive 10.42
+       * participant4 pays 0 and consumes 21.88 (3/24 * 175) → should give 21.88
+       */
+      const participants = {
+        participant1: createParticipant({
+          _id: "participant1",
+          share: { adults: 2, children: 0 },
+          participantShare: {
+            type: "custom",
+            shares: [
+              {
+                label: "Share 1",
+                multiplier: { adults: 2, children: 0 }, // x4
+                period: {
+                  start: new Date("2025-01-01"), // x4
+                  end: new Date("2025-01-02"),
+                  arrival: "AM",
+                  departure: "PM",
+                },
+              },
+            ],
+          },
+        }),
+        participant2: createParticipant({
+          _id: "participant2",
+          share: { adults: 0, children: 1 },
+          participantShare: {
+            type: "custom",
+            shares: [
+              {
+                label: "Share 1",
+                multiplier: { adults: 1, children: 0 }, // x2
+                period: {
+                  start: new Date("2025-01-01"), // x2
+                  end: new Date("2025-01-01"),
+                  arrival: "PM",
+                  departure: "PM",
+                },
+              },
+              {
+                label: "Share 2",
+                multiplier: { adults: 0, children: 1 }, // x1
+                period: {
+                  start: new Date("2025-01-02"), // x1
+                  end: new Date("2025-01-02"),
+                  arrival: "AM",
+                  departure: "AM",
+                },
+              },
+            ],
+          },
+        }),
+        participant3: createParticipant({
+          _id: "participant3",
+          share: { adults: 1, children: 0 },
+          participantShare: {
+            type: "custom",
+            shares: [
+              {
+                label: "Share 1",
+                multiplier: { adults: 0, children: 1 }, // x1
+                period: {
+                  start: new Date("2025-01-01"), // x2
+                  end: new Date("2025-01-01"),
+                  arrival: "AM",
+                  departure: "PM",
+                },
+              },
+            ],
+          },
+        }),
+        participant4: createParticipant({
+          _id: "participant4",
+          share: { adults: 1, children: 1 },
+          participantShare: {
+            type: "custom",
+            shares: [
+              {
+                label: "Share 1",
+                multiplier: { adults: 0, children: 1 }, // x1
+                period: {
+                  start: new Date("2025-01-01"), // x1
+                  end: new Date("2025-01-01"),
+                  arrival: "PM",
+                  departure: "PM",
+                },
+              },
+              {
+                label: "Share 2",
+                multiplier: { adults: 1, children: 0 }, // x2
+                period: {
+                  start: new Date("2025-01-01"), // x2
+                  end: new Date("2025-01-01"),
+                  arrival: "AM",
+                  departure: "PM",
+                },
+              },
+            ],
+          },
+        }),
+      };
+      const expenses = {
+        expense1: createExpense({
+          _id: "expense1",
+          category: "Transport",
+          lender: "participant1",
+          amount: "100",
+          share: { type: "default" },
+        }),
+        expense2: createExpense({
+          _id: "expense2",
+          category: "Food",
+          lender: "participant2",
+          amount: "50",
+          share: { type: "default" },
+        }),
+        expense3: createExpense({
+          _id: "expense3",
+          category: "Food",
+          lender: "participant3",
+          amount: "25",
+          share: { type: "default" },
+        }),
+      };
+
+      const event = createEvent({
+        participants,
+        expenses: {
+          expense1: expenses.expense1,
+          expense2: expenses.expense2,
+          expense3: expenses.expense3,
+        },
+        period: {
+          start: new Date("2025-01-01"),
+          arrival: "AM",
+          end: new Date("2025-01-01"),
+          departure: "PM",
+        },
+      });
+
+      const distribution = getEventDistribution({
+        event,
+      });
+
+      expect(distribution).toStrictEqual(
+        Either.right({
+          participant1: [
+            {
+              type: "give",
+              amount: 769,
+              participant: "participant2",
+            },
+          ],
+          participant2: [
+            {
+              type: "receive",
+              amount: 2212,
+              participant: "participant4",
+            },
+            {
+              type: "receive",
+              amount: 769,
+              participant: "participant1",
+            },
+          ],
+          participant3: [
+            {
+              type: "receive",
+              amount: 1154,
+              participant: "participant4",
+            },
+          ],
+          participant4: [
+            {
+              type: "give",
+              amount: 1154,
+              participant: "participant3",
+            },
+            {
+              type: "give",
+              amount: 2212,
+              participant: "participant2",
             },
           ],
         })

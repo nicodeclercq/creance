@@ -5,14 +5,16 @@ import { useStore } from "../store/StoreProvider";
 
 export function useAuthentication() {
   const [state, setState] = useState<AuthState>({ type: "loading" });
-  const [currentUserId, setCurrentUserId] = useStore("currentUserId");
+  const [currentParticipantId, setCurrentParticipantId] = useStore(
+    "currentParticipantId"
+  );
 
   useEffect(() => {
     const subscription = $isAuthenticated.asObservable().subscribe({
       next: (authState) => {
         setState(authState);
         if (authState.type === "authenticated") {
-          setCurrentUserId(() => authState.userId);
+          setCurrentParticipantId(() => authState.participantId);
         }
       },
     });
@@ -21,6 +23,7 @@ export function useAuthentication() {
 
   return {
     state,
-    currentUserId: state.type === "authenticated" ? currentUserId : null,
+    currentParticipantId:
+      state.type === "authenticated" ? currentParticipantId : null,
   };
 }

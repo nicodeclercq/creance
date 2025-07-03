@@ -7,15 +7,15 @@ import { Event } from "../../../models/Event";
 import { EventPageTemplate } from "../../../shared/PageTemplate/EventPageTemplate";
 import { Expense } from "../../../models/Expense";
 import { ExpenseItem } from "./ExpenseItem";
+import { Participant } from "../../../models/Participant";
 import { Stack } from "../../../ui/Stack/Stack";
 import { TotalAmount } from "./TotalAmount";
-import { User } from "../../../models/User";
 import { sort } from "../../../utils/date";
 import { useTranslation } from "react-i18next";
 
 type Props = {
   event: Event;
-  users: Record<string, User>;
+  participants: Record<string, Participant>;
   onDeleteExpense: (expenseId: string) => void;
   onDeleteDeposit: (depositId: string) => void;
 };
@@ -29,7 +29,7 @@ const isExpenseElement = (element: Element): element is ExpenseElement =>
 
 export function ExpenseList({
   event,
-  users,
+  participants,
   onDeleteExpense,
   onDeleteDeposit,
 }: Props) {
@@ -71,7 +71,7 @@ export function ExpenseList({
                       eventId={event._id}
                       expense={element.data}
                       category={event.categories[element.data.category]}
-                      users={users}
+                      participants={participants}
                       onDelete={deleteExpense(element.data._id)}
                     />
                   ) : (
@@ -80,7 +80,7 @@ export function ExpenseList({
                       isClosed={event.isClosed}
                       eventId={event._id}
                       deposit={element.data}
-                      users={users}
+                      participants={participants}
                       onDelete={deleteDeposit(element.data._id)}
                     />
                   )

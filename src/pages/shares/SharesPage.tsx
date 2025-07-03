@@ -1,57 +1,55 @@
-import * as RecordFP from "fp-ts/Record";
-
-import { Card } from "../../ui/Card/Card";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
-import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
+import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";
+import { ParticipantShareList } from "./private/ParticipantShareList";
+import { Redirect } from "../../Redirect";
 import { ShareItem } from "./private/ShareItem";
-import { Stack } from "../../ui/Stack/Stack";
-import { pipe } from "fp-ts/function";
-import { useEventUsers } from "../../hooks/useEventUsers";
 import { useParams } from "react-router-dom";
 import { useStore } from "../../store/StoreProvider";
-import { useTranslation } from "react-i18next";
 
 export function SharesPage() {
-  const { t } = useTranslation();
   const { eventId } = useParams();
-  const users = useEventUsers(eventId);
-  const [currentEvent, setCurrentEvent] = useStore(`events.${eventId}`);
+  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const [currentParticipantId] = useStore("currentParticipantId");
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 
-  const onDelete = (userId: string) => () => {
-    setCurrentEvent((event) => ({
+  const deleteShare = (participantId: string) => {
+    setEvent((event) => ({
       ...event,
-      shares: pipe(event.shares, RecordFP.deleteAt(userId)),
+      participants: {
+        ...event.participants,
+        [participantId]: {
+          ...event.participants[participantId],
+          participantShare: { type: "default" },
+        },
+      },
     }));
   };
 
+  if (currentEvent.isClosed) {
+    return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
+  }
+
+  const shares = Object.keys(currentEvent.participants).map((participantId) => (
+    <ShareItem
+      key={participantId}
+      eventId={currentEvent._id}
+      participant={currentEvent.participants[participantId]}
+      share={currentEvent.participants[participantId].participantShare}
+      onDelete={() => deleteShare(participantId)}
+    />
+  ));
+
   return (
-    <PageTemplate
-      title={t("page.event.shares.title")}
-      leftAction={{
-        as: "link",
-        icon: "chevron-left",
-        label: t("page.event.edit.actions.backToEvent"),
-        to: "EVENT",
-        params: { eventId },
-      }}
-    >
-      <Card>
-        <Stack gap="m" as="ul">
-          {Object.keys(currentEvent.shares).map((userId) => (
-            <ShareItem
-              eventId={currentEvent._id}
-              share={currentEvent.shares[userId]}
-              onDelete={onDelete(userId)}
-              user={users[userId]}
-              key={userId}
-            />
-          ))}
-        </Stack>
-      </Card>
-    </PageTemplate>
+    <EventPageTemplate event={currentEvent}>
+      <ParticipantShareList
+        event={currentEvent}
+        participants={currentEvent.participants}
+        currentParticipantId={currentParticipantId}
+      />
+      {shares}
+    </EventPageTemplate>
   );
 }

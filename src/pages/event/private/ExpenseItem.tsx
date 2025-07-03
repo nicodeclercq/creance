@@ -6,16 +6,16 @@ import { Columns } from "../../../ui/Columns/Columns";
 import { Expense } from "../../../models/Expense";
 import { Menu } from "../../../ui/Menu/Menu";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
+import { Participant } from "../../../models/Participant";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
-import { User } from "../../../models/User";
 import { useTranslation } from "react-i18next";
 
 type ExpenseItemProps = {
   eventId: string;
   isClosed?: boolean;
   expense: Expense;
-  users: Record<string, User>;
+  participants: Record<string, Participant>;
   category: Category;
   onDelete: () => void;
 };
@@ -23,14 +23,14 @@ type ExpenseItemProps = {
 export function ExpenseItem({
   eventId,
   expense,
-  users,
+  participants,
   category,
   isClosed,
   onDelete,
 }: ExpenseItemProps) {
   const { t } = useTranslation();
 
-  const lender = users[expense.lender];
+  const lender = participants[expense.lender];
 
   return (
     <Columns

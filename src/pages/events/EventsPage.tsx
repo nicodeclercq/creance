@@ -7,7 +7,6 @@ import { useStore } from "../../store/StoreProvider";
 
 export function EventsPage() {
   const [events, setEvents] = useStore("events");
-  const [users] = useStore("users");
 
   const autoClosedEvents = Object.values(events)
     .filter(shouldCloseEvent)
@@ -27,5 +26,5 @@ export function EventsPage() {
     return null; // Prevent rendering while updating state
   }
 
-  return <EventList events={Object.values(events)} users={users} />;
+  return <EventList events={events} />;
 }

@@ -5,9 +5,9 @@ import { Deposit } from "../../../models/Deposit";
 import { ExchangeMoneyIcon } from "../../../ui/Icon/private/ExchangeMoneyIcon";
 import { Menu } from "../../../ui/Menu/Menu";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
+import { Participant } from "../../../models/Participant";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
-import { User } from "../../../models/User";
 import { computeRandomColor } from "../../../ui/Avatar/Avatar";
 import { useTranslation } from "react-i18next";
 
@@ -15,21 +15,21 @@ type DepositItemProps = {
   eventId: string;
   isClosed?: boolean;
   deposit: Deposit;
-  users: Record<string, User>;
+  participants: Record<string, Participant>;
   onDelete: () => void;
 };
 
 export function DepositItem({
   eventId,
   deposit,
-  users,
+  participants,
   isClosed,
   onDelete,
 }: DepositItemProps) {
   const { t } = useTranslation();
 
-  const from = users[deposit.from];
-  const to = users[deposit.to];
+  const from = participants[deposit.from];
+  const to = participants[deposit.to];
 
   return (
     <Columns

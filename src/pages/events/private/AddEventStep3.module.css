@@ -1,4 +1,4 @@
-.addUserForm{
+.addParticipantForm{
   display: grid;
   grid-template-columns: min-content 1fr 1fr min-content;
   background: var(--ui-primitive-green-900);

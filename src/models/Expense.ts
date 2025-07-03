@@ -1,16 +1,16 @@
-import { User } from "./User";
+import { Participant } from "./Participant";
 
 export type DefaultShare = {
   type: "default";
 };
 export type PercentageShare = {
   type: "percentage";
-  distribution: Record<User["_id"], string>;
+  distribution: Record<Participant["_id"], string>;
 };
 
 export type FixedShare = {
   type: "fixed";
-  distribution: Record<User["_id"], string>;
+  distribution: Record<Participant["_id"], string>;
 };
 
 export type Share = DefaultShare | PercentageShare | FixedShare;
@@ -22,6 +22,6 @@ export type Expense = {
   amount: string;
   date: Date;
   share: Share;
-  lender: User["_id"];
+  lender: Participant["_id"];
   updatedAt: Date;
 };

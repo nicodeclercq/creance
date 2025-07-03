@@ -6,17 +6,18 @@ import {
   depositSchema as defaultDepositSchema,
   eventSchema as defaultEventSchema,
   expenseSchema as defaultExpenseSchema,
-  userSchema as defaultUserSchema,
+  participantSchema as defaultParticipantSchema,
 } from "../adapters/json";
 import { flow, pipe } from "fp-ts/function";
 
 import { Deposit } from "../models/Deposit";
 import { Event } from "../models/Event";
 import { Expense } from "../models/Expense";
-import { User } from "../models/User";
+import { Participant } from "../models/Participant";
+import { uid } from "./crypto";
 import { withoutKey } from "../helpers/object";
 
-const userSchema = defaultUserSchema.omit({
+const participantSchema = defaultParticipantSchema.omit({
   updatedAt: true,
 });
 const expenseSchema = defaultExpenseSchema.omit({
@@ -32,24 +33,18 @@ const eventSchema = defaultEventSchema
     deposits: true,
   })
   .extend({
-    users: z.array(userSchema),
+    participants: z.array(participantSchema),
     expenses: z.array(expenseSchema),
     deposits: z.array(depositSchema),
   });
 
 type ExportedData = z.infer<typeof eventSchema>;
 
-export function toExportedData({
-  event,
-  users,
-}: {
-  event: Event;
-  users: Record<string, User>;
-}): ExportedData {
+export function toExportedData({ event }: { event: Event }): ExportedData {
   return {
     ...withoutKey(event, "updatedAt"),
-    users: Object.keys(event.shares).map((userId) =>
-      withoutKey(users[userId], "updatedAt")
+    participants: Object.values(event.participants).map((participant) =>
+      withoutKey(participant, "updatedAt")
     ),
     expenses: Object.values(event.expenses).map((expense) =>
       withoutKey(expense, "updatedAt")
@@ -64,11 +59,15 @@ export function fromExportedData(data: ExportedData): Either.Either<
   Error,
   {
     event: Event;
-    users: Record<string, User>;
   }
 > {
   const now = new Date();
-  const { users: dataUsers, expenses, deposits, ...eventData } = data;
+  const {
+    participants: dataParticipants,
+    expenses,
+    deposits,
+    ...eventData
+  } = data;
 
   const expensesMap: Record<string, Expense> = expenses.reduce(
     (acc, expense) => ({
@@ -92,27 +91,27 @@ export function fromExportedData(data: ExportedData): Either.Either<
     {}
   );
 
-  const event: Event = {
-    ...eventData,
-    updatedAt: now,
-    expenses: expensesMap,
-    deposits: depositsMap,
-  };
-
-  const users: Record<string, User> = dataUsers.reduce(
-    (acc, user) => ({
+  const participantsMap: Record<string, Participant> = dataParticipants.reduce(
+    (acc, participant) => ({
       ...acc,
-      [user._id]: {
-        ...user,
+      [participant._id]: {
+        ...participant,
         updatedAt: now,
       },
     }),
     {}
   );
 
+  const event: Event = {
+    ...eventData,
+    updatedAt: now,
+    participants: participantsMap,
+    expenses: expensesMap,
+    deposits: depositsMap,
+  };
+
   return Either.right({
     event,
-    users,
   });
 }
 
@@ -139,13 +138,11 @@ function getEventModifications({
   data: ExportedData;
   currentState: {
     events: Record<string, Event>;
-    users: Record<string, User>;
   };
 }): Either.Either<
   Error,
   {
     events: Record<string, Event>;
-    users: Record<string, User>;
   }
 > {
   const areEqual = <T extends { updatedAt: Date }>(
@@ -166,25 +163,13 @@ function getEventModifications({
       const currentEvent = currentState.events[formattedData.event._id];
       const result: {
         events: Record<string, Event>;
-        users: Record<string, User>;
       } = {
         events: {},
-        users: {},
       };
 
       if (!areEqual(currentEvent, formattedData.event)) {
         result.events[formattedData.event._id] = formattedData.event;
       }
-      result.users = Object.values(formattedData.users).reduce((acc, user) => {
-        if (
-          !currentState.users[user._id] ||
-          !areEqual(currentState.users[user._id], user)
-        ) {
-          acc[user._id] = user;
-        }
-
-        return acc;
-      }, {} as Record<string, User>);
 
       return result;
     })
@@ -198,13 +183,11 @@ function getArrayOfEventsModifications({
   data: ExportedData[];
   currentState: {
     events: Record<string, Event>;
-    users: Record<string, User>;
   };
 }): Either.Either<
   Error,
   {
     events: Record<string, Event>;
-    users: Record<string, User>;
   }
 > {
   return pipe(
@@ -217,16 +200,13 @@ function getArrayOfEventsModifications({
       modifications.reduce(
         (acc, modification) => {
           acc.events = { ...acc.events, ...modification.events };
-          acc.users = { ...acc.users, ...modification.users };
 
           return acc;
         },
         {
           events: {},
-          users: {},
         } as {
           events: Record<string, Event>;
-          users: Record<string, User>;
         }
       )
     )
@@ -240,14 +220,12 @@ export function readData({
   file: File;
   currentState: {
     events: Record<string, Event>;
-    users: Record<string, User>;
   };
 }): Promise<
   Either.Either<
     Error,
     {
       events: Record<string, Event>;
-      users: Record<string, User>;
     }
   >
 > {
@@ -297,19 +275,12 @@ export function readData({
   );
 }
 
-export function importData({
-  events,
-  users,
-}: {
-  events: Record<string, Event>;
-  users: Record<string, User>;
-}) {
+export function importData({ events }: { events: Record<string, Event> }) {
   return new Promise<
     Either.Either<
       Error,
       {
         events: Record<string, Event>;
-        users: Record<string, User>;
       }
     >
   >((resolve) => {
@@ -323,7 +294,6 @@ export function importData({
         file,
         currentState: {
           events,
-          users,
         },
       })
         .then((data) => {
@@ -336,4 +306,70 @@ export function importData({
     };
     input.click();
   });
+}
+
+export function exportEventAsJson(event: Event): string {
+  const data = {
+    name: event.name,
+    description: event.description,
+    period: event.period,
+    participants: Object.values(event.participants).map((participant) =>
+      withoutKey(participant, "updatedAt")
+    ),
+    categories: Object.values(event.categories),
+    expenses: Object.values(event.expenses).map((expense) =>
+      withoutKey(expense, "updatedAt")
+    ),
+    deposits: Object.values(event.deposits).map((deposit) =>
+      withoutKey(deposit, "updatedAt")
+    ),
+    isAutoClose: event.isAutoClose,
+  };
+
+  return JSON.stringify(data, null, 2);
+}
+
+export function importEventFromJson(json: string): Event {
+  const data = JSON.parse(json);
+  const {
+    participants: dataParticipants,
+    expenses,
+    deposits,
+    ...eventData
+  } = data;
+
+  const participants = dataParticipants.reduce(
+    (acc: Record<string, Participant>, participant: Participant) => {
+      acc[participant._id] = participant;
+      return acc;
+    },
+    {}
+  );
+
+  const eventExpenses = expenses.reduce(
+    (acc: Record<string, Expense>, expense: Expense) => {
+      acc[expense._id] = expense;
+      return acc;
+    },
+    {}
+  );
+
+  const eventDeposits = deposits.reduce(
+    (acc: Record<string, Deposit>, deposit: Deposit) => {
+      acc[deposit._id] = deposit;
+      return acc;
+    },
+    {}
+  );
+
+  const event: Event = {
+    _id: uid(),
+    participants,
+    expenses: eventExpenses,
+    deposits: eventDeposits,
+    updatedAt: new Date(),
+    ...eventData,
+  };
+
+  return event;
 }

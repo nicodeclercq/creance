@@ -17,10 +17,10 @@ import { useTranslation } from "react-i18next";
 
 type DepositsShareProps = {
   deposits: DepositShare[];
-  users: Record<string, { name: string }>;
+  participants: Record<string, { name: string }>;
 };
 
-export function DepositsShare({ deposits, users }: DepositsShareProps) {
+export function DepositsShare({ deposits, participants }: DepositsShareProps) {
   const { t } = useTranslation();
 
   const totalDepositAmount = getTotalDepositAmount(deposits);
@@ -30,7 +30,7 @@ export function DepositsShare({ deposits, users }: DepositsShareProps) {
       <Stack gap="m" justifyContent="stretch">
         <Columns gap="m" align="center">
           <Heading level={2} styles={{ font: "body-large", flexGrow: true }}>
-            {t("page.usershare.deposit.title")}
+            {t("page.participantshare.deposit.title")}
           </Heading>
           <Price type="total">{totalDepositAmount}</Price>
         </Columns>
@@ -51,16 +51,16 @@ export function DepositsShare({ deposits, users }: DepositsShareProps) {
                 <Columns align="center" gap="s">
                   <Avatar
                     label={
-                      deposit.userId in users
-                        ? users[deposit.userId].name
+                      deposit.participantId in participants
+                        ? participants[deposit.participantId].name
                         : "unknwon"
                     }
                     size="s"
                   />
                   <Paragraph styles={{ font: "body-small" }}>
-                    {deposit.userId in users
-                      ? users[deposit.userId].name
-                      : deposit.userId}
+                    {deposit.participantId in participants
+                      ? participants[deposit.participantId].name
+                      : deposit.participantId}
                   </Paragraph>
                 </Columns>
               </Stack>

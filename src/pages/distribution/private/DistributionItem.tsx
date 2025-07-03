@@ -13,17 +13,17 @@ import { pipe } from "fp-ts/function";
 import styles from "./DistributionItem.module.css";
 
 type DistributionItemProps = {
-  isCurrentUser: boolean;
-  userId: string;
+  isCurrentParticipant: boolean;
+  participantId: string;
   distributions: Distribution[];
-  users: Record<string, { name: string }>;
+  participants: Record<string, { name: string }>;
 };
 
 export function DistributionItem({
-  isCurrentUser,
-  userId,
+  isCurrentParticipant,
+  participantId,
   distributions,
-  users,
+  participants,
 }: DistributionItemProps) {
   const { t } = useTranslation();
   const { left, right } = pipe(
@@ -36,7 +36,7 @@ export function DistributionItem({
   };
 
   const Wrapper = ({ children }: { children: ReactNode }) =>
-    isCurrentUser ? (
+    isCurrentParticipant ? (
       <Stack gap="s" justifyContent="center" alignItems="center">
         {children}
       </Stack>
@@ -50,8 +50,11 @@ export function DistributionItem({
     <Card>
       <Stack>
         <Wrapper>
-          <Avatar label={users[userId].name} size={isCurrentUser ? "l" : "m"} />
-          <Paragraph>{users[userId].name}</Paragraph>
+          <Avatar
+            label={participants[participantId].name}
+            size={isCurrentParticipant ? "l" : "m"}
+          />
+          <Paragraph>{participants[participantId].name}</Paragraph>
         </Wrapper>
         {(["gives", "receives"] as const).map((array) => (
           <Fragment key={array}>
@@ -67,35 +70,37 @@ export function DistributionItem({
                   </Paragraph>
                 </div>
                 <ul className={styles.list}>
-                  {values[array].map(({ amount, type, user }, index) => (
-                    <li key={index} className={styles.item}>
-                      <Columns
-                        gap="s"
-                        align="center"
-                        justify="start"
-                        styles={{
-                          color:
-                            type === "give"
-                              ? "failure-default"
-                              : "primary-default",
-                        }}
-                      >
-                        <Icon
-                          name={type === "give" ? "minus" : "plus"}
-                          size="s"
-                        />
-                        {type === "give"
-                          ? t("page.distribution.gives.value", {
-                              value: centToDecimal(amount),
-                              user: users[user].name,
-                            })
-                          : t("page.distribution.receives.value", {
-                              value: centToDecimal(amount),
-                              user: users[user].name,
-                            })}
-                      </Columns>
-                    </li>
-                  ))}
+                  {values[array].map(
+                    ({ amount, type, participant: participantId }, index) => (
+                      <li key={index} className={styles.item}>
+                        <Columns
+                          gap="s"
+                          align="center"
+                          justify="start"
+                          styles={{
+                            color:
+                              type === "give"
+                                ? "failure-default"
+                                : "primary-default",
+                          }}
+                        >
+                          <Icon
+                            name={type === "give" ? "minus" : "plus"}
+                            size="s"
+                          />
+                          {type === "give"
+                            ? t("page.distribution.gives.value", {
+                                value: centToDecimal(amount),
+                                participant: participants[participantId].name,
+                              })
+                            : t("page.distribution.receives.value", {
+                                value: centToDecimal(amount),
+                                participant: participants[participantId].name,
+                              })}
+                        </Columns>
+                      </li>
+                    )
+                  )}
                 </ul>
               </>
             ) : (
