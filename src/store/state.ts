@@ -1,18 +1,14 @@
+import { Account } from "../models/Account";
 import { Event } from "../models/Event";
-import { Participant } from "../models/Participant";
-
-export type Account = Omit<Participant, "participantShare"> & {
-  eventKeys: Record<string, string>;
-};
 
 export type State = {
   currentParticipantId: string;
   events: Record<string, Event>;
-  account: Account;
+  account: null | Account;
 };
 
 export const DEFAULT_STATE = {
   currentParticipantId: "",
-  account: {} as Account,
+  account: null,
   events: {},
 } as State;

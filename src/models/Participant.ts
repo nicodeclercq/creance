@@ -1,13 +1,6 @@
 import { ParticipantShare } from "./ParticipantShare";
+import { User } from "./User";
 
-export type Participant = {
-  _id: string;
-  name: string;
-  avatar?: string;
-  share: {
-    adults: number;
-    children: number;
-  };
+export type Participant = User & {
   participantShare: ParticipantShare;
-  updatedAt: Date;
 };

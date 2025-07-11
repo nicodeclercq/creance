@@ -1,7 +1,7 @@
-import { logoutParticipant } from "../service/firebase";
+import { logoutUser } from "../service/firebase";
 
 export function resetStore() {
-  logoutParticipant();
+  logoutUser();
   localStorage.removeItem("state");
   location.reload();
 }

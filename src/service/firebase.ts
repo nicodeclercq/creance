@@ -1,5 +1,5 @@
-import * as Option from "fp-ts/Option";
 import * as Either from "fp-ts/Either";
+import * as ArrayFP from "fp-ts/Array";
 import { identity, constVoid } from "fp-ts/function";
 import * as TaskEither from "fp-ts/TaskEither";
 import * as RecordFP from "fp-ts/Record";
@@ -7,7 +7,9 @@ import * as RX from "rxjs";
 import * as z from "zod";
 
 import {
+  DatabaseReference,
   DataSnapshot,
+  get,
   getDatabase,
   onValue,
   ref,
@@ -24,17 +26,29 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { pipe, flow } from "fp-ts/function";
-import { eventSchema } from "../adapters/json";
+import { accountSchema, eventSchema } from "../adapters/json";
 import { State } from "../store/state";
 import { Path, ValueFromPath } from "../store/store";
 import { synchronize } from "./synchronize";
+import { decrypt, encrypt, generateKey } from "./crypto";
+import { Account } from "../models/Account";
+import { update as updataLocalStore } from "../store/StoreProvider";
 
 type Schema<Data> = ZodSchema<Data, any, any>;
+const LOCAL_STORAGE_KEY = "userKey";
 
 export const COLLECTIONS = {
-  EVENTS: "events",
+  EVENTS: firebaseConfig.collections.EVENTS,
+  USERS: firebaseConfig.collections.USERS,
 } as const;
 type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
+
+const log =
+  (message: string) =>
+  <A>(a: A): A => {
+    console.log(message, a);
+    return a;
+  };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -58,32 +72,60 @@ export type AuthState =
 export const $isAuthenticated = new RX.BehaviorSubject<AuthState>({
   type: "loading",
 });
-onAuthStateChanged(auth, (participant) => {
-  if (participant === null) {
-    $isAuthenticated.next({ type: "unauthenticated" });
-  } else if (participant.uid) {
-    $isAuthenticated.next({
-      type: "authenticated",
-      participantId: participant.uid,
+onAuthStateChanged(auth, (user) => {
+  if (user?.uid && localStorage.getItem(LOCAL_STORAGE_KEY) != null) {
+    onValue(ref(db, `${COLLECTIONS.USERS}/${user.uid}`), (snapshot) => {
+      Promise.resolve()
+        .then(() => (snapshot.exists() ? snapshot.val() : undefined))
+        .then((data) => {
+          if (data == null) {
+            return Promise.resolve(
+              Either.right(null) as Either.Either<Error, Account | null>
+            );
+          }
+          return z.string().safeParse(data).success
+            ? decrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "").then(
+                fromFirebaseData(accountSchema)
+              )
+            : Promise.reject(new Error("Failed to decrypt user data"));
+        })
+        .then(
+          Either.fold(
+            (error) => {
+              console.log(error);
+            },
+            (accountData) => {
+              updateStoreWithAccountData(accountData);
+
+              if ($isAuthenticated.value.type !== "authenticated") {
+                $isAuthenticated.next({
+                  type: "authenticated",
+                  participantId: user.uid,
+                });
+              }
+            }
+          )
+        )
+        .catch((error) => Either.left(error));
     });
+  } else {
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    $isAuthenticated.next({ type: "unauthenticated" });
   }
 });
 
-const listenToRemoteChanges = <LocalData>(
-  collectionName: CollectionName,
-  adapter: (d: unknown) => LocalData = identity as (d: unknown) => LocalData,
-  onChange: (data: Either.Either<Error, Record<string, LocalData>>) => void
+const listenToRemoteCollection = <LocalData>(
+  collection: DatabaseReference,
+  adapter: (d: unknown) => Promise<LocalData> = identity as (
+    d: unknown
+  ) => Promise<LocalData>,
+  onChange: (data: Either.Either<Error, LocalData>) => void
 ) => {
-  const collectionRef = ref(db, collectionName);
-  const firebaseWatch = (): RX.Observable<
-    Either.Either<Error, Record<string, LocalData>>
-  > => {
-    const $value = new RX.Subject<
-      Either.Either<Error, Record<string, LocalData>>
-    >();
+  const firebaseWatch = (): RX.Observable<Either.Either<Error, LocalData>> => {
+    const $value = new RX.Subject<Either.Either<Error, LocalData>>();
     try {
       onValue(
-        collectionRef,
+        collection,
         (snapshot) =>
           pipe(
             snapshot,
@@ -91,24 +133,35 @@ const listenToRemoteChanges = <LocalData>(
               (s: DataSnapshot) => s.exists(),
               () =>
                 new Error(
-                  `No data found in Firebase for collection ${collectionName}`
+                  `No data found in Firebase for collection ${collection.toString()}`
                 )
             ),
-            Either.chain((s) => {
-              const firebaseSchema = z.record(z.string(), z.unknown());
-              const result = firebaseSchema.safeParse(s.val());
+            Either.fold(
+              (error) => {
+                $value.next(Either.left(error));
+              },
+              (s) => {
+                const result: unknown = s.val();
 
-              return result.success
-                ? pipe(result.data, RecordFP.map(adapter), Either.right)
-                : Either.left(new Error(result.error.message));
-            }),
-            (value) => $value.next(value)
+                adapter(result)
+                  .then((adaptedData) => {
+                    $value.next(Either.right(adaptedData));
+                  })
+                  .catch((error) => {
+                    $value.next(
+                      Either.left(
+                        new Error(`Error processing snapshot: ${error}`)
+                      )
+                    );
+                  });
+              }
+            )
           ),
         () => {
           $value.next(
             Either.left(
               new Error(
-                `Error listening to changes in Firebase for collection ${collectionName}:`
+                `Error listening to changes in Firebase for collection ${collection.toString()}`
               )
             )
           );
@@ -124,35 +177,94 @@ const listenToRemoteChanges = <LocalData>(
     },
     error: (error) => {
       console.error(
-        `Error listening to changes in Firebase for collection ${collectionName}:`,
+        `Error listening to changes in Firebase for collection ${collection.toString()}:`,
         error
       );
     },
   });
 };
 
-const toFirebaseData = <Data>(data: Data): string => JSON.stringify(data);
+const listenToRemoteChanges = <LocalData>(
+  collectionName: CollectionName,
+  adapter: (d: unknown) => Promise<LocalData> = identity as (
+    d: unknown
+  ) => Promise<LocalData>,
+  onChange: (data: Either.Either<Error, LocalData>) => void
+) => {
+  const collectionRef = ref(db, collectionName);
+  listenToRemoteCollection(collectionRef, adapter, onChange);
+};
+
+const toFirebaseData = <Data>(data: Data): Promise<string> =>
+  Promise.resolve(data).then((a) => JSON.stringify(a));
 
 const fromFirebaseData =
   <Data>(schema: Schema<Data>) =>
-  (data: unknown): Either.Either<Error, Data> => {
-    try {
-      const parsed = z.string().safeParse(data);
-      if (parsed.success) {
-        const d = JSON.parse(parsed.data);
-        const dd = typeof d === "string" ? JSON.parse(d) : d;
-        const result = schema.safeParse(dd);
+  (data: unknown): Promise<Either.Either<Error, Data>> => {
+    return Promise.resolve(data)
+      .then((data) => {
+        const parsed = z.string().safeParse(data);
+        if (!parsed.success) {
+          throw new Error(`Failed to parse data: ${parsed.error}`);
+        }
+        return parsed.data;
+      })
+      .then((data) => JSON.parse(data))
+      .then((data) => (typeof data === "string" ? JSON.parse(data) : data))
+      .then((data) => schema.safeParse(data))
+      .then((result) => {
         return result.success
           ? Either.right(result.data)
           : Either.left(result.error);
-      } else {
-        return Either.left(new Error(`Failed to parse data: ${parsed.error}`));
-      }
-    } catch (error) {
-      console.error("Failed to parse Firebase data:", data);
-      return Either.left(new Error(`Failed to parse Firebase data: ${error}`));
-    }
+      })
+      .catch((error) => {
+        console.error("Failed to parse Firebase data:", data);
+        return Either.left(
+          new Error(`Failed to parse Firebase data: ${error}`)
+        );
+      });
   };
+
+function getAccountData(): Promise<Either.Either<Error, Account | null>> {
+  return Promise.resolve()
+    .then(() => auth.authStateReady())
+    .then(() => {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No authenticated user found");
+      }
+      return ref(db, `${COLLECTIONS.USERS}/${user.uid}`);
+    })
+    .then((collectionRef) => get(collectionRef))
+    .then((snapshot) => (snapshot.exists() ? snapshot.val() : undefined))
+    .then((data) => {
+      if (data == null) {
+        return Promise.resolve(
+          Either.right(null) as Either.Either<Error, Account | null>
+        );
+      }
+      return z.string().safeParse(data).success
+        ? decrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "").then(
+            fromFirebaseData(accountSchema)
+          )
+        : Promise.reject(new Error("Failed to decrypt user data"));
+    })
+    .catch((error) => Either.left(error));
+}
+
+function updateStoreWithAccountData(data: Account | undefined | null) {
+  if (data == null) {
+    return;
+  }
+  updataLocalStore("account")((oldData) => ({
+    ...oldData,
+    ...data,
+    events: {
+      ...oldData?.events,
+      ...data.events,
+    },
+  }));
+}
 
 export function signUpParticipant({
   email,
@@ -175,7 +287,7 @@ export function signUpParticipant({
       });
 }
 
-export function loginParticipant({
+export function loginUser({
   email,
   password,
 }: {
@@ -184,23 +296,33 @@ export function loginParticipant({
 }): TaskEither.TaskEither<Error, void> {
   return () =>
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => Either.right(undefined))
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        return Either.left(
-          new Error(
-            `Failed to create participant: ${errorCode} - ${errorMessage}`
+      .then(() => generateKey(password))
+      .then((key) => {
+        localStorage.setItem(LOCAL_STORAGE_KEY, key);
+      })
+      .then(getAccountData)
+      .then((result) =>
+        pipe(
+          result,
+          Either.fold(
+            (error) => {
+              console.error(`Error fetching account data for user:`, error);
+            },
+            (data) => {
+              updateStoreWithAccountData(data);
+            }
           )
-        );
-      });
+        )
+      )
+      .then(() => Either.right(undefined));
 }
 
-export function logoutParticipant() {
+export function logoutUser() {
   auth.signOut().then(() => {
     Object.values(COLLECTIONS).forEach((collectionName) => {
       localStorage.getItem(`lastUpdate_${collectionName}`);
     });
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
   });
 }
 
@@ -210,13 +332,17 @@ function save<Data extends { _id: string }>({
   data,
 }: {
   collectionName: CollectionName;
-  transform?: (data: Data) => unknown;
+  transform?: (data: Data) => Promise<unknown>;
   data: Data;
 }): Promise<void> {
   return Promise.resolve()
     .then(() => auth.authStateReady())
     .then(() => ref(db, `${collectionName}/${data._id}`))
-    .then((collectionRef) => set(collectionRef, transform(data)));
+    .then((collectionRef) =>
+      transform(data).then((transformedData) =>
+        set(collectionRef, transformedData)
+      )
+    );
 }
 
 type Diff<Data> = {
@@ -246,10 +372,10 @@ function deleteData(collectionName: CollectionName, id: string) {
 
 function getRemoteStore<Data>(
   collectionName: CollectionName,
-  adapter: (data: unknown) => Data = identity as (data: unknown) => Data
-) {
+  adapter: (data: unknown) => Promise<Data>
+): RX.Observable<Data | undefined> {
   type Loading = { type: "loading" };
-  type Loaded = { type: "loaded"; data: Record<string, Data> };
+  type Loaded = { type: "loaded"; data: Data };
   type Errored = { type: "errored" };
   type State = Loading | Loaded | Errored;
   const isLoaded = (state: State): state is Loaded => state.type === "loaded";
@@ -269,7 +395,7 @@ function getRemoteStore<Data>(
           );
           $remoteStore.next({ type: "errored" });
         },
-        (newRemoteData: Record<string, Data>) => {
+        (newRemoteData: Data) => {
           $remoteStore.next({
             type: "loaded",
             data: newRemoteData,
@@ -289,11 +415,13 @@ function getRemoteStore<Data>(
       ([state, isAuthenticated]) =>
         (isLoaded(state) || isError(state)) && isAuthenticated
     ),
-    RX.map(([state]) => (isLoaded(state) ? (state as Loaded).data : {}))
+    RX.map(([state]) => (isLoaded(state) ? (state as Loaded).data : undefined))
   );
 }
 
-function synchronizeCollection<Data extends { _id: string; updatedAt: Date }>({
+function synchronizeCollectionRecord<
+  Data extends { _id: string; updatedAt: Date }
+>({
   collectionName,
   $localStore,
   updateLocalState,
@@ -305,11 +433,50 @@ function synchronizeCollection<Data extends { _id: string; updatedAt: Date }>({
     mergeFn: (currentLocalData: Record<string, Data>) => Record<string, Data>
   ) => void;
   adapter: {
-    in: (data: unknown) => Either.Either<Error, Data>;
-    out: (data: Data) => unknown;
+    in: (data: unknown, key: string) => Promise<Either.Either<Error, Data>>;
+    out: (data: Data) => Promise<unknown>;
   };
 }) {
-  const $remoteStore = getRemoteStore(collectionName, adapter.in);
+  const $remoteStore = getRemoteStore<Record<string, Data>>(
+    collectionName,
+    (data) => {
+      const recordSchema = z.record(z.string(), z.unknown());
+      const parsed = recordSchema.safeParse(data);
+
+      console.log(
+        `Parsed remote data for collection ${collectionName}:`,
+        parsed.success ? "Success" : "Failed",
+        parsed.success ? parsed.data : parsed.error
+      );
+
+      return parsed.success
+        ? Promise.all(
+            Object.entries(parsed.data)
+              .map(log("parsed.data"))
+              .map(([key, value]) => adapter.in(value, key))
+          )
+            .then(
+              flow(
+                ArrayFP.filter((result) => Either.isRight(result)),
+                ArrayFP.chain(ArrayFP.fromEither),
+                ArrayFP.map((data) => [data._id, data] as [string, Data]),
+                RecordFP.fromEntries
+              )
+            )
+            .catch((error) => {
+              console.error(
+                `Error processing remote data for collection ${collectionName}:`,
+                error
+              );
+              throw error;
+            })
+        : Promise.reject(
+            new Error(
+              `Failed to parse remote data for collection ${collectionName}: ${parsed.error}`
+            )
+          );
+    }
+  );
 
   synchronize({
     collectionName,
@@ -319,12 +486,9 @@ function synchronizeCollection<Data extends { _id: string; updatedAt: Date }>({
         (prev, cur) => JSON.stringify(prev) === JSON.stringify(cur)
       )
     ),
+    // RX.Observable<Record<string, Data>>
     remote: $remoteStore.pipe(
-      RX.map(
-        RecordFP.filterMap((data) =>
-          Option.fromNullable(Either.isRight(data) ? data.right : undefined)
-        )
-      )
+      RX.map((data) => (data == null ? ({} as Record<string, Data>) : data))
     ),
     saveLocal: (diff) =>
       Promise.resolve().then(() =>
@@ -357,6 +521,7 @@ function synchronizeCollection<Data extends { _id: string; updatedAt: Date }>({
 export function synchronizeFirebase({
   $store: $localStore,
   update: updateLocalState,
+  get: getLocalState,
 }: {
   $store: RX.Observable<State>;
   update: <P extends Path<State>>(
@@ -364,29 +529,49 @@ export function synchronizeFirebase({
   ) => (
     map: (oldValue: ValueFromPath<P, State>) => ValueFromPath<P, State>
   ) => void;
+  get: <P extends Path<State>>(path: P) => ValueFromPath<P, State>;
 }) {
-  synchronizeCollection({
+  synchronizeCollectionRecord({
     collectionName: COLLECTIONS.EVENTS,
     updateLocalState: updateLocalState("events"),
     $localStore: $localStore.pipe(RX.map(({ events }) => events)),
     adapter: {
-      in: (d) => {
+      in: (d, id) => {
         const schema = z.object({
           data: z.string(),
+          users: z.record(z.string(), z.boolean()),
         });
         const parsed = schema.safeParse(d);
 
-        if (!parsed.success) {
-          return Either.left(
-            new Error(`Failed to parse event data: ${parsed.error}`)
-          );
-        }
-
-        return fromFirebaseData(eventSchema)(parsed.data.data);
+        return parsed.success
+          ? Promise.resolve(parsed.data.data)
+              .then((data) =>
+                decrypt(data, getLocalState(`account.events.${id}.key`))
+              )
+              .then((a) => {
+                console.log("Decrypted event data:", a);
+                return a;
+              })
+              .then(fromFirebaseData(eventSchema))
+          : Promise.resolve(
+              Either.left(
+                new Error(`Failed to parse event data: ${parsed.error}`)
+              )
+            );
       },
-      out: (data) => ({
-        data: toFirebaseData(data),
-      }),
+      out: (data) => {
+        return Promise.resolve(data)
+          .then(toFirebaseData)
+          .then((d) =>
+            encrypt(d, getLocalState(`account.events.${data._id}.key`))
+          )
+          .then((serializedData) => ({
+            data: serializedData,
+            users: Object.fromEntries(
+              Object.keys(data.participants).map((key) => [key, true])
+            ),
+          }));
+      },
     },
   });
 }

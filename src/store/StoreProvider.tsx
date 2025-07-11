@@ -7,6 +7,7 @@ export const {
   onChange,
   onPathChange,
   load,
+  get,
   update,
   $store,
 } = createContextStore(DEFAULT_STATE);

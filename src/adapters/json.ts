@@ -65,7 +65,7 @@ export const expenseSchema = z.strictObject({
     .transform((date) => (date == null ? new Date() : new Date(date))),
 });
 
-export const participantSchema = z.strictObject({
+export const userSchema = z.strictObject({
   _id: z.string(),
   name: z.string(),
   avatar: z.string().optional(),
@@ -73,10 +73,13 @@ export const participantSchema = z.strictObject({
     adults: z.number(),
     children: z.number(),
   }),
-  participantShare: participantShareSchema,
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
+});
+
+export const participantSchema = userSchema.extend({
+  participantShare: participantShareSchema,
 });
 
 export const categorySchema = z.strictObject({
@@ -122,9 +125,20 @@ export const eventSchema = z.strictObject({
   isAutoClose: z.boolean().optional(),
 });
 
+export const accountSchema = userSchema.extend({
+  events: z.record(
+    z.string(),
+    z.object({
+      key: z.string(),
+      uid: z.string(),
+    })
+  ),
+});
+
 const stateSchema = z.strictObject({
   currentParticipantId: z.string(),
   events: z.record(z.string(), eventSchema),
+  account: accountSchema.nullable(),
 });
 
 export const toState = (data: unknown): Either.Either<ZodError, State> => {

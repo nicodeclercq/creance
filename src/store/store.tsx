@@ -153,12 +153,17 @@ export function createContextStore<State>(initialState: State) {
       load((currentState) => setValueAtPath(path, map, currentState as State));
     };
 
+  const get = <P extends Path<State>>(path: P) => {
+    return getValueFromPath<P, State>(path)(store.getValue());
+  };
+
   return {
     StoreProvider,
     useStore,
     onChange,
     onPathChange,
     load,
+    get,
     update,
     $store: store.asObservable(),
   } as const;

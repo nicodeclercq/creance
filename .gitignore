@@ -29,3 +29,5 @@ secrets.tmp.ts
 secrets.ts
 
 .llm/
+.cursor/
+.claude/

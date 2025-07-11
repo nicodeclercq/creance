@@ -1,3 +1,4 @@
+import { Account } from "./models/Account";
 import { Container } from "./ui/Container/Container";
 import { FormData } from "./pages/participants/ParticipantForm";
 import { LoadingIcon } from "./ui/Button/LoadingIcon";
@@ -17,12 +18,19 @@ export function PrivatePage({ children }: Props) {
   const [account, setAccount] = useStore("account");
 
   const submit = (data: FormData) => {
-    setAccount(() => ({
-      _id: currentParticipantId,
-      eventKeys: {},
-      updatedAt: new Date(),
-      ...data,
-    }));
+    setAccount((oldValue) => {
+      const baseValue = {
+        _id: currentParticipantId,
+        events: {},
+        ...(oldValue ?? {}),
+        updatedAt: new Date(),
+      } as Account;
+
+      return {
+        ...baseValue,
+        ...data,
+      };
+    });
   };
 
   switch (state.type) {
@@ -46,7 +54,7 @@ export function PrivatePage({ children }: Props) {
     case "unauthenticated":
       return <Redirect to="LOGIN" />;
     case "authenticated":
-      return !currentParticipantId || !account?._id ? (
+      return !currentParticipantId || !account ? (
         <SetCurrentParticipantPage onSubmit={submit} />
       ) : (
         <>{children}</>

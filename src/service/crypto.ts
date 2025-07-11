@@ -1,3 +1,5 @@
+import { salt } from "../secrets";
+
 const split = (str: string, index: number): [string, string] => {
   return [str.slice(0, index), str.slice(index)];
 };
@@ -51,7 +53,19 @@ const fromStr = (
 
 export const uid = () => crypto.randomUUID();
 
-export const getKeys = () =>
+export const generateKey = (secret: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const saltedSecret = `${salt}${secret}${salt}`;
+  const data = encoder.encode(saltedSecret);
+
+  return crypto.subtle
+    .digest("SHA-256", data)
+    .then((hashBuffer) =>
+      btoa(String.fromCharCode(...new Uint8Array(hashBuffer)))
+    );
+};
+
+export const generateKeyPair = () =>
   crypto.subtle.generateKey(
     {
       name: "RSA-OAEP",
@@ -63,7 +77,7 @@ export const getKeys = () =>
     ["encrypt", "decrypt"]
   );
 
-export function exportKeys(keyPair: CryptoKeyPair) {
+export function exportKeyPair(keyPair: CryptoKeyPair) {
   return Promise.all([
     crypto.subtle.exportKey("spki", keyPair.publicKey),
     crypto.subtle.exportKey("pkcs8", keyPair.privateKey),
@@ -156,20 +170,6 @@ export function decode(str: string, privateKey: CryptoKey): Promise<string> {
       bytes.buffer
     )
     .then((buffer) => new TextDecoder().decode(buffer));
-}
-
-export function generateKey(): Promise<string> {
-  return crypto.subtle
-    .generateKey(
-      {
-        name: "AES-GCM",
-        length: 256,
-      },
-      true,
-      ["encrypt", "decrypt"]
-    )
-    .then((key) => crypto.subtle.exportKey("raw", key))
-    .then((exported) => btoa(String.fromCharCode(...new Uint8Array(exported))));
 }
 
 export const encrypt = async (plaintext: string, key: string) => {

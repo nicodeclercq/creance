@@ -3,16 +3,16 @@ import {
   decrypt,
   encode,
   encrypt,
-  exportKeys,
+  exportKeyPair,
   generateKey,
-  getKeys,
+  generateKeyPair,
   importKeys,
 } from "./crypto";
 import { describe, expect, it } from "vitest";
 
 describe("Crypto Service", () => {
   it("should encrypt and decrypt a string", async () => {
-    const keys = await getKeys();
+    const keys = await generateKeyPair();
     const originalText = "Hello, World! Bonjour le monde!";
 
     const encoded = await encode(originalText, keys.publicKey);
@@ -23,8 +23,8 @@ describe("Crypto Service", () => {
   });
 
   it("can be exported and imported", async () => {
-    const keys = await getKeys();
-    const exportedKeys = await exportKeys(keys);
+    const keys = await generateKeyPair();
+    const exportedKeys = await exportKeyPair(keys);
     const importedKeys = await importKeys(exportedKeys);
 
     expect(typeof exportedKeys.publicKey).toBe("string");
@@ -34,10 +34,10 @@ describe("Crypto Service", () => {
   });
 
   it("should encrypt and decrypt a string with imported keys", async () => {
-    const keys = await getKeys();
+    const keys = await generateKeyPair();
     const originalText = "Hello, World! Bonjour le monde!";
 
-    const exportedKeys = await exportKeys(keys);
+    const exportedKeys = await exportKeyPair(keys);
     const importedKeys = await importKeys(exportedKeys);
 
     const encoded = await encode(originalText, importedKeys.publicKey);
@@ -65,8 +65,9 @@ describe("encrypt/decrypt", () => {
 
 describe("generateKey", () => {
   it("should generate a key", async () => {
-    const key = await generateKey();
-    expect(typeof key).toBe("string");
-    expect(key.length).toBeGreaterThan(0);
+    const key1 = await generateKey("test");
+    expect(typeof key1).toBe("string");
+    const key2 = await generateKey("test");
+    expect(key1).toBe(key2);
   });
 });

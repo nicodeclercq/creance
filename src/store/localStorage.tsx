@@ -24,7 +24,11 @@ export function synchronizeLocalStorage({
     }),
     Either.chainW(toState),
     Either.getOrElse((error) => {
-      console.error("Failed to load state from localStorage:", error);
+      console.error(
+        "Failed to load state from localStorage:",
+        error,
+        localStorage.getItem("state")
+      );
       return DEFAULT_STATE;
     }),
     load

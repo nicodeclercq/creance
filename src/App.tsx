@@ -3,6 +3,7 @@ import "./App.css";
 import {
   $store,
   StoreProvider,
+  get,
   load,
   onChange,
   update,
@@ -15,7 +16,7 @@ import { synchronizeLocalStorage } from "./store/localStorage";
 
 // Synchronize local storage with the store
 synchronizeLocalStorage({ load, onChange });
-synchronizeFirebase({ $store, update });
+synchronizeFirebase({ $store, update, get });
 
 function App() {
   return (
