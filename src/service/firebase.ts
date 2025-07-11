@@ -112,6 +112,17 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+const hasAccountChanged = (a: Account | null, b: Account | null): boolean => {
+  if (a == null && b == null) return false;
+  if (a == null || b == null) return true;
+  return (
+    a._id !== b._id ||
+    a.name !== b.name ||
+    a.events !== b.events ||
+    JSON.stringify(a.events) !== JSON.stringify(b.events)
+  );
+};
+
 const listenToRemoteCollection = <LocalData>(
   collection: DatabaseReference,
   adapter: (d: unknown) => Promise<LocalData> = identity as (
@@ -540,10 +551,7 @@ function synchronizeUserAccount({
 
       const parsed = z.string().safeParse(data);
       return parsed.success
-        ? decrypt(
-            parsed.data,
-            localStorage.getItem(LOCAL_STORAGE_KEY) ?? ""
-          )
+        ? decrypt(parsed.data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "")
             .then(fromFirebaseData(accountSchema))
             .then(
               Either.fold(
@@ -575,18 +583,19 @@ function synchronizeUserAccount({
 
   // Listen to local changes and sync to remote
   let lastSavedData: Account | null = null;
-  
+
   $localStore
     .pipe(
       RX.filter((accountData): accountData is Account => accountData != null),
-      RX.distinctUntilChanged(
-        (prev, cur) => JSON.stringify(prev) === JSON.stringify(cur)
-      )
+      RX.distinctUntilChanged(hasAccountChanged)
     )
     .subscribe((accountData) => {
       if (accountData && accountData._id) {
         // Only save if data has changed from last saved version
-        if (lastSavedData == null || JSON.stringify(accountData) !== JSON.stringify(lastSavedData)) {
+        if (
+          lastSavedData == null ||
+          JSON.stringify(accountData) !== JSON.stringify(lastSavedData)
+        ) {
           Promise.resolve(accountData)
             .then(toFirebaseData)
             .then((data) =>
