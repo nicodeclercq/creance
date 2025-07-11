@@ -574,6 +574,8 @@ function synchronizeUserAccount({
   );
 
   // Listen to local changes and sync to remote
+  let lastSavedData: Account | null = null;
+  
   $localStore
     .pipe(
       RX.filter((accountData): accountData is Account => accountData != null),
@@ -583,15 +585,22 @@ function synchronizeUserAccount({
     )
     .subscribe((accountData) => {
       if (accountData && accountData._id) {
-        Promise.resolve(accountData)
-          .then(toFirebaseData)
-          .then((data) =>
-            encrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "")
-          )
-          .then((encryptedData) => set(userRef, encryptedData))
-          .catch((error) => {
-            console.error(`Failed to sync user ${userId} to remote:`, error);
-          });
+        // Only save if data has changed from last saved version
+        if (lastSavedData == null || JSON.stringify(accountData) !== JSON.stringify(lastSavedData)) {
+          Promise.resolve(accountData)
+            .then(toFirebaseData)
+            .then((data) =>
+              encrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "")
+            )
+            .then((encryptedData) => set(userRef, encryptedData))
+            .then(() => {
+              lastSavedData = { ...accountData };
+              console.log(`User ${userId} data saved to remote`);
+            })
+            .catch((error) => {
+              console.error(`Failed to sync user ${userId} to remote:`, error);
+            });
+        }
       }
     });
 }
