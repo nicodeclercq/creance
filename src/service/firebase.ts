@@ -518,6 +518,86 @@ function synchronizeCollectionRecord<
   });
 }
 
+function synchronizeUserAccount({
+  userId,
+  updateLocalState,
+  $localStore,
+}: {
+  userId: string;
+  updateLocalState: (
+    mergeFn: (currentLocalData: Account | null) => Account | null
+  ) => void;
+  $localStore: RX.Observable<Account | null>;
+}) {
+  const userCollectionPath = `${COLLECTIONS.USERS}/${userId}`;
+  const userRef = ref(db, userCollectionPath);
+
+  // Listen to remote changes for this specific user
+  listenToRemoteCollection(
+    userRef,
+    (data) => {
+      if (data == null) {
+        return Promise.resolve(null);
+      }
+
+      const parsed = z.string().safeParse(data);
+      return parsed.success
+        ? decrypt(
+            parsed.data,
+            localStorage.getItem(LOCAL_STORAGE_KEY) ?? ""
+          )
+            .then(fromFirebaseData(accountSchema))
+            .then(
+              Either.fold(
+                (error) => {
+                  console.error(`Error parsing account data:`, error);
+                  return null;
+                },
+                (accountData) => accountData
+              )
+            )
+        : Promise.reject(new Error("Failed to decrypt user data"));
+    },
+    (result) => {
+      pipe(
+        result,
+        Either.fold(
+          (error) => {
+            console.error(`Error syncing user ${userId}:`, error);
+          },
+          (accountData: Account | null) => {
+            if (accountData) {
+              updateLocalState(() => accountData);
+            }
+          }
+        )
+      );
+    }
+  );
+
+  // Listen to local changes and sync to remote
+  $localStore
+    .pipe(
+      RX.filter((accountData): accountData is Account => accountData != null),
+      RX.distinctUntilChanged(
+        (prev, cur) => JSON.stringify(prev) === JSON.stringify(cur)
+      )
+    )
+    .subscribe((accountData) => {
+      if (accountData && accountData._id) {
+        Promise.resolve(accountData)
+          .then(toFirebaseData)
+          .then((data) =>
+            encrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "")
+          )
+          .then((encryptedData) => set(userRef, encryptedData))
+          .catch((error) => {
+            console.error(`Failed to sync user ${userId} to remote:`, error);
+          });
+      }
+    });
+}
+
 export function synchronizeFirebase({
   $store: $localStore,
   update: updateLocalState,
@@ -531,6 +611,7 @@ export function synchronizeFirebase({
   ) => void;
   get: <P extends Path<State>>(path: P) => ValueFromPath<P, State>;
 }) {
+  // Synchronize events collection
   synchronizeCollectionRecord({
     collectionName: COLLECTIONS.EVENTS,
     updateLocalState: updateLocalState("events"),
@@ -574,4 +655,18 @@ export function synchronizeFirebase({
       },
     },
   });
+
+  // Synchronize user account data
+  $isAuthenticated
+    .pipe(
+      RX.filter((state) => state.type === "authenticated"),
+      RX.map((state) => (state as AuthenticatedState).participantId)
+    )
+    .subscribe((userId) => {
+      synchronizeUserAccount({
+        userId,
+        updateLocalState: updateLocalState("account"),
+        $localStore: $localStore.pipe(RX.map(({ account }) => account)),
+      });
+    });
 }
