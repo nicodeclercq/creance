@@ -74,40 +74,38 @@ export const $isAuthenticated = new RX.BehaviorSubject<AuthState>({
 });
 onAuthStateChanged(auth, (user) => {
   if (user?.uid && localStorage.getItem(LOCAL_STORAGE_KEY) != null) {
-    onValue(ref(db, `${COLLECTIONS.USERS}/${user.uid}`), (snapshot) => {
-      Promise.resolve()
-        .then(() => (snapshot.exists() ? snapshot.val() : undefined))
-        .then((data) => {
-          if (data == null) {
-            return Promise.resolve(
-              Either.right(null) as Either.Either<Error, Account | null>
-            );
-          }
-          return z.string().safeParse(data).success
-            ? decrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "").then(
-                fromFirebaseData(accountSchema)
-              )
-            : Promise.reject(new Error("Failed to decrypt user data"));
-        })
-        .then(
-          Either.fold(
-            (error) => {
-              console.log(error);
-            },
-            (accountData) => {
-              updateStoreWithAccountData(accountData);
+    get(ref(db, `${COLLECTIONS.USERS}/${user.uid}`))
+      .then((snapshot) => (snapshot.exists() ? snapshot.val() : undefined))
+      .then((data) => {
+        if (data == null) {
+          return Promise.resolve(
+            Either.right(null) as Either.Either<Error, Account | null>
+          );
+        }
+        return z.string().safeParse(data).success
+          ? decrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "").then(
+              fromFirebaseData(accountSchema)
+            )
+          : Promise.reject(new Error("Failed to decrypt user data"));
+      })
+      .then(
+        Either.fold(
+          (error) => {
+            console.log(error);
+          },
+          (accountData) => {
+            updateStoreWithAccountData(accountData);
 
-              if ($isAuthenticated.value.type !== "authenticated") {
-                $isAuthenticated.next({
-                  type: "authenticated",
-                  participantId: user.uid,
-                });
-              }
+            if ($isAuthenticated.value.type !== "authenticated") {
+              $isAuthenticated.next({
+                type: "authenticated",
+                participantId: user.uid,
+              });
             }
-          )
+          }
         )
-        .catch((error) => Either.left(error));
-    });
+      )
+      .catch((error) => Either.left(error));
   } else {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     $isAuthenticated.next({ type: "unauthenticated" });
