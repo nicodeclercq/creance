@@ -68,6 +68,15 @@ export function ParticipantForm({
       <Controller
         name="name"
         control={control}
+        rules={{
+          required: true,
+          maxLength: {
+            value: 100,
+            message: t("participantForm.name.validation.maxLength", {
+              max: 100,
+            }),
+          },
+        }}
         render={({ field: { value, onChange } }) => (
           <InputText
             type="text"

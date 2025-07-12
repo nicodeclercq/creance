@@ -267,6 +267,12 @@ export function ExpenseForm({
       <Controller
         name="reason"
         control={control}
+        rules={{
+          maxLength: {
+            value: 100,
+            message: t("expenseForm.reason.validation.maxLength", { max: 100 }),
+          },
+        }}
         render={({ field: { value, onChange } }) => (
           <InputText
             type="text"

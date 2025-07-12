@@ -277,5 +277,11 @@
   "page.participantshare.results.title": "Résultats",
   "page.participantshare.shares.title": "Participation",
   "page.participantshare.deposit.title": "Avances",
-  "page.information.import.error": "Les données du fichier n'ont pas pu être importées. Veuillez vérifier son format et réessayez."
+  "page.information.import.error": "Les données du fichier n'ont pas pu être importées. Veuillez vérifier son format et réessayez.",
+  "depositForm.note.validation.maxLength": "La raison de l'avance doit comporter au maximum {max} caractères",
+  "expenseForm.reason.validation.maxLength": "Le commentaire de la dépense doit comporter au maximum {max} caractères",
+  "eventForm.name.validation.maxLength": "Le nom de l'événement doit comporter au maximum {max} caractères",
+  "categoryForm.name.validation.maxLength": "Le nom de la catégorie doit comporter au maximum {max} caractères",
+  "participantForm.name.validation.maxLength": "Le nom doit comporter au maximum {max} caractères",
+  "shareForm.label.validation.maxLength": "Le libellé de la participation doit comporter au maximum {max} caractères"
 }

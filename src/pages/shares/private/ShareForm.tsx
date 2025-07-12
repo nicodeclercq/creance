@@ -134,6 +134,12 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
       <Controller
         control={control}
         name="label"
+        rules={{
+          maxLength: {
+            value: 100,
+            message: t("shareForm.label.validation.maxLength", { max: 100 }),
+          },
+        }}
         render={({ field: { value, onChange } }) => (
           <InputText
             type="text"

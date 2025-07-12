@@ -59,6 +59,12 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
               min: 3,
             }),
           },
+          maxLength: {
+            value: 100,
+            message: t("eventForm.name.validation.maxLength", {
+              max: 100,
+            }),
+          },
           validate: {
             isUnique: (value) => {
               const isUnique = !Object.values(events).some(
@@ -87,11 +93,11 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
         control={control}
         rules={{
           maxLength: {
-            value: 128,
+            value: 100,
             message: t(
               "page.events.add.form.field.description.validation.maxLength",
               {
-                max: 128,
+                max: 100,
               }
             ),
           },

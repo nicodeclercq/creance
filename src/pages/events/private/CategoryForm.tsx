@@ -81,6 +81,10 @@ export function CategoryForm({
           required: t(
             "page.events.add.form.field.categoryName.validation.required"
           ),
+          maxLength: {
+            value: 100,
+            message: t("categoryForm.name.validation.maxLength", { max: 100 }),
+          },
           validate: {
             isUnique: (value) => {
               const isUnique = !categories.some(

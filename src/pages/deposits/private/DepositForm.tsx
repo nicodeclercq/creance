@@ -181,6 +181,12 @@ export function DepositForm({
       <Controller
         name="note"
         control={control}
+        rules={{
+          maxLength: {
+            value: 100,
+            message: t("depositForm.note.validation.maxLength", { max: 100 }),
+          },
+        }}
         render={({ field: { value, onChange } }) => (
           <InputText
             type="text"
