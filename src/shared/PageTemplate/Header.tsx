@@ -31,7 +31,7 @@ export function Header({ leftAction, title, rightActions }: HeaderProps) {
         zIndex: 100,
       }}
     >
-      <Columns gap="s" styles={{ background: "transparent" }} align="center">
+      <Columns gap="s" align="center">
         {leftAction && <IconButton {...leftAction} variant="primary" />}
         <Heading
           styles={{ font: "body-large", color: "inverted", flexGrow: true }}

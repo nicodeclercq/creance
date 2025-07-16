@@ -7,6 +7,7 @@ import { useStore } from "../../store/StoreProvider";
 
 export function EventsPage() {
   const [events, setEvents] = useStore("events");
+  const [account, setAccount] = useStore("account");
 
   const autoClosedEvents = Object.values(events)
     .filter(shouldCloseEvent)
@@ -24,6 +25,34 @@ export function EventsPage() {
       )
     );
     return null; // Prevent rendering while updating state
+  }
+
+  if (account) {
+    const participants = Object.values(events).flatMap((event) =>
+      Object.values(event.participants)
+    );
+    const missingParticipants = participants.filter(
+      (participant) => !(participant._id in account.users)
+    );
+
+    if (missingParticipants.length > 0) {
+      setAccount((currentAccount) => {
+        if (!currentAccount) return null;
+
+        return {
+          ...currentAccount,
+          users: {
+            ...currentAccount.users,
+            ...Object.fromEntries(
+              missingParticipants.map(({ participantShare, ...user }) => [
+                user._id,
+                user,
+              ])
+            ),
+          },
+        };
+      });
+    }
   }
 
   return <EventList events={events} />;

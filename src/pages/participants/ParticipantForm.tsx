@@ -5,6 +5,7 @@ import { Container } from "../../ui/Container/Container";
 import { Form } from "../../ui/Form/Form";
 import { InputNumber } from "../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../ui/FormField/InputText/InputText";
+import { User } from "../../models/User";
 import { useTranslation } from "react-i18next";
 
 export type FormData = {
@@ -17,13 +18,17 @@ export type FormData = {
 };
 
 type ParticipantFormProps = {
+  defaultValue: FormData;
   submitLabel: string;
   onSubmit: (data: FormData) => void;
+  users: Record<string, User>;
 };
 
 export function ParticipantForm({
+  defaultValue,
   submitLabel,
   onSubmit,
+  users = {},
 }: ParticipantFormProps) {
   const { t } = useTranslation();
   const {
@@ -34,13 +39,7 @@ export function ParticipantForm({
     getValues,
     formState: { errors },
   } = useForm<FormData>({
-    defaultValues: {
-      name: "",
-      share: {
-        adults: 0,
-        children: 0,
-      },
-    },
+    defaultValues: defaultValue,
     mode: "onChange",
   });
 
@@ -75,6 +74,11 @@ export function ParticipantForm({
             message: t("participantForm.name.validation.maxLength", {
               max: 100,
             }),
+          },
+          validate: (value) => {
+            if (Object.values(users).some((user) => user.name === value)) {
+              return t("participantForm.name.validation.unique");
+            }
           },
         }}
         render={({ field: { value, onChange } }) => (

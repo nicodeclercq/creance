@@ -49,7 +49,7 @@ function DefaultRenderer<T>({
   valueRenderer?: (value: Option<T>) => ReactNode;
 }) {
   return (
-    <Columns gap="s" styles={{ background: "transparent" }} align="center">
+    <Columns gap="s" align="center">
       {valueRenderer?.(option)}
       {option.label}
     </Columns>

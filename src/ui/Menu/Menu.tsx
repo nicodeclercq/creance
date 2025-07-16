@@ -52,11 +52,7 @@ export function Menu({
           <Stack alignItems="stretch">
             {actions.map(({ label, icon, ...action }, index) => {
               const content = (
-                <Columns
-                  styles={{ background: "transparent" }}
-                  gap="s"
-                  align="center"
-                >
+                <Columns gap="s" align="center">
                   <span style={{ flexGrow: 1 }}>{label}</span>
                   <Icon name={icon} />
                 </Columns>

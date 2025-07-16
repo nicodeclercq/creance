@@ -86,15 +86,19 @@ export function Form<TFieldValues extends FieldValues, TTransformedValues>({
   return (
     <form
       className={styles.form}
-      onSubmit={handleSubmit((data) => {
-        const result = submit.onClick(data);
-        if (result instanceof Promise) {
-          setIsLoading(true);
-          result.finally(() => {
-            setIsLoading(false);
-          });
-        }
-      })}
+      onSubmit={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        handleSubmit((data) => {
+          const result = submit.onClick(data);
+          if (result instanceof Promise) {
+            setIsLoading(true);
+            result.finally(() => {
+              setIsLoading(false);
+            });
+          }
+        })(e);
+      }}
     >
       <FormLayout
         hasError={hasError}

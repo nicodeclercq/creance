@@ -122,11 +122,7 @@ export function ParticipantShareList({
             }))}
             valueRenderer={(option) => (
               <div>
-                <Columns
-                  gap="s"
-                  align="center"
-                  styles={{ background: "transparent" }}
-                >
+                <Columns gap="s" align="center">
                   <Avatar label={option.label} size="m" />
                 </Columns>
               </div>

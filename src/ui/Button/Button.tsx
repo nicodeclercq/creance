@@ -59,12 +59,7 @@ export function Button(props: ButtonProps) {
       [styles.isOverlay]: overlays,
     }),
     children: (
-      <Columns
-        align="center"
-        justify="center"
-        gap="s"
-        styles={{ background: "transparent" }}
-      >
+      <Columns align="center" justify="center" gap="s">
         {icon?.position === "start" && <Icon name={icon.name} />}
         <span className={styles.label}>{label}</span>
         {icon?.position === "end" && <Icon name={icon.name} />}

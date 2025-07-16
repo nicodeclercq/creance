@@ -47,7 +47,7 @@ export function ConfirmButton({
         )}
         onClick={undefined}
       >
-        <Columns align="center" gap="s" styles={{ background: "transparent" }}>
+        <Columns align="center" gap="s">
           <span>{action.label}</span>
           {action.icon && <Icon name={action.icon.name} size="m" />}
         </Columns>

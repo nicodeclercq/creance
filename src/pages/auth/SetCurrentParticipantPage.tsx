@@ -1,3 +1,4 @@
+import { useStore } from "../../store/StoreProvider";
 import { Card } from "../../ui/Card/Card";
 import { Container } from "../../ui/Container/Container";
 import { Heading } from "../../ui/Heading/Heading";
@@ -17,6 +18,7 @@ export function SetCurrentParticipantPage({
   onSubmit,
 }: SetCurrentParticipantPageProps) {
   const { t } = useTranslation();
+  const [users] = useStore("account.users");
 
   return (
     <Container
@@ -30,7 +32,7 @@ export function SetCurrentParticipantPage({
         padding: "l",
       }}
     >
-      <Container styles={{ maxWidth: "40rem", background: "transparent" }}>
+      <Container styles={{ maxWidth: "40rem" }}>
         <Card>
           <Stack alignItems="center" gap="m">
             <Heading styles={{ font: "body-larger" }}>
@@ -40,6 +42,15 @@ export function SetCurrentParticipantPage({
               {t("page.setCurrentParticipant.description")}
             </Paragraph>
             <ParticipantForm
+              defaultValue={{
+                name: "",
+                avatar: "",
+                share: {
+                  adults: 0,
+                  children: 0,
+                },
+              }}
+              users={users}
               onSubmit={onSubmit}
               submitLabel={t("page.setCurrentParticipant.actions.submit")}
             />

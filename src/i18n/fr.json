@@ -283,5 +283,9 @@
   "eventForm.name.validation.maxLength": "Le nom de l'événement doit comporter au maximum {max} caractères",
   "categoryForm.name.validation.maxLength": "Le nom de la catégorie doit comporter au maximum {max} caractères",
   "participantForm.name.validation.maxLength": "Le nom doit comporter au maximum {max} caractères",
-  "shareForm.label.validation.maxLength": "Le libellé de la participation doit comporter au maximum {max} caractères"
+  "shareForm.label.validation.maxLength": "Le libellé de la participation doit comporter au maximum {max} caractères",
+  "AddEventStep3.actions.addParticipant": "Créer un participant",
+  "AddEventStep3.modal.addParticipant.submit": "Ajouter",
+  "AddEventStep3.actions.addParticipant.description": "Vous pouvez ajouter un participant à la liste de créances en cliquant sur le bouton ci-dessous. Vous pourrez ensuite modifier ses informations (nombre de parts, dates d'arrivée et de départ, etc.) dans la liste des participants.",
+  "participantForm.name.validation.unique": "Ce nom existe déjà. Veuillez en choisir un autre."
 }

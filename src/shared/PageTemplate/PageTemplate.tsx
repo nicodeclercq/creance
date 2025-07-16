@@ -35,9 +35,7 @@ export function PageTemplate({
         rightActions={rightActions}
       />
       {menu && <Menu actions={menu} />}
-      <Container styles={{ padding: "m", background: "transparent" }}>
-        {children}
-      </Container>
+      <Container styles={{ padding: "m" }}>{children}</Container>
       <div style={{ height: "15rem" }}>
         {/* Reserved place to ensure Quick Action doesn't overlap content */}
       </div>

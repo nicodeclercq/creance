@@ -1,17 +1,17 @@
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { FormData, ParticipantForm } from "../../participants/ParticipantForm";
 
 import { Avatar } from "../../../ui/Avatar/Avatar";
+import { Button } from "../../../ui/Button/Button";
+import { CheckboxList } from "../../../ui/FormField/CheckboxList/CheckboxList";
+import { Columns } from "../../../ui/Columns/Columns";
 import { Form } from "../../../ui/Form/Form";
 import { Fragment } from "react/jsx-runtime";
-import { Grid } from "../../../ui/Grid/Grid";
-import { IconButton } from "../../../ui/IconButton/IconButton";
-import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
-import { InputText } from "../../../ui/FormField/InputText/InputText";
+import { Modal } from "../../../ui/Modal/Modal";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Participant } from "../../../models/Participant";
-import { ParticipantShare } from "../../../models/ParticipantShare";
-import styles from "./AddEventStep3.module.css";
+import { User } from "../../../models/User";
 import { uid } from "../../../service/crypto";
+import { useState } from "react";
 import { useStore } from "../../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
@@ -24,219 +24,159 @@ type AddEventStep3Props = {
   onPrevious: (data: Step3Data) => void;
 };
 
-type AddParticipantsFormProps = {
-  participants: Participant[];
-  onAdd: (participant: Participant) => void;
-};
-
-type AddParticipantsFormData = {
-  name: string;
-  adults: number;
-  children: number;
-};
-function AddParticipantsForm({
-  onAdd,
-  participants: participants,
-}: AddParticipantsFormProps) {
-  const { t } = useTranslation();
-  const { control, handleSubmit, watch, reset } =
-    useForm<AddParticipantsFormData>({
-      defaultValues: {
-        name: "",
-        adults: 1,
-        children: 0,
-      },
-    });
-
-  const addParticipant = (data: AddParticipantsFormData) => {
-    const newParticipant: Participant = {
-      _id: uid(),
-      name: data.name,
-      avatar: data.name,
-      share: {
-        adults: data.adults,
-        children: data.children,
-      },
-      participantShare: { type: "default" } as ParticipantShare,
-      updatedAt: new Date(),
-    };
-    onAdd(newParticipant);
-    reset();
-  };
-
-  return (
-    <div className={styles.addParticipantForm}>
-      <div>
-        <div style={{ font: "var(--ui-semantic-font-body-small)" }}>&nbsp;</div>
-        <Avatar label={watch("name")} size="m" />
-      </div>
-      <Controller
-        control={control}
-        rules={{
-          required: t(
-            "page.events.add.form.participant.name.validation.required"
-          ),
-          validate: {
-            isUnique: (value) => {
-              const isUnique = !participants.some(
-                (participant) => participant.name === value
-              );
-              return (
-                isUnique ||
-                t("page.events.add.form.participant.name.validation.isUnique")
-              );
-            },
-          },
-        }}
-        name="name"
-        render={({ field: { value, onChange }, fieldState: { error } }) => (
-          <div className={styles.name}>
-            <InputText
-              type="text"
-              value={value}
-              onChange={onChange}
-              label={t("page.events.add.form.participant.name.label")}
-              isRequired
-              error={error?.message}
-            />
-          </div>
-        )}
-      />
-      <div>
-        <div style={{ font: "var(--ui-semantic-font-body-small)" }}>&nbsp;</div>
-        <IconButton
-          icon="add"
-          label={t("page.events.add.form.participant.share.submit")}
-          onClick={handleSubmit(addParticipant)}
-          variant="tertiary"
-        />
-      </div>
-      <div className={styles.fieldLegend}>
-        {t("page.events.add.form.participant.share.label")}
-      </div>
-      <Controller
-        control={control}
-        rules={{
-          min: {
-            value: 0,
-            message: t(
-              "page.events.add.form.participant.share.adults.validation.min"
-            ),
-          },
-        }}
-        name="adults"
-        render={({ field: { value, onChange }, fieldState: { error } }) => (
-          <InputNumber
-            as="number"
-            type="number"
-            value={value}
-            onChange={onChange}
-            label={t("page.events.add.form.participant.share.adults.label")}
-            isRequired
-            error={error?.message}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        rules={{
-          min: {
-            value: 0,
-            message: t(
-              "page.events.add.form.participant.share.children.validation.min"
-            ),
-          },
-        }}
-        name="children"
-        render={({ field: { value, onChange }, fieldState: { error } }) => (
-          <InputNumber
-            as="number"
-            type="number"
-            value={value}
-            onChange={onChange}
-            label={t("page.events.add.form.participant.share.children.label")}
-            isRequired
-            error={error?.message}
-          />
-        )}
-      />
-    </div>
-  );
-}
-
 export function AddEventStep3({
   data,
   onNext,
   onPrevious,
 }: AddEventStep3Props) {
   const { t } = useTranslation();
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [currentParticipantId] = useStore("currentParticipantId");
-  const { control, handleSubmit, watch, formState, getValues } =
-    useForm<Step3Data>({
-      defaultValues: data,
-      mode: "onBlur",
-    });
+  const [selection, setSelection] = useState<Participant[]>(data.participants);
+  const [account, setAccount] = useStore("account");
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "participants",
-  });
-
-  const removeParticipant = (id: string) => () => {
-    const index = fields.findIndex((item) => item._id === id);
-    remove(index);
+  const currentParticipant: Participant = {
+    _id: currentParticipantId,
+    name: account?.name ?? "",
+    updatedAt: new Date(),
+    avatar: account?.avatar ?? "",
+    share: account?.share ?? {
+      adults: 1,
+      children: 0,
+    },
+    participantShare: { type: "default" },
   };
-  const hasError = Object.keys(formState.errors).length > 0;
+
+  const addParticipant = (data: FormData) => {
+    const user: User = {
+      _id: uid(),
+      name: data.name,
+      avatar: data.avatar,
+      share: {
+        adults: data.share.adults,
+        children: data.share.children,
+      },
+      updatedAt: new Date(),
+    };
+    const newParticipant: Participant = {
+      ...user,
+      participantShare: { type: "default" },
+    };
+
+    setAccount((account) => {
+      if (!account) return null;
+
+      return {
+        ...account,
+        users: {
+          ...account.users,
+          [user._id]: user,
+        },
+      };
+    });
+    setSelection((s) => [...s, newParticipant]);
+    setIsFormOpen(false);
+  };
+
+  const itemRenderer = (item: User) => (
+    <Columns align="center" gap="s">
+      <Avatar label={item.name} size="m" />
+      {
+        <div>
+          <Paragraph styles={{ flexGrow: true }}>{item.name}</Paragraph>
+          <Paragraph styles={{ font: "body-smaller" }}>
+            {t("page.events.add.form.participant.share.count", {
+              adults: item.share.adults,
+              children: item.share.children,
+            })}
+          </Paragraph>
+        </div>
+      }
+    </Columns>
+  );
+
+  const submit = () => () => {
+    onNext({
+      participants: selection,
+    } as Step3Data);
+
+    return Promise.resolve();
+  };
+
+  const onSelectionChange = (selection: User[]) => {
+    const selectedParticipants = selection.map(
+      (user) =>
+        ({
+          ...user,
+          participantShare: { type: "default" },
+        } as Participant)
+    );
+    setSelection([currentParticipant, ...selectedParticipants]);
+  };
+
   return (
     <Form
-      hasError={hasError}
-      handleSubmit={handleSubmit}
+      hasError={false}
+      handleSubmit={submit}
       submit={{
         label: t("page.events.add.form.submit"),
         onClick: onNext,
       }}
       cancel={{
         label: t("page.events.add.form.previous"),
-        onClick: () => onPrevious(getValues()),
+        onClick: () => onPrevious({ participants: selection }),
       }}
     >
-      <Grid
-        columns={["min-content", "1fr", "min-content"]}
-        gap="s"
-        align="center"
-        justify="start"
-      >
-        {fields.map((item) => (
-          <Fragment key={item._id}>
-            <Avatar label={item.name} size="m" />
-            <div>
-              <Paragraph styles={{ flexGrow: true }}>{item.name}</Paragraph>
-              <Paragraph styles={{ font: "body-smaller" }}>
-                {t("page.events.add.form.participant.share.count", {
-                  adults: item.share.adults,
-                  children: item.share.children,
-                })}
-              </Paragraph>
-            </div>
-            {item._id === currentParticipantId ? (
-              <span></span>
-            ) : (
-              <IconButton
-                variant="tertiary"
-                icon="trash"
-                label={t("page.events.add.form.participant.remove", {
-                  name: item.name,
-                })}
-                onClick={removeParticipant(item._id)}
-              />
-            )}
+      {currentParticipant && (
+        <Columns align="center" justify="start">
+          <Fragment key={currentParticipant._id}>
+            <span style={{ width: "4rem" }}></span>
+            {itemRenderer(currentParticipant)}
           </Fragment>
-        ))}
-      </Grid>
-      <AddParticipantsForm
-        onAdd={(participant: Participant) => append(participant)}
-        participants={watch("participants")}
+        </Columns>
+      )}
+      <CheckboxList
+        onChange={onSelectionChange}
+        items={Object.values(account?.users ?? {})
+          .filter((user) => user._id !== currentParticipantId)
+          .map((user) => ({
+            label: user.name,
+            id: user._id,
+            value: user,
+          }))}
+        values={selection.map(({ participantShare, ...value }) => ({
+          label: value.name,
+          id: value._id,
+          value,
+        }))}
+        valueRenderer={itemRenderer}
       />
+      <Columns justify="center">
+        <Button
+          icon={{ name: "add", position: "start" }}
+          variant="tertiary"
+          onClick={() => setIsFormOpen(true)}
+          label={t("AddEventStep3.actions.addParticipant")}
+        />
+      </Columns>
+      <Modal
+        title={t("AddEventStep3.actions.addParticipant")}
+        isOpen={isFormOpen}
+      >
+        <ParticipantForm
+          defaultValue={{
+            name: "",
+            avatar: "",
+            share: {
+              adults: 0,
+              children: 0,
+            },
+          }}
+          onSubmit={addParticipant}
+          submitLabel={t("AddEventStep3.modal.addParticipant.submit")}
+          users={account?.users ?? {}}
+        />
+      </Modal>
     </Form>
   );
 }

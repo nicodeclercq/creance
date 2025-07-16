@@ -304,7 +304,6 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
           width: "100%",
           display: "flex",
           justifyContent: "center",
-          background: "transparent",
         }}
       >
         <Button
@@ -435,7 +434,6 @@ export function ShareForm({
                     width: "100%",
                     display: "flex",
                     justifyContent: "center",
-                    background: "transparent",
                   }}
                 >
                   <Button

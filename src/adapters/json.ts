@@ -3,6 +3,7 @@ import * as z from "zod";
 
 import { CATEGORY_ICONS_NAMES } from "../ui/CategoryIcon/private";
 import { State } from "../store/state";
+import { User } from "../models/User";
 import type { ZodError } from "zod";
 
 const defaultParticipantShareSchema = z.strictObject({
@@ -133,6 +134,18 @@ export const accountSchema = userSchema.extend({
       uid: z.string(),
     })
   ),
+  users: z
+    .union([
+      z.array(userSchema).transform((arr) =>
+        arr.reduce((acc, cur) => {
+          acc[cur._id] = cur;
+          return acc;
+        }, {} as Record<string, User>)
+      ),
+      z.record(z.string(), userSchema),
+    ])
+    .optional()
+    .default({}),
 });
 
 const stateSchema = z.strictObject({

@@ -33,7 +33,6 @@ export function Stack({
     <Container
       as={as}
       styles={{
-        background: "transparent",
         ...styles,
         display: "flex",
         flexDirection: "column",

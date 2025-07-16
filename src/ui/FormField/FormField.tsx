@@ -1,7 +1,7 @@
 import { Text } from "react-aria-components";
 import classNames from "classnames";
 import styles from "./FormField.module.css";
-import { type ReactNode, useId } from "react";
+import { type ReactNode } from "react";
 import { ErrorMessage } from "./ErrorMessage/ErrorMessage";
 import { Label } from "./Label/Label";
 
@@ -16,6 +16,7 @@ export type FormFieldProps = {
 };
 
 export function FormField({
+  id,
   label: providedLabel,
   error,
   children,
@@ -23,7 +24,6 @@ export function FormField({
   isDisabled = false,
   message,
 }: FormFieldProps) {
-  const id = useId();
   const label = isRequired ? providedLabel : `${providedLabel} (optionel)`;
 
   return (

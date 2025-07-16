@@ -1,37 +1,62 @@
 import { GridList, GridListItem } from "react-aria-components";
 import styles from "./CheckboxList.module.css";
-
+import * as ArrayFP from "fp-ts/Array";
+import * as Option from "fp-ts/Option";
+import { pipe } from "fp-ts/function";
 import { Checkbox } from "../Checkbox/Checkbox";
 import { type ReactNode } from "react";
 
-type Item = {
+type Item<T> = {
   label: string;
-  value: string;
+  id: string;
+  value: T;
 };
 
-type CheckboxListProps<T extends Item> = {
-  items: T[];
-  renderer: (value: T) => ReactNode;
+type CheckboxListProps<T> = {
+  items: Item<T>[];
+  valueRenderer?: (value: T) => ReactNode;
+  onChange: (value: T[]) => void;
+  values: Item<T>[];
 };
 
-export function CheckboxList<T extends Item>({
+export function CheckboxList<T>({
   items,
-  renderer,
+  valueRenderer,
+  onChange,
+  values,
 }: CheckboxListProps<T>) {
   return (
     <GridList
       aria-label="Favorite pokemon"
       selectionMode="multiple"
       className={styles.CheckboxList}
+      selectedKeys={values.map((value) => value.id)}
+      onSelectionChange={(selection) =>
+        pipe(
+          selection,
+          Array.from,
+          ArrayFP.map((value) => items.find((i) => i.id === value)),
+          ArrayFP.filterMap((item) =>
+            Option.fromNullable(item ? item.value : undefined)
+          ),
+          onChange
+        )
+      }
     >
       {items.map((item) => (
         <GridListItem
-          key={item.value}
+          id={item.id}
+          value={item}
+          key={item.id}
           textValue={item.label}
           className={styles.CheckboxListItem}
         >
           <Checkbox slot="selection" />
-          {renderer(item)}
+          {valueRenderer ? (
+            valueRenderer(item.value)
+          ) : (
+            <span>{item.label}</span>
+          )}
         </GridListItem>
       ))}
     </GridList>

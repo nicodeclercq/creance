@@ -73,7 +73,8 @@ export const $isAuthenticated = new RX.BehaviorSubject<AuthState>({
   type: "loading",
 });
 onAuthStateChanged(auth, (user) => {
-  if (user?.uid && localStorage.getItem(LOCAL_STORAGE_KEY) != null) {
+  const key = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (user?.uid && key != null) {
     get(ref(db, `${COLLECTIONS.USERS}/${user.uid}`))
       .then((snapshot) => (snapshot.exists() ? snapshot.val() : undefined))
       .then((data) => {
@@ -83,17 +84,29 @@ onAuthStateChanged(auth, (user) => {
           );
         }
         return z.string().safeParse(data).success
-          ? decrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "").then(
-              fromFirebaseData(accountSchema)
-            )
+          ? decrypt(data, key)
+              .then(fromFirebaseData(accountSchema))
+              .catch((error) => {
+                console.error("Failed to decrypt user data:", error, data);
+                return Either.left(error);
+              })
           : Promise.reject(new Error("Failed to decrypt user data"));
       })
+      .catch(
+        (error: Error) =>
+          Either.left(error) as Either.Either<Error, Account | null>
+      )
       .then(
         Either.fold(
           (error) => {
-            console.log(error);
+            console.error("Error loading account data", error);
           },
           (accountData) => {
+            console.log(
+              `User ${user.uid} authenticated with data:`,
+              accountData
+            );
+
             updateStoreWithAccountData(accountData);
 
             if ($isAuthenticated.value.type !== "authenticated") {
@@ -104,8 +117,7 @@ onAuthStateChanged(auth, (user) => {
             }
           }
         )
-      )
-      .catch((error) => Either.left(error));
+      );
   } else {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     $isAuthenticated.next({ type: "unauthenticated" });
@@ -271,6 +283,10 @@ function updateStoreWithAccountData(data: Account | undefined | null) {
     events: {
       ...oldData?.events,
       ...data.events,
+    },
+    users: {
+      ...oldData?.users,
+      ...data.users,
     },
   }));
 }
@@ -452,17 +468,11 @@ function synchronizeCollectionRecord<
       const recordSchema = z.record(z.string(), z.unknown());
       const parsed = recordSchema.safeParse(data);
 
-      console.log(
-        `Parsed remote data for collection ${collectionName}:`,
-        parsed.success ? "Success" : "Failed",
-        parsed.success ? parsed.data : parsed.error
-      );
-
       return parsed.success
         ? Promise.all(
-            Object.entries(parsed.data)
-              .map(log("parsed.data"))
-              .map(([key, value]) => adapter.in(value, key))
+            Object.entries(parsed.data).map(([key, value]) =>
+              adapter.in(value, key)
+            )
           )
             .then(
               flow(
@@ -640,21 +650,37 @@ export function synchronizeFirebase({
         });
         const parsed = schema.safeParse(d);
 
-        return parsed.success
-          ? Promise.resolve(parsed.data.data)
-              .then((data) =>
-                decrypt(data, getLocalState(`account.events.${id}.key`))
-              )
-              .then((a) => {
-                console.log("Decrypted event data:", a);
-                return a;
-              })
-              .then(fromFirebaseData(eventSchema))
-          : Promise.resolve(
-              Either.left(
-                new Error(`Failed to parse event data: ${parsed.error}`)
-              )
-            );
+        return Promise.resolve(getLocalState(`account`))
+          .then((account) => {
+            const key = (account as Account).events?.[id]?.key ?? undefined;
+
+            if (!key) {
+              console.warn(
+                `No key found for event ${id}, generating a new one.`,
+                account?.events
+              );
+            }
+
+            return key
+              ? Promise.resolve(key)
+              : Promise.reject(new Error(`No key found for event ${id}`));
+          })
+          .then((localState) => {
+            return parsed.success && localState != null
+              ? Promise.resolve(parsed.data.data)
+                  .then((data) => decrypt(data, localState))
+                  .then((a) => {
+                    console.log("Decrypted event data:", a);
+                    return a;
+                  })
+                  .then(fromFirebaseData(eventSchema))
+              : Promise.resolve(
+                  Either.left(
+                    new Error(`Failed to parse event data: ${parsed.error}`)
+                  )
+                );
+          })
+          .catch((error: Error) => Either.left(error));
       },
       out: (data) => {
         return Promise.resolve(data)

@@ -187,7 +187,7 @@ export function Container({
     position,
     gridTemplateColumns,
     color,
-    background = "default",
+    background,
     padding,
     font,
     gap,
