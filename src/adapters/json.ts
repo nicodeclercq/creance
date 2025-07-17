@@ -14,7 +14,7 @@ const customParticipantShareSchema = z.strictObject({
   type: z.literal("custom"),
   shares: z.array(
     z.strictObject({
-      label: z.string(),
+      label: z.string().max(100),
       multiplier: z.strictObject({
         adults: z.number(),
         children: z.number(),
@@ -39,12 +39,12 @@ const defaultExpenseShareSchema = z.strictObject({
 });
 const percentageExpenseShareSchema = z.strictObject({
   type: z.literal("percentage"),
-  distribution: z.record(z.string(), z.string()),
+  distribution: z.record(z.string().max(100), z.string().max(100)),
 });
 
 const fixedExpenseShareSchema = z.strictObject({
   type: z.literal("fixed"),
-  distribution: z.record(z.string(), z.string()),
+  distribution: z.record(z.string().max(100), z.string().max(100)),
 });
 
 export const expenseShareSchema = z.union([
@@ -54,22 +54,22 @@ export const expenseShareSchema = z.union([
 ]);
 
 export const expenseSchema = z.strictObject({
-  _id: z.string(),
-  reason: z.string(),
-  category: z.string(),
-  amount: z.string(),
+  _id: z.string().max(100),
+  reason: z.string().max(100),
+  category: z.string().max(100),
+  amount: z.string().max(100),
   date: z.string().transform((date) => new Date(date)),
   share: expenseShareSchema,
-  lender: z.string(),
+  lender: z.string().max(100),
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
 });
 
 export const userSchema = z.strictObject({
-  _id: z.string(),
-  name: z.string(),
-  avatar: z.string().optional(),
+  _id: z.string().max(100),
+  name: z.string().max(100),
+  avatar: z.string().max(100).optional(),
   share: z.strictObject({
     adults: z.number(),
     children: z.number(),
@@ -84,8 +84,8 @@ export const participantSchema = userSchema.extend({
 });
 
 export const categorySchema = z.strictObject({
-  _id: z.string(),
-  name: z.string(),
+  _id: z.string().max(100),
+  name: z.string().max(100),
   icon: z.enum(CATEGORY_ICONS_NAMES),
 });
 
@@ -97,29 +97,29 @@ export const periodSchema = z.strictObject({
 });
 
 export const depositSchema = z.strictObject({
-  _id: z.string(),
-  amount: z.string(),
+  _id: z.string().max(100),
+  amount: z.string().max(100),
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
   date: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
-  from: z.string(),
-  to: z.string(),
-  note: z.string(),
+  from: z.string().max(100),
+  to: z.string().max(100),
+  note: z.string().max(100),
 });
 
 export const eventSchema = z.strictObject({
-  _id: z.string(),
+  _id: z.string().max(100),
   isClosed: z.boolean().optional(),
-  name: z.string(),
-  participants: z.record(z.string(), participantSchema),
+  name: z.string().max(100),
+  participants: z.record(z.string().max(100), participantSchema),
   period: periodSchema,
-  description: z.string(),
-  expenses: z.record(z.string(), expenseSchema),
-  deposits: z.record(z.string(), depositSchema),
-  categories: z.record(z.string(), categorySchema),
+  description: z.string().max(100),
+  expenses: z.record(z.string().max(100), expenseSchema),
+  deposits: z.record(z.string().max(100), depositSchema),
+  categories: z.record(z.string().max(100), categorySchema),
   updatedAt: z
     .string()
     .transform((date) => (date == null ? new Date() : new Date(date))),
@@ -128,10 +128,10 @@ export const eventSchema = z.strictObject({
 
 export const accountSchema = userSchema.extend({
   events: z.record(
-    z.string(),
+    z.string().max(100),
     z.object({
-      key: z.string(),
-      uid: z.string(),
+      key: z.string().max(100),
+      uid: z.string().max(100),
     })
   ),
   users: z
@@ -142,15 +142,15 @@ export const accountSchema = userSchema.extend({
           return acc;
         }, {} as Record<string, User>)
       ),
-      z.record(z.string(), userSchema),
+      z.record(z.string().max(100), userSchema),
     ])
     .optional()
     .default({}),
 });
 
 const stateSchema = z.strictObject({
-  currentParticipantId: z.string(),
-  events: z.record(z.string(), eventSchema),
+  currentParticipantId: z.string().max(100),
+  events: z.record(z.string().max(100), eventSchema),
   account: accountSchema.nullable(),
 });
 
