@@ -3,21 +3,25 @@ import buttonStyles from "../Button/Button.module.css";
 import styles from "./IconButton.module.css";
 import { Icon, type IconProps } from "../Icon/Icon";
 import { Link } from "react-router-dom";
-import { getPath, RouteName } from "../../routes";
+import { getPath, Params, RouteName } from "../../routes";
 import { Button, Tooltip, TooltipTrigger } from "react-aria-components";
 
 type CommonProps = {
   label: string;
   icon: IconProps["name"];
-  variant?: "primary" | "secondary" | "tertiary";
-  overlays?: boolean;
 };
 
-export type AsLink = {
-  as: "link";
-  to: RouteName;
-  params?: Record<string, string | number>;
-};
+export type AsLink<R extends RouteName = RouteName> =
+  Params<R> extends undefined
+    ? {
+        as: "link";
+        to: R;
+      }
+    : {
+        as: "link";
+        to: R;
+        params: Params<R>;
+      };
 
 export type AsButton = {
   as?: "button";
@@ -25,14 +29,26 @@ export type AsButton = {
   onClick?: () => void;
 };
 
-export type IconButtonProps<T extends AsLink | AsButton = AsLink | AsButton> =
-  CommonProps & T;
+export type IconButtonPropsWhithoutVariantAndOverlays<
+  T extends AsLink<RouteName> | AsButton = AsLink<RouteName> | AsButton
+> = CommonProps & T;
 
-function isLink(props: IconButtonProps): props is CommonProps & AsLink {
-  return props.as === "link";
+export type IconButtonProps<
+  T extends AsLink<RouteName> | AsButton = AsLink<RouteName> | AsButton
+> = IconButtonPropsWhithoutVariantAndOverlays<T> & {
+  variant?: "primary" | "secondary" | "tertiary";
+  overlays?: boolean;
+};
+
+export function isButton<R extends RouteName>(
+  props: IconButtonProps<AsLink<R> | AsButton>
+): props is CommonProps & AsButton {
+  return props.as === "button" || props.as == null;
 }
 
-export function IconButton(props: IconButtonProps) {
+export function IconButton<T extends AsLink<RouteName> | AsButton>(
+  props: IconButtonProps<T>
+) {
   const {
     icon,
     label,
@@ -57,10 +73,17 @@ export function IconButton(props: IconButtonProps) {
 
   return (
     <TooltipTrigger delay={0}>
-      {isLink(props) ? (
-        <Link {...commonProps} to={getPath(props.to, props.params)} />
+      {isButton(props) ? (
+        <Button type="button" {...commonProps} onClick={props.onClick} />
       ) : (
-        <Button {...commonProps} onClick={props.onClick} />
+        <Link
+          {...commonProps}
+          to={
+            "params" in props
+              ? getPath(props.to, props.params as Record<string, string>)
+              : getPath(props.to)
+          }
+        />
       )}
       <Tooltip className={styles.tooltip}>{label}</Tooltip>
     </TooltipTrigger>

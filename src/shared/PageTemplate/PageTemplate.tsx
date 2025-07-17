@@ -2,31 +2,30 @@ import { Container } from "../../ui/Container/Container";
 import { type ReactNode } from "react";
 import { Stack } from "../../ui/Stack/Stack";
 import type {
-  IconButtonProps,
   AsLink,
   AsButton,
+  IconButtonPropsWhithoutVariantAndOverlays,
 } from "../../ui/IconButton/IconButton";
 
 import { Menu, MenuProps } from "./Menu/Menu";
 import { Header, HeaderProps } from "./Header";
+import { RouteName } from "../../routes";
 
-type PageTemplateProps = {
+type PageTemplateProps<R extends RouteName> = {
   title: string;
   children: ReactNode;
-  leftAction?:
-    | Omit<IconButtonProps<AsLink>, "variant">
-    | Omit<IconButtonProps<AsButton>, "variant">;
+  leftAction?: IconButtonPropsWhithoutVariantAndOverlays<AsLink<R> | AsButton>;
   rightActions?: HeaderProps["rightActions"];
   menu?: MenuProps["actions"];
 };
 
-export function PageTemplate({
+export function PageTemplate<R extends RouteName>({
   leftAction,
   rightActions,
   children,
   title,
   menu,
-}: PageTemplateProps) {
+}: PageTemplateProps<R>) {
   return (
     <Stack>
       <Header

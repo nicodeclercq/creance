@@ -50,6 +50,7 @@ export function AddExpensePage() {
         to: "EVENT",
         label: t("page.event.add.actions.backToList"),
         icon: "chevron-left",
+        params: { eventId: currentEvent._id },
       }}
     >
       <Card>

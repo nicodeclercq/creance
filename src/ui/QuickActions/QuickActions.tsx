@@ -1,23 +1,33 @@
 import { Button, Dialog, DialogTrigger, Popover } from "react-aria-components";
-import { IconButton, IconButtonProps } from "../IconButton/IconButton";
+import {
+  IconButton,
+  type IconButtonPropsWhithoutVariantAndOverlays,
+  type AsButton,
+  type AsLink,
+} from "../IconButton/IconButton";
 
-import { DistributiveOmit } from "../../helpers/DistributiveOmit";
 import { Icon } from "../Icon/Icon";
 import { IconName } from "../Icon/private";
 import buttonStyles from "../Button/Button.module.css";
 import classNames from "classnames";
 import iconButtonStyles from "../IconButton/IconButton.module.css";
 import styles from "./QuickActions.module.css";
+import { RouteName } from "../../routes";
 
-export type Action = DistributiveOmit<IconButtonProps, "variant" | "overlays">;
+export type Action<R extends RouteName> =
+  IconButtonPropsWhithoutVariantAndOverlays<AsLink<R> | AsButton>;
 
-type QuickActionsProps = {
+type QuickActionsProps<R extends RouteName> = {
   icon: IconName;
   label: string;
-  actions: Action[];
+  actions: Action<R>[];
 };
 
-export function QuickActions({ icon, label, actions }: QuickActionsProps) {
+export function QuickActions<R extends RouteName>({
+  icon,
+  label,
+  actions,
+}: QuickActionsProps<R>) {
   return (
     <div className={styles.quickActions}>
       <DialogTrigger>
@@ -38,7 +48,11 @@ export function QuickActions({ icon, label, actions }: QuickActionsProps) {
               {actions.map((action) => (
                 <div key={action.label} className={styles.action}>
                   <span>{action.label}</span>
-                  <IconButton {...action} variant="primary" overlays />
+                  <IconButton
+                    {...(action as IconButtonPropsWhithoutVariantAndOverlays<AsButton>)}
+                    variant="primary"
+                    overlays
+                  />
                 </div>
               ))}
             </div>

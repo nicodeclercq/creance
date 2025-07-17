@@ -56,6 +56,7 @@ export function EditExpensePage() {
         to: "EVENT",
         label: t("page.event.edit.actions.backToEvent"),
         icon: "chevron-left",
+        params: { eventId: currentEvent._id },
       }}
     >
       <Card>

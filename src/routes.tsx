@@ -131,6 +131,25 @@ export const routes = Object.values(ROUTES_DEFINITION) as LeafRoute[];
 export type Route = LeafRoute;
 export type RouteName = keyof typeof ROUTES_DEFINITION;
 
+type RoutePath<R extends RouteName> = (typeof ROUTES_DEFINITION)[R]["path"];
+
+type ParamsFromString<R extends string> =
+  R extends `${infer _Start}:${infer Param}/${infer Rest}`
+    ? {
+        [K in Param]: string;
+      } & ParamsFromString<`/${Rest}`>
+    : R extends `${infer _Start}:${infer Param}`
+    ? {
+        [K in Param]: string;
+      }
+    : {};
+
+export type Params<R extends RouteName> = {} extends ParamsFromString<
+  RoutePath<R>
+>
+  ? undefined
+  : ParamsFromString<RoutePath<R>>;
+
 export const isLeafRoute = (route: Route): route is LeafRoute =>
   "component" in route;
 
