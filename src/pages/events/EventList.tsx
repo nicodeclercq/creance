@@ -6,6 +6,7 @@ import { EventItem } from "./EventItem/EventItem";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
+import { sortByDate } from "../../utils/date";
 import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
@@ -15,7 +16,9 @@ type Props = {
 
 export function EventList({ events }: Props) {
   const { t } = useTranslation();
-  const eventsValues = Object.values(events);
+  const eventsValues = Object.values(events).sort(
+    sortByDate("updatedAt", "desc")
+  );
   const [currentParticipantId] = useStore("currentParticipantId");
 
   const filteredEvents = eventsValues.filter((event) => {

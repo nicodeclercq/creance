@@ -4,6 +4,15 @@ export const addDays = (nb: number, date: Date = new Date()) => {
   return result;
 };
 
+export const sortByDate =
+  <K extends string, T extends { [k in K]: Date }>(
+    k: K,
+    direction: "asc" | "desc" = "asc"
+  ) =>
+  (a: T, b: T) => {
+    return direction === "desc" ? sort(b[k], a[k]) : sort(a[k], b[k]);
+  };
+
 export const sort = (a: Date, b: Date) => (a < b ? -1 : a > b ? 1 : 0);
 
 export const isBefore = (a: Date) => (b: Date) => b.getTime() < a.getTime();
