@@ -61,6 +61,14 @@ describe("encrypt/decrypt", () => {
     expect(typeof encoded).toBe("string");
     expect(decoded).toBe(originalText);
   });
+
+  it("should throw an error if the key is invalid", async () => {
+    const originalText = "Hello, World! Bonjour le monde!";
+    const key1 = await generateKey("a");
+    const key2 = await generateKey("b");
+    const encoded = await encrypt(originalText, key1);
+    await expect(decrypt(encoded, key2)).rejects.toThrow("Decryption failed");
+  });
 });
 
 describe("generateKey", () => {
@@ -69,5 +77,11 @@ describe("generateKey", () => {
     expect(typeof key1).toBe("string");
     const key2 = await generateKey("test");
     expect(key1).toBe(key2);
+  });
+
+  it("should generate different keys for different inputs", async () => {
+    const key1 = await generateKey("b");
+    const key2 = await generateKey("a");
+    expect(key1).not.toBe(key2);
   });
 });

@@ -173,62 +173,70 @@ export function decode(str: string, privateKey: CryptoKey): Promise<string> {
 }
 
 export const encrypt = async (plaintext: string, key: string) => {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const encodedPlaintext = new TextEncoder().encode(plaintext);
+  try {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encodedPlaintext = new TextEncoder().encode(plaintext);
 
-  const binaryString = atob(key);
-  const keyBytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    keyBytes[i] = binaryString.charCodeAt(i);
+    const binaryString = atob(key);
+    const keyBytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      keyBytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const secretKey = await crypto.subtle.importKey(
+      "raw",
+      keyBytes.buffer,
+      {
+        name: "AES-GCM",
+        length: 256,
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+    const ciphertext = await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv,
+      },
+      secretKey,
+      encodedPlaintext
+    );
+    return toStr(ciphertext, iv);
+  } catch (error) {
+    throw new Error("Encryption failed");
   }
-
-  const secretKey = await crypto.subtle.importKey(
-    "raw",
-    keyBytes.buffer,
-    {
-      name: "AES-GCM",
-      length: 256,
-    },
-    true,
-    ["encrypt", "decrypt"]
-  );
-  const ciphertext = await crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    secretKey,
-    encodedPlaintext
-  );
-  return toStr(ciphertext, iv);
 };
 
 export const decrypt = async (str: string, key: string) => {
-  const { cipher, iv } = fromStr(str);
+  try {
+    const { cipher, iv } = fromStr(str);
 
-  const binaryString = atob(key);
-  const keyBytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    keyBytes[i] = binaryString.charCodeAt(i);
+    const binaryString = atob(key);
+    const keyBytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      keyBytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const secretKey = await crypto.subtle.importKey(
+      "raw",
+      keyBytes.buffer,
+      {
+        name: "AES-GCM",
+        length: 256,
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+    const decrypted = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv,
+      },
+      secretKey,
+      cipher
+    );
+    return new TextDecoder().decode(decrypted);
+  } catch (error) {
+    throw new Error("Decryption failed");
   }
-
-  const secretKey = await crypto.subtle.importKey(
-    "raw",
-    keyBytes.buffer,
-    {
-      name: "AES-GCM",
-      length: 256,
-    },
-    true,
-    ["encrypt", "decrypt"]
-  );
-  const decrypted = await crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    secretKey,
-    cipher
-  );
-  return new TextDecoder().decode(decrypted);
 };

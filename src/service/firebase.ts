@@ -43,13 +43,6 @@ export const COLLECTIONS = {
 } as const;
 type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 
-const log =
-  (message: string) =>
-  <A>(a: A): A => {
-    console.log(message, a);
-    return a;
-  };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
