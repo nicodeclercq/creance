@@ -65,57 +65,59 @@ export type AuthState =
 export const $isAuthenticated = new RX.BehaviorSubject<AuthState>({
   type: "loading",
 });
-onAuthStateChanged(auth, (user) => {
-  const key = localStorage.getItem(LOCAL_STORAGE_KEY);
-  if (user?.uid && key != null) {
-    get(ref(db, `${COLLECTIONS.USERS}/${user.uid}`))
-      .then((snapshot) => (snapshot.exists() ? snapshot.val() : undefined))
-      .then((data) => {
-        if (data == null) {
-          return Promise.resolve(
-            Either.right(null) as Either.Either<Error, Account | null>
-          );
-        }
-        return z.string().safeParse(data).success
-          ? decrypt(data, key)
-              .then(fromFirebaseData(accountSchema))
-              .catch((error) => {
-                console.error("Failed to decrypt user data:", error, data);
-                return Either.left(error);
-              })
-          : Promise.reject(new Error("Failed to decrypt user data"));
-      })
-      .catch(
-        (error: Error) =>
-          Either.left(error) as Either.Either<Error, Account | null>
-      )
-      .then(
-        Either.fold(
-          (error) => {
-            console.error("Error loading account data", error);
-          },
-          (accountData) => {
-            console.log(
-              `User ${user.uid} authenticated with data:`,
-              accountData
+
+export const listenToAuthChanges = () => {
+  onAuthStateChanged(auth, (user) => {
+    const key = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (user?.uid && key != null) {
+      get(ref(db, `${COLLECTIONS.USERS}/${user.uid}`))
+        .then((snapshot) => (snapshot.exists() ? snapshot.val() : undefined))
+        .then((data) => {
+          if (data == null) {
+            return Promise.resolve(
+              Either.right(null) as Either.Either<Error, Account | null>
             );
-
-            updateStoreWithAccountData(accountData);
-
-            if ($isAuthenticated.value.type !== "authenticated") {
-              $isAuthenticated.next({
-                type: "authenticated",
-                participantId: user.uid,
-              });
-            }
           }
+          return z.string().safeParse(data).success
+            ? decrypt(data, key)
+                .then(fromFirebaseData(accountSchema))
+                .catch((error) => {
+                  console.error("Failed to decrypt user data:", error, data);
+                  return Either.left(error);
+                })
+            : Promise.reject(new Error("Failed to decrypt user data"));
+        })
+        .catch(
+          (error: Error) =>
+            Either.left(error) as Either.Either<Error, Account | null>
         )
-      );
-  } else {
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    $isAuthenticated.next({ type: "unauthenticated" });
-  }
-});
+        .then(
+          Either.fold(
+            (error) => {
+              console.error("Error loading account data", error);
+            },
+            (accountData) => {
+              console.log(
+                `User ${user.uid} authenticated with data:`,
+                accountData
+              );
+
+              updateStoreWithAccountData(accountData);
+              if ($isAuthenticated.value.type !== "authenticated") {
+                $isAuthenticated.next({
+                  type: "authenticated",
+                  participantId: user.uid,
+                });
+              }
+            }
+          )
+        );
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      $isAuthenticated.next({ type: "unauthenticated" });
+    }
+  });
+};
 
 const hasAccountChanged = (a: Account | null, b: Account | null): boolean => {
   if (a == null && b == null) return false;

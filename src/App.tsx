@@ -8,14 +8,16 @@ import {
   onChange,
   update,
 } from "./store/StoreProvider";
+import { listenToAuthChanges, synchronizeFirebase } from "./service/firebase";
 
 import { I18nProvider } from "react-aria";
 import { Router } from "./router";
-import { synchronizeFirebase } from "./service/firebase";
 import { synchronizeLocalStorage } from "./store/localStorage";
 
 // Synchronize local storage with the store
 synchronizeLocalStorage({ load, onChange });
+// Synchronize Firebase with the store
+listenToAuthChanges();
 synchronizeFirebase({ $store, update, get });
 
 function App() {
