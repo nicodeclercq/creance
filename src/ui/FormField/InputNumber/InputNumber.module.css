@@ -15,13 +15,17 @@
   }
 }
 .input input{
+  --component-padding-y: var(--ui-semantic-padding-action-y);
+  --component-padding-x: var(--ui-semantic-padding-action-x);
+  grid-area: input;
   width: 100%;
   max-width: 100%;
+  min-width: calc(2.25ch + 2 * var(--component-padding-x));
   background: transparent;
   border: none;
   color: inherit;
   font: inherit;
-  padding: var(--ui-semantic-padding-action);
+  padding: var(--component-padding-y) var(--component-padding-x);
 
   &:focus{
     box-shadow: none;
@@ -33,6 +37,59 @@
 }
 
 .unit{
+  grid-area: input;
   padding: var(--ui-semantic-padding-action);
   padding-inline-start: 0;
+}
+
+.asNumber {
+  display: grid;
+  grid-template-columns: min-content 1fr min-content;
+  grid-template-areas: 'decrement input increment';
+  input {
+    text-align: center;
+    --component-padding-x: var(--ui-semantic-padding-x-s);
+  }
+}
+
+.decrementButton,
+.incrementButton {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  border-radius: var(--ui-semantic-radius-l);
+  overflow: hidden;
+  min-width: 3.2rem;
+  min-height: 3.2rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease-in;
+  padding: var(--ui-semantic-padding-xs);
+  align-items: center;
+  justify-content: center;
+  font: var(--ui-semantic-font-action-default);
+  border: none;
+  color: var(--ui-semantic-color-primary-default);
+  background: var(--ui-background-default);
+  
+  &:hover {
+    background: var(--ui-semantic-color-primary-weaker);
+  }
+  &:active {
+    background: var(--ui-semantic-color-primary-weak);
+  }
+}
+
+.decrementButton {
+  grid-area: decrement;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-inline-end: 0.1rem solid var(--ui-semantic-color-primary-strong);
+}
+
+.incrementButton {
+  grid-area: increment;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-inline-start: 0.1rem solid var(--ui-semantic-color-primary-strong);
 }

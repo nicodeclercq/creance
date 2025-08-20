@@ -14,6 +14,7 @@ import { ErrorMessage } from "../../../ui/FormField/ErrorMessage/ErrorMessage";
 import { Event } from "../../../models/Event";
 import { Expense } from "../../../models/Expense";
 import { Form } from "../../../ui/Form/Form";
+import { Grid } from "../../../ui/Grid/Grid";
 import { InputDate } from "../../../ui/FormField/InputDate/InputDate";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
@@ -332,26 +333,26 @@ export function ExpenseForm({
               required: true,
             }}
             render={({ field: { value, onChange }, fieldState: { error } }) => (
-              <Columns gap="m">
+              <Grid columns={["1fr", "min-content"]} gap="m">
                 <Columns align="center" gap="s" styles={{ flexGrow: true }}>
                   <Avatar label={participant.name} />
                   <Paragraph>{participant.name}</Paragraph>
                 </Columns>
                 <InputNumber
-                  as="string"
+                  as="number"
                   type="number"
                   label={t(
                     "page.event.add.form.field.share.percentage.amount.label"
                   )}
-                  value={value}
+                  value={isNaN(Number(value)) ? 0 : Number(value)}
                   isRequired
                   onChange={(v) => {
-                    onChange(v);
+                    onChange(String(v));
                     trigger("share");
                   }}
                   error={error?.message}
                 />
-              </Columns>
+              </Grid>
             )}
           />
         ))}

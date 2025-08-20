@@ -2,7 +2,9 @@ import { Input } from "react-aria-components";
 import { type InputProps } from "../private/InputProps";
 import { FormField } from "../FormField";
 import styles from "./InputNumber.module.css";
-import { useId } from "react";
+import { useId, useRef } from "react";
+import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 export type InputNumberProps<T extends string | number> = InputProps<
   "number",
@@ -21,7 +23,9 @@ export function InputNumber<T extends string | number = string>({
   unit,
   ...props
 }: InputNumberProps<T>) {
+  const ref = useRef<HTMLInputElement>(null);
   const id = useId();
+  const { t } = useTranslation();
 
   return (
     <FormField
@@ -30,8 +34,13 @@ export function InputNumber<T extends string | number = string>({
       isDisabled={isDisabled}
       isRequired={isRequired}
     >
-      <div className={styles.input}>
+      <div
+        className={classNames(styles.input, {
+          [styles.asNumber]: as === "number",
+        })}
+      >
         <Input
+          ref={ref}
           id={id}
           type="text"
           value={value}
@@ -61,6 +70,42 @@ export function InputNumber<T extends string | number = string>({
           spellCheck="false"
         />
         {unit && <span className={styles.unit}>{unit}</span>}
+        {as === "number" && (
+          <button
+            type="button"
+            className={styles.decrementButton}
+            disabled={isDisabled || ref.current?.value === "0"}
+            onClick={() => {
+              if (ref.current) {
+                const num = Number(ref.current.value);
+                const newValue = isNaN(num) ? 0 : num - 1;
+                onChange(newValue as T);
+                ref.current.value = String(newValue);
+              }
+            }}
+            aria-label={t("component.inputNumber.actions.decrement")}
+          >
+            -
+          </button>
+        )}
+        {as === "number" && (
+          <button
+            type="button"
+            className={styles.incrementButton}
+            disabled={isDisabled}
+            onClick={() => {
+              if (ref.current) {
+                const num = Number(ref.current.value);
+                const newValue = isNaN(num) ? 0 : num + 1;
+                onChange(newValue as T);
+                ref.current.value = String(newValue);
+              }
+            }}
+            aria-label={t("component.inputNumber.actions.increment")}
+          >
+            +
+          </button>
+        )}
       </div>
     </FormField>
   );

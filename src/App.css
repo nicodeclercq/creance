@@ -109,7 +109,9 @@
   --ui-semantic-padding-m: var(--ui-semantic-padding-x-m) var(--ui-semantic-padding-y-m);
   --ui-semantic-padding-l: var(--ui-semantic-padding-x-l) var(--ui-semantic-padding-y-l);
   
-  --ui-semantic-padding-action: var(--ui-semantic-padding-y-s) var(--ui-semantic-padding-x-l);
+  --ui-semantic-padding-action-y: var(--ui-semantic-padding-y-s);
+  --ui-semantic-padding-action-x: var(--ui-semantic-padding-x-l);
+  --ui-semantic-padding-action: var(--ui-semantic-padding-action-y) var(--ui-semantic-padding-action-x);
 
   --ui-semantic-gap-xs: var(--ui-primitive-spacing-s);
   --ui-semantic-gap-s: var(--ui-primitive-spacing-m);
