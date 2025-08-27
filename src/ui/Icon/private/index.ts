@@ -20,6 +20,7 @@ import { MinusIcon } from "./MinusIcon";
 import { PlusIcon } from "./PlusIcon";
 import { ShoppingCartIcon } from "./ShoppingCartIcon";
 import { ShowIcon } from "./ShowIcon";
+import { StarIcon } from "./StarIcon";
 import { TrashIcon } from "./TrashIcon";
 import { UnlockIcon } from "./UnlockIcon";
 import { UploadIcon } from "./UploadIcon";
@@ -52,6 +53,7 @@ export const ICONS = {
   plus: PlusIcon,
   "shopping-cart": ShoppingCartIcon,
   show: ShowIcon,
+  star: StarIcon,
   trash: TrashIcon,
   unlock: UnlockIcon,
   upload: UploadIcon,

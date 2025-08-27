@@ -6,11 +6,12 @@ import { Avatar } from "../../../ui/Avatar/Avatar";
 import { Card } from "../../../ui/Card/Card";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Icon } from "../../../ui/Icon/Icon";
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 import { centToDecimal } from "../../../helpers/Number";
 import * as ArrayFp from "fp-ts/Array";
 import { pipe } from "fp-ts/function";
 import styles from "./DistributionItem.module.css";
+import { Illustration } from "../../../ui/Illustration/Illustration";
 
 type DistributionItemProps = {
   isCurrentParticipant: boolean;
@@ -56,6 +57,18 @@ export function DistributionItem({
           />
           <Paragraph>{participants[participantId].name}</Paragraph>
         </Wrapper>
+        {distributions.length === 0 && (
+          <Columns gap="s" align="center">
+            <Illustration name="pig-happy" size="m" />
+            <Paragraph
+              styles={{
+                color: "primary-strong",
+              }}
+            >
+              <Trans i18nKey="page.distribution.item.empty" />
+            </Paragraph>
+          </Columns>
+        )}
         {(["gives", "receives"] as const).map((array) => (
           <Fragment key={array}>
             {values[array].length > 0 ? (

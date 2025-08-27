@@ -6,10 +6,13 @@ import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
 import { i18n } from "./i18n";
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
-root.render(
+const root = document.getElementById("root");
+
+if (!root) {
+  throw new Error("Root element not found");
+}
+
+ReactDOM.createRoot(root).render(
   <StrictMode>
     <I18nextProvider i18n={i18n}>
       <App />

@@ -63,7 +63,7 @@ export function DistributionPage() {
               isCurrentParticipant
               key={currentParticipantId}
               participantId={currentParticipantId}
-              distributions={currentParticipantDistribution}
+              distributions={currentParticipantDistribution ?? []}
               participants={participants}
             />
             {Object.entries(otherParticipantsDistribution).map(
@@ -72,7 +72,7 @@ export function DistributionPage() {
                   isCurrentParticipant={false}
                   key={participantId}
                   participantId={participantId}
-                  distributions={distributions}
+                  distributions={distributions ?? []}
                   participants={participants}
                 />
               )

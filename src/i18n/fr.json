@@ -88,6 +88,8 @@
   "page.event.empty.description.closed":
     "Cette liste de créances est clôturée. Vous ne pouvez plus ajouter de dépenses.",
   "page.event.empty.actions.add": "Ajouter une dépense",
+  "component.inputNumber.actions.decrement": "Diminuer",
+  "component.inputNumber.actions.increment": "Augmenter",
   "component.categoryIcon.axe": "Hache",
   "component.categoryIcon.ball": "Ballon",
   "component.categoryIcon.basket": "Panier",
@@ -287,5 +289,6 @@
   "AddEventStep3.actions.addParticipant": "Créer un participant",
   "AddEventStep3.modal.addParticipant.submit": "Ajouter",
   "AddEventStep3.actions.addParticipant.description": "Vous pouvez ajouter un participant à la liste de créances en cliquant sur le bouton ci-dessous. Vous pourrez ensuite modifier ses informations (nombre de parts, dates d'arrivée et de départ, etc.) dans la liste des participants.",
-  "participantForm.name.validation.unique": "Ce nom existe déjà. Veuillez en choisir un autre."
+  "participantForm.name.validation.unique": "Ce nom existe déjà. Veuillez en choisir un autre.",
+  "page.distribution.item.empty": "<strong>Le compte est bon!</strong><br />Il n'y a aucune distribution à réaliser."
 }
