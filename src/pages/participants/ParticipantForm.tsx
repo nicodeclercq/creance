@@ -21,6 +21,10 @@ type ParticipantFormProps = {
   defaultValue: FormData;
   submitLabel: string;
   onSubmit: (data: FormData) => void;
+  cancel?: {
+    label: string;
+    onCancel: () => void;
+  };
   users: Record<string, User>;
 };
 
@@ -28,6 +32,7 @@ export function ParticipantForm({
   defaultValue,
   submitLabel,
   onSubmit,
+  cancel,
   users = {},
 }: ParticipantFormProps) {
   const { t } = useTranslation();
@@ -53,6 +58,14 @@ export function ParticipantForm({
         label: submitLabel,
         onClick: onSubmit,
       }}
+      cancel={
+        cancel
+          ? {
+              label: cancel?.label,
+              onClick: cancel?.onCancel,
+            }
+          : undefined
+      }
       hasError={hasError}
     >
       <Container
@@ -62,7 +75,7 @@ export function ParticipantForm({
           gap: "m",
         }}
       >
-        <Avatar label={name} size="xl" />
+        <Avatar label={name} image={users[name]?.avatar} size="xl" />
       </Container>
       <Controller
         name="name"

@@ -3,12 +3,20 @@
   grid-template-columns: min-content auto;
   align-items: center;
   gap: var(--ui-semantic-gap-s);
+  border-radius: var(--ui-semantic-radius-m);
+  font: var(--ui-semantic-font-body-small)
+}
+
+.type-subtle {
+  padding: var(--ui-semantic-padding-xs);
+  color: var(--ui-semantic-color-warning-strong);
+}
+
+.type-prominent {
   padding: var(--ui-semantic-padding-s);
   background: var(--ui-semantic-color-warning-weaker);
   color: var(--ui-semantic-color-warning-stronger);
-  border-radius: var(--ui-semantic-radius-m);
   border: 0.1rem solid var(--ui-semantic-color-warning-default);
-  font: var(--ui-semantic-font-body-small)
 }
 
 .icon {

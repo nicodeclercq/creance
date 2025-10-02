@@ -5,6 +5,7 @@ import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Participant } from "../../../models/Participant";
 import { ParticipantShare } from "../../../models/ParticipantShare";
 import { Stack } from "../../../ui/Stack/Stack";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 type ShareItemProps = {
@@ -14,19 +15,24 @@ type ShareItemProps = {
   onDelete: () => void;
 };
 
-export function ShareItem({
+export function EventParticipantItem({
   participant,
   share,
   onDelete,
   eventId,
 }: ShareItemProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   return (
     <Columns align="center" gap="s" as="li" styles={{ flexGrow: true }}>
-      <Avatar label={participant.name} />
+      <Avatar label={participant.name} image={participant.avatar} />
       <Stack>
-        <Paragraph>{participant.name}</Paragraph>
+        <Paragraph>
+          {isCurrentUser(participant)
+            ? t("currentUser.anonymous.name")
+            : participant.name}
+        </Paragraph>
         <Paragraph styles={{ font: "body-small" }}>
           {t("page.event.shares.type", {
             share: share.type,
@@ -41,8 +47,8 @@ export function ShareItem({
             variant: "primary",
             icon: "edit",
             label: t("page.event.shares.actions.edit"),
-            to: "SHARES_EDIT",
-            params: { eventId, shareId: participant._id },
+            to: "EVENT_USERS_EDIT",
+            params: { eventId, participantId: participant._id },
           },
           {
             icon: "trash",

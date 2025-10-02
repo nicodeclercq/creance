@@ -1,3 +1,5 @@
+import { Store, StoreManager } from "./store/StoreManager";
+
 import { Account } from "./models/Account";
 import { Container } from "./ui/Container/Container";
 import { FormData } from "./pages/participants/ParticipantForm";
@@ -5,35 +7,48 @@ import { LoadingIcon } from "./ui/Button/LoadingIcon";
 import { ReactNode } from "react";
 import { Redirect } from "./Redirect";
 import { SetCurrentParticipantPage } from "./pages/auth/SetCurrentParticipantPage";
-import { useAuthentication } from "./hooks/useAnthentication";
-import { useStore } from "./store/StoreProvider";
+import { State } from "./store/state";
+import { uid } from "./service/crypto";
+import { useData } from "./store/useData";
+import { useStore } from "./store/useStore";
 
 type Props = {
   children: ReactNode;
 };
 
 export function PrivatePage({ children }: Props) {
-  const { state } = useAuthentication();
-  const [currentParticipantId] = useStore("currentParticipantId");
-  const [account, setAccount] = useStore("account");
+  const [store, setStore] = useStore();
+  const [account] = useData("account");
 
   const submit = (data: FormData) => {
-    setAccount((oldValue) => {
-      const baseValue = {
-        _id: currentParticipantId,
-        events: {},
-        ...(oldValue ?? {}),
-        updatedAt: new Date(),
-      } as Account;
+    setStore((oldValue: Store<State>): Store<State> => {
+      if (StoreManager.hasData(oldValue)) {
+        const newCurrentParticipantId = oldValue.data.account?._id ?? uid();
+        const baseValue = {
+          _id: newCurrentParticipantId,
+          events: {},
+          ...(oldValue.data.account ?? {}),
+          updatedAt: new Date(),
+        } as Account;
 
-      return {
-        ...baseValue,
-        ...data,
-      };
+        return {
+          type: oldValue.type,
+          data: {
+            ...oldValue.data,
+            events: oldValue.data.events,
+            account: {
+              ...baseValue,
+              ...data,
+            },
+          },
+        };
+      }
+
+      return oldValue as Store<State>;
     });
   };
 
-  switch (state.type) {
+  switch (store.type) {
     case "loading":
       return (
         <Container
@@ -51,10 +66,10 @@ export function PrivatePage({ children }: Props) {
           <LoadingIcon size="l" />
         </Container>
       );
-    case "unauthenticated":
+    case "ready":
       return <Redirect to="LOGIN" />;
     case "authenticated":
-      return !currentParticipantId || !account ? (
+      return !account ? (
         <SetCurrentParticipantPage onSubmit={submit} />
       ) : (
         <>{children}</>

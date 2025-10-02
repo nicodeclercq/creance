@@ -72,7 +72,7 @@ export function IconButton<T extends AsLink<RouteName> | AsButton>(
   };
 
   return (
-    <TooltipTrigger delay={0}>
+    <TooltipTrigger data-component="IconButton" delay={0}>
       {isButton(props) ? (
         <Button type="button" {...commonProps} onClick={props.onClick} />
       ) : (

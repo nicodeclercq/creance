@@ -21,6 +21,7 @@ export function InputNumber<T extends string | number = string>({
   isRequired = false,
   isDisabled = false,
   unit,
+  ariaLabelledby,
   ...props
 }: InputNumberProps<T>) {
   const ref = useRef<HTMLInputElement>(null);
@@ -29,8 +30,10 @@ export function InputNumber<T extends string | number = string>({
 
   return (
     <FormField
+      data-component="InputNumber"
       id={id}
       {...props}
+      ariaLabelledby={ariaLabelledby}
       isDisabled={isDisabled}
       isRequired={isRequired}
     >
@@ -45,6 +48,7 @@ export function InputNumber<T extends string | number = string>({
           type="text"
           value={value}
           aria-required={isRequired}
+          aria-labelledby={ariaLabelledby}
           disabled={isDisabled}
           onKeyDown={(event) => {
             // Replace ',' with '.' to limit casting errors

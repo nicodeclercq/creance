@@ -17,6 +17,7 @@ type FormProps<TFieldValues extends FieldValues, TTransformedValues> = {
     onClick: (data: TTransformedValues) => void | Promise<void>;
   };
   cancel?: DistributiveOmit<ButtonProps, "variant">;
+  isLoading?: boolean;
 };
 
 type FormLayoutProps = {
@@ -76,8 +77,10 @@ export function Form<TFieldValues extends FieldValues, TTransformedValues>({
   steps,
   submit,
   cancel,
+  isLoading: externalIsLoading,
 }: FormProps<TFieldValues, TTransformedValues>) {
   const [isLoading, setIsLoading] = useState(false);
+  const aggregatedIsLoading = externalIsLoading || isLoading;
 
   const submitForm = () => {
     // do nothing submit is automatically handled by the form
@@ -85,6 +88,7 @@ export function Form<TFieldValues extends FieldValues, TTransformedValues>({
 
   return (
     <form
+      data-component="Form"
       className={styles.form}
       onSubmit={(e) => {
         e.stopPropagation();
@@ -102,7 +106,7 @@ export function Form<TFieldValues extends FieldValues, TTransformedValues>({
     >
       <FormLayout
         hasError={hasError}
-        isLoading={isLoading}
+        isLoading={aggregatedIsLoading}
         submit={{ ...submit, onClick: submitForm }}
         cancel={cancel}
         steps={steps}

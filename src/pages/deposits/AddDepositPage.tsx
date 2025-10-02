@@ -7,15 +7,15 @@ import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
 import { uid } from "../../service/crypto";
 import { useParams } from "react-router-dom";
+import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export function AddDepositPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const { eventId } = useParams();
-  const [event, setEvent] = useStore(`events.${eventId}`);
+  const [event, setEvent] = useData(`events.${eventId}`);
 
   const defaultValue: Deposit = {
     _id: uid(),

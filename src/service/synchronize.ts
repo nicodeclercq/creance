@@ -1,6 +1,7 @@
 import * as RX from "rxjs";
 import { type Observable } from "rxjs";
 import * as z from "zod";
+import { Logger } from "./Logger";
 
 type Diff<Data> = {
   created: Record<string, Data>;
@@ -25,10 +26,9 @@ export const lastUpdate = {
     const lastUpdate = localStorage.getItem(`lastUpdate_${collectionName}`);
     const parsed = model.safeParse(lastUpdate);
     if (!parsed.success) {
-      console.error(
-        "Failed to parse lastUpdate from localStorage, returning current date.",
-        parsed.error
-      );
+      Logger.error(
+        "Failed to parse lastUpdate from localStorage, returning current date."
+      )(parsed.error);
       return new Date();
     }
 
@@ -156,11 +156,11 @@ export function synchronize<Data extends { updatedAt: Date }>({
             lastUpdate.update(collectionName);
           })
           .catch((error) => {
-            console.error("Error saving data:", error);
+            Logger.error("Error saving data:")(error);
           });
       },
       error: (error) => {
-        console.error("Error during synchronization:", error);
+        Logger.error("Error during synchronization:")(error);
       },
     });
 }

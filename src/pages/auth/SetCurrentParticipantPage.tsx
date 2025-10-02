@@ -1,4 +1,4 @@
-import { useStore } from "../../store/StoreProvider";
+import { useData } from "../../store/useData";
 import { Card } from "../../ui/Card/Card";
 import { Container } from "../../ui/Container/Container";
 import { Heading } from "../../ui/Heading/Heading";
@@ -18,7 +18,7 @@ export function SetCurrentParticipantPage({
   onSubmit,
 }: SetCurrentParticipantPageProps) {
   const { t } = useTranslation();
-  const [account] = useStore("account");
+  const [account] = useData("account");
 
   return (
     <Container

@@ -1,6 +1,6 @@
 .quickActions{
   position: fixed;
-  left: calc(100vw - 6.4rem - var(--ui-semantic-gap-m));
+  right: var(--ui-semantic-gap-m);
   bottom: calc(var(--ui-semantic-gap-m) + 6.4rem);
 }
 

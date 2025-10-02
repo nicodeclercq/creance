@@ -1,4 +1,4 @@
-import { logoutUser } from "../service/firebase";
+import { logoutUser } from "./private/firebase";
 
 export function resetStore() {
   logoutUser();

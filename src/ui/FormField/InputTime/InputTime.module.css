@@ -1,0 +1,47 @@
+.input{
+  display: inline-flex;
+  flex-direction: row;
+  background: var(--ui-background-default);
+  border: 0.1rem solid currentColor;
+  color: inherit;
+  font: inherit;
+  border-radius: var(--ui-semantic-radius-l);
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  padding: var(--ui-semantic-padding-action);
+
+  &:focus-within{
+    box-shadow: var(--ui-shadow-focus);
+  }
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-semantic-gap-s);
+  background: var(--ui-background-default);
+  border: 0.1rem solid currentColor;
+  color: inherit;
+  font: inherit;
+  border-radius: var(--ui-semantic-radius-l);
+  padding: var(--ui-semantic-padding-action);
+  width: 100%;
+  max-width: 100%;
+
+}
+.group:focus-within {
+  box-shadow: var(--ui-shadow-focus);
+}
+
+.segment {
+  color: inherit;
+  font: inherit;
+  line-height: 1.6rem;
+}
+.segment:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0.1rem 0 var(--ui-primitive-green-800),
+    0 0.3rem 0  var(--ui-primitive-green-200);
+}

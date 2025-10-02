@@ -25,6 +25,7 @@ export type AsLink = {
   type?: undefined;
   to: RouteName;
   params?: Record<string, string | number>;
+  hash?: string;
 };
 
 export type AsButton = {
@@ -58,6 +59,7 @@ export function Button(props: ButtonProps) {
       [styles.isLoading]: !isLink(props) && (props.isLoading || isLoading),
       [styles.isOverlay]: overlays,
     }),
+    "data-component": "Button",
     children: (
       <Columns align="center" justify="center" gap="s">
         {icon?.position === "start" && <Icon name={icon.name} />}
@@ -83,7 +85,7 @@ export function Button(props: ButtonProps) {
   };
 
   return isLink(props) ? (
-    <Link {...commonProps} to={getPath(props.to, props.params)} />
+    <Link {...commonProps} to={getPath(props.to, props.params, props.hash)} />
   ) : (
     <button
       {...commonProps}

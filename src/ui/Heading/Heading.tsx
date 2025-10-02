@@ -15,7 +15,7 @@ type ParagraphProps = {
 export function Heading({ styles = {}, level = 1, children }: ParagraphProps) {
   const { color = "primary-default", ...rest } = styles;
   return (
-    <Container as={`h${level}`} styles={{ color, ...rest }}>
+    <Container as={`h${level}`} data-component="Heading" styles={{ color, ...rest }}>
       {children}
     </Container>
   );

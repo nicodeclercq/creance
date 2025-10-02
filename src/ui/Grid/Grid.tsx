@@ -1,39 +1,32 @@
 import { type ReactNode } from "react";
 import {
-  computeAlignItems,
-  computeGap,
-  computeJustifyContent,
+  Container,
   ContainerStyles,
+  WithMediaQuery,
 } from "../Container/Container";
 
 type GridProps = {
-  columns: number | string[];
+  columns: WithMediaQuery<number | string[]>;
   children: ReactNode;
   gap?: ContainerStyles["gap"];
   align?: ContainerStyles["alignItems"];
   justify?: ContainerStyles["justifyContent"];
 };
 
-const getColumnsStyle = (columns: number | string[]) => {
-  if (typeof columns === "number") {
-    return `repeat(${columns}, 1fr)`;
-  }
-  return columns.join(" ");
-};
-
 export function Grid({ children, columns, gap, align, justify }: GridProps) {
   return (
-    <div
-      style={{
+    <Container
+      data-component="Grid"
+      styles={{
         display: "grid",
-        gridTemplateColumns: getColumnsStyle(columns),
-        gap: computeGap(gap),
-        alignItems: computeAlignItems(align),
-        justifyContent: computeJustifyContent(justify),
+        gap,
+        alignItems: align,
+        justifyContent: justify,
         width: "100%",
+        gridTemplateColumns: columns,
       }}
     >
       {children}
-    </div>
+    </Container>
   );
 }

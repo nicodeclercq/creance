@@ -18,10 +18,12 @@ import { Grid } from "../../../ui/Grid/Grid";
 import { InputDate } from "../../../ui/FormField/InputDate/InputDate";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
+import { Logger } from "../../../service/Logger";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Participant } from "../../../models/Participant";
 import { RadioGroup } from "../../../ui/Form/RadioGroup/RadioGroup";
 import { Select } from "../../../ui/FormField/Select/Select";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 export type Props = {
@@ -42,6 +44,7 @@ export function ExpenseForm({
   cancel,
 }: Props) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   const {
     control,
@@ -141,7 +144,7 @@ export function ExpenseForm({
   const submit = (data: FormExpense) => {
     const expense = toExpense(data, setError, t);
     if (Either.isLeft(expense)) {
-      console.error("Invalid amount", expense.left);
+      Logger.error("Invalid amount")(expense.left);
       return;
     }
     onSubmit(expense.right);
@@ -170,13 +173,18 @@ export function ExpenseForm({
             value={value}
             onChange={onChange}
             valueRenderer={({ value }) => (
-              <Avatar label={participants[value]?.name} size="m" />
+              <Avatar
+                label={participants[value]?.name}
+                image={participants[value]?.avatar}
+                size="m"
+              />
             )}
             options={Object.keys(event.participants).map(
               (participant, index) => ({
                 id: participant ?? index,
-                label:
-                  participants[participant]?.name ?? t("participant.unknown"),
+                label: isCurrentUser(participants[participant])
+                  ? t("currentUser.anonymous.name")
+                  : participants[participant].name ?? t("participant.unknown"),
                 value:
                   participants[participant]?._id ?? t("participant.unknown"),
               })
@@ -335,8 +343,12 @@ export function ExpenseForm({
             render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Grid columns={["1fr", "min-content"]} gap="m">
                 <Columns align="center" gap="s" styles={{ flexGrow: true }}>
-                  <Avatar label={participant.name} />
-                  <Paragraph>{participant.name}</Paragraph>
+                  <Avatar label={participant.name} image={participant.avatar} />
+                  <Paragraph>
+                    {isCurrentUser(participant)
+                      ? t("currentUser.anonymous.name")
+                      : participant.name}
+                  </Paragraph>
                 </Columns>
                 <InputNumber
                   as="number"
@@ -368,8 +380,12 @@ export function ExpenseForm({
             render={({ field: { value, onChange }, fieldState: { error } }) => (
               <Columns gap="m">
                 <Columns align="center" gap="s" styles={{ flexGrow: true }}>
-                  <Avatar label={participant.name} />
-                  <Paragraph>{participant.name}</Paragraph>
+                  <Avatar label={participant.name} image={participant.avatar} />
+                  <Paragraph>
+                    {isCurrentUser(participant)
+                      ? t("currentUser.anonymous.name")
+                      : participant.name}
+                  </Paragraph>
                 </Columns>
                 <InputNumber
                   as="string"

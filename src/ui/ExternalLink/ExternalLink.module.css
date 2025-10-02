@@ -1,0 +1,33 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid currentColor;
+  padding: var(--ui-semantic-padding-s);
+  gap: var(--ui-semantic-gap-s);
+  border-radius: var(--ui-semantic-radius-l);
+  max-width: 100%;
+  font: var(--ui-semantic-font-body-smaller);
+  overflow: hidden;
+}
+
+.linkText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link:hover {
+  background: var(--ui-semantic-color-primary-weaker);
+}
+.link:active {
+  background: var(--ui-semantic-color-primary-weak);
+}
+
+
+.tooltip {
+  font: var(--ui-semantic-font-body-smaller);
+  color: var(--ui-semantic-color-neutral-weaker);
+  background: var(--ui-semantic-color-neutral-stronger);
+  padding: var(--ui-semantic-padding-xs);
+  border-radius: var(--ui-semantic-radius-s);
+}

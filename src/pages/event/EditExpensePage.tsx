@@ -8,15 +8,15 @@ import { Redirect } from "../../Redirect";
 import { fromExpense } from "./private/formExpense";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
+import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export function EditExpensePage() {
   const { t } = useTranslation();
   const { eventId, expenseId } = useParams();
   const { goTo } = useRoute();
-  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.${eventId}`);
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {

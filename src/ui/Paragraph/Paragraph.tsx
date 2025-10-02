@@ -8,13 +8,21 @@ import {
 import type { ReactNode } from "react";
 
 export type ParagraphProps = {
+  id?: string;
   children: ReactNode;
-  styles?: ContainerStyles<TypographyStyles | LayoutStyles>;
+  styles?: ContainerStyles<
+    TypographyStyles | LayoutStyles | "customCSSProperties"
+  >;
 };
 
-export function Paragraph({ styles, children }: ParagraphProps) {
+export function Paragraph({ id, styles, children }: ParagraphProps) {
   return (
-    <Container as="p" styles={styles}>
+    <Container
+      id={id}
+      as="p"
+      data-component="Paragraph"
+      styles={{ ...styles, customCSSProperties: { "icon-margin": "0.3rem" } }}
+    >
       {children}
     </Container>
   );

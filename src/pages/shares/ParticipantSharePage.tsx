@@ -1,50 +1,50 @@
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
+import { EventParticipantNotFoundPage } from "../participants/private/EventParticipantNotFoundPage";
+import { EventParticipantShareForm } from "../participants/private/EventParticipantShareForm";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ParticipantShare } from "../../models/ParticipantShare";
 import { Redirect } from "../../Redirect";
-import { ShareForm } from "./private/ShareForm";
-import { ShareNotFoundPage } from "./private/ShareNotFoundPage";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
+import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export function ParticipantSharePage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const { eventId, shareId } = useParams();
-  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const { eventId, participantId } = useParams();
+  const [currentEvent, setEvent] = useData(`events.${eventId}`);
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 
-  const currentParticipant = participants[shareId ?? ""];
+  const currentParticipant = participants[participantId ?? ""];
 
-  if (!shareId || !currentParticipant) {
-    return <ShareNotFoundPage eventId={currentEvent._id} />;
+  if (!participantId || !currentParticipant) {
+    return <EventParticipantNotFoundPage eventId={currentEvent._id} />;
   }
 
   if (currentEvent.isClosed) {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
   }
 
-  const share = currentEvent.participants[shareId].participantShare;
+  const share = currentEvent.participants[participantId].participantShare;
 
   const saveShare = (data: ParticipantShare) => {
     setEvent((event) => ({
       ...event,
       participants: {
         ...event.participants,
-        [shareId]: {
-          ...event.participants[shareId],
+        [participantId]: {
+          ...event.participants[participantId],
           participantShare: data,
         },
       },
     }));
-    goTo("SHARES", { eventId: currentEvent._id });
+    goTo("EVENT_USERS", { eventId: currentEvent._id });
   };
 
   return (
@@ -56,11 +56,11 @@ export function ParticipantSharePage() {
         as: "link",
         icon: "chevron-left",
         label: t("page.event.share.edit.actions.backToShares"),
-        to: "SHARES",
+        to: "EVENT_USERS",
         params: { eventId: currentEvent._id },
       }}
     >
-      <ShareForm
+      <EventParticipantShareForm
         event={currentEvent}
         participant={currentParticipant}
         defaultValues={share}
@@ -68,7 +68,7 @@ export function ParticipantSharePage() {
         onSubmit={saveShare}
         cancel={{
           label: t("page.share.form.actions.cancel"),
-          onClick: () => goTo("SHARES", { eventId: currentEvent._id }),
+          onClick: () => goTo("EVENT_USERS", { eventId: currentEvent._id }),
         }}
       />
     </PageTemplate>

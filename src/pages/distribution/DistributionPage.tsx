@@ -11,14 +11,14 @@ import { getEventDistribution } from "../../service/calculation";
 import { pipe } from "fp-ts/function";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
-import { useStore } from "../../store/StoreProvider";
+import { useData } from "../../store/useData";
 import { useTranslation } from "react-i18next";
 
 export function DistributionPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
-  const [currentEvent] = useStore(`events.${eventId}`);
-  const [currentParticipantId] = useStore("currentParticipantId");
+  const [currentEvent] = useData(`events.${eventId}`);
+  const [currentParticipantId] = useData(`account.events.${eventId}.uid`);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;

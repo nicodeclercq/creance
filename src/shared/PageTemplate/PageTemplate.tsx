@@ -1,12 +1,10 @@
-import { Container } from "../../ui/Container/Container";
 import { type ReactNode } from "react";
-import { Stack } from "../../ui/Stack/Stack";
+import { Container } from "../../ui/Container/Container";
 import type {
   AsLink,
   AsButton,
   IconButtonPropsWhithoutVariantAndOverlays,
 } from "../../ui/IconButton/IconButton";
-
 import { Menu, MenuProps } from "./Menu/Menu";
 import { Header, HeaderProps } from "./Header";
 import { RouteName } from "../../routes";
@@ -27,17 +25,51 @@ export function PageTemplate<R extends RouteName>({
   menu,
 }: PageTemplateProps<R>) {
   return (
-    <Stack>
+    <Container
+      styles={{
+        display: "grid",
+        justifyContent: "center",
+        background: "inverted",
+        height: "100vh",
+        gridTemplateRows: {
+          default: ["max-content", "1fr", "max-content"],
+          md: ["max-content", "1fr"],
+        },
+        gridTemplateColumns: {
+          default: 1,
+          md: ["max-content", "1fr"],
+        },
+        gridTemplateAreas: {
+          default: '"header" "content" "menu"',
+          md: '". header" "menu content"',
+        },
+      }}
+    >
       <Header
         leftAction={leftAction}
         title={title}
         rightActions={rightActions}
+        gridArea="header"
       />
-      {menu && <Menu actions={menu} />}
-      <Container styles={{ padding: "m" }}>{children}</Container>
-      <div style={{ height: "15rem" }}>
-        {/* Reserved place to ensure Quick Action doesn't overlap content */}
-      </div>
-    </Stack>
+      {menu && <Menu actions={menu} gridArea="menu" />}
+      <Container
+        styles={{
+          padding: "m",
+          gridArea: "content",
+          background: "body",
+          height: "100%",
+          overflow: "auto",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <Container styles={{ width: "100%", maxWidth: "80rem" }}>
+          {children}
+          <Container styles={{ height: "15rem" }}>
+            {/* Reserved place to ensure Quick Action doesn't overlap content */}
+          </Container>
+        </Container>
+      </Container>
+    </Container>
   );
 }

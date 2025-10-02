@@ -1,11 +1,13 @@
-import { Participant } from "./Participant";
+import * as z from "zod";
 
-export type Deposit = {
-  _id: string;
-  amount: string;
-  from: Participant["_id"];
-  to: Participant["_id"];
-  note: string;
-  updatedAt: Date;
-  date: Date;
-};
+export const depositSchema = z.strictObject({
+  _id: z.string().max(100),
+  amount: z.string().max(100),
+  from: z.string().max(100),
+  to: z.string().max(100),
+  note: z.string().max(100),
+  updatedAt: z.string().transform((date) => new Date(date)),
+  date: z.string().transform((date) => new Date(date)),
+});
+
+export type Deposit = z.infer<typeof depositSchema>;

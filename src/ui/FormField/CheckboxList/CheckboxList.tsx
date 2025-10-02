@@ -27,6 +27,7 @@ export function CheckboxList<T>({
 }: CheckboxListProps<T>) {
   return (
     <GridList
+      data-component="CheckboxList"
       aria-label="Favorite pokemon"
       selectionMode="multiple"
       className={styles.CheckboxList}

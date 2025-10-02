@@ -1,6 +1,10 @@
-import { ParticipantShare } from "./ParticipantShare";
-import { User } from "./User";
+import * as z from "zod";
 
-export type Participant = User & {
-  participantShare: ParticipantShare;
-};
+import { participantShareSchema } from "./ParticipantShare";
+import { userSchema } from "./User";
+
+export const participantSchema = userSchema.extend({
+  participantShare: participantShareSchema,
+});
+
+export type Participant = z.infer<typeof participantSchema>;

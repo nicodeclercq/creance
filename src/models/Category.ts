@@ -1,11 +1,19 @@
-import { CategoryIconName } from "../ui/CategoryIcon/private";
+import * as z from "zod";
+
+import {
+  CATEGORY_ICONS_NAMES,
+  CategoryIconName,
+} from "../ui/CategoryIcon/private";
+
 import { uid } from "../service/crypto";
 
-export type Category = {
-  _id: string;
-  name: string;
-  icon: CategoryIconName;
-};
+export const categorySchema = z.strictObject({
+  _id: z.string().max(100),
+  name: z.string().max(100),
+  icon: z.enum(CATEGORY_ICONS_NAMES),
+});
+
+export type Category = z.infer<typeof categorySchema>;
 
 export const DEFAULT_CATEGORY_ICON: CategoryIconName = "coin";
 

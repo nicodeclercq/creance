@@ -7,6 +7,7 @@ import {
   PercentageShare,
 } from "../../../models/Expense";
 
+import { Logger } from "../../../service/Logger";
 import { Participant } from "../../../models/Participant";
 import { UseFormSetError } from "react-hook-form";
 import { calculationAsNumber } from "../../../helpers/Number";
@@ -125,7 +126,7 @@ export const toExpense = (
         ) => {
           const calculation = calculationAsNumber(value);
           if (Either.isLeft(calculation)) {
-            console.error("Invalid percentage share", { value, calculation });
+            Logger.error("Invalid percentage share")({ value, calculation });
             return Either.left(new Error("Invalid percentage share"));
           }
 

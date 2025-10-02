@@ -29,7 +29,7 @@ export function QuickActions<R extends RouteName>({
   actions,
 }: QuickActionsProps<R>) {
   return (
-    <div className={styles.quickActions}>
+    <div data-component="QuickActions" className={styles.quickActions}>
       <DialogTrigger>
         <Button
           className={classNames(

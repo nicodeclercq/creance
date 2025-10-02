@@ -12,12 +12,14 @@ import * as ArrayFp from "fp-ts/Array";
 import { pipe } from "fp-ts/function";
 import styles from "./DistributionItem.module.css";
 import { Illustration } from "../../../ui/Illustration/Illustration";
+import { type User } from "../../../models/User";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 
 type DistributionItemProps = {
   isCurrentParticipant: boolean;
   participantId: string;
   distributions: Distribution[];
-  participants: Record<string, { name: string }>;
+  participants: Record<string, User>;
 };
 
 export function DistributionItem({
@@ -27,6 +29,7 @@ export function DistributionItem({
   participants,
 }: DistributionItemProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
   const { left, right } = pipe(
     distributions,
     ArrayFp.partition((d) => d.type === "receive")
@@ -53,9 +56,14 @@ export function DistributionItem({
         <Wrapper>
           <Avatar
             label={participants[participantId].name}
+            image={participants[participantId].avatar}
             size={isCurrentParticipant ? "l" : "m"}
           />
-          <Paragraph>{participants[participantId].name}</Paragraph>
+          <Paragraph>
+            {isCurrentParticipant
+              ? t("currentUser.anonymous.name")
+              : participants[participantId].name}
+          </Paragraph>
         </Wrapper>
         {distributions.length === 0 && (
           <Columns gap="s" align="center">
@@ -104,11 +112,19 @@ export function DistributionItem({
                           {type === "give"
                             ? t("page.distribution.gives.value", {
                                 value: centToDecimal(amount),
-                                participant: participants[participantId].name,
+                                participant: isCurrentUser(
+                                  participants[participantId]
+                                )
+                                  ? t("currentUser.anonymous.name")
+                                  : participants[participantId].name,
                               })
                             : t("page.distribution.receives.value", {
                                 value: centToDecimal(amount),
-                                participant: participants[participantId].name,
+                                participant: isCurrentUser(
+                                  participants[participantId]
+                                )
+                                  ? t("currentUser.anonymous.name")
+                                  : participants[participantId].name,
                               })}
                         </Columns>
                       </li>

@@ -37,7 +37,7 @@ export function AddParticipantsForm({
     const newParticipant: Participant = {
       _id: uid(),
       name: data.name,
-      avatar: data.name,
+      avatar: "",
       share: {
         adults: data.adults,
         children: data.children,
@@ -53,7 +53,7 @@ export function AddParticipantsForm({
     <div>
       <div>
         <div style={{ font: "var(--ui-semantic-font-body-small)" }}>&nbsp;</div>
-        <Avatar label={watch("name")} size="m" />
+        <Avatar label={watch("name")} image={""} size="m" />
       </div>
       <Controller
         control={control}

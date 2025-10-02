@@ -101,6 +101,7 @@ export function Select<T>({
 
   return (
     <RASelect
+      data-component="Select"
       id={id}
       className={classNames(styles.select, styles[`isVariant-${variant}`])}
       selectedKey={selectedOption?.label}
@@ -116,7 +117,11 @@ export function Select<T>({
         ) : (
           "Sélectionner"
         )}
-        {variant === "default" && <Icon size="s" name="chevron-down" />}
+        {variant === "default" && (
+          <div className={styles.chevron}>
+            <Icon size="s" name="chevron-down" />
+          </div>
+        )}
       </Button>
       <Popover
         className={classNames(styles.popover, styles[`isVariant-${variant}`])}

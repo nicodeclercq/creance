@@ -1,15 +1,15 @@
 import { EmptyEvent } from "../event/EmptyEvent";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";
-import { ParticipantShareList } from "./private/ParticipantShareList";
+import { ParticipantShareList } from "../shares/private/ParticipantShareList";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
-import { useStore } from "../../store/StoreProvider";
+import { useData } from "../../store/useData";
 
 export function EventParticipantSharePage() {
   const { eventId } = useParams();
-  const [currentEvent] = useStore(`events.${eventId}`);
-  const [currentParticipantId] = useStore("currentParticipantId");
+  const [currentEvent] = useData(`events.${eventId}`);
+  const [currentParticipantId] = useData(`account.events.${eventId}.uid`);
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {

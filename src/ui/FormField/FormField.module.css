@@ -7,7 +7,7 @@
   color: var(--ui-semantic-color-failure-default);
 }
 .isDisabled {
-  color: var(--ui-semantic-color-neutral-weak);
+  color: var(--ui-semantic-color-neutral-weaker);
 }
 
 .message {

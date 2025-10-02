@@ -4,15 +4,17 @@ import { Avatar } from "../../../ui/Avatar/Avatar";
 import { Button } from "../../../ui/Button/Button";
 import { CheckboxList } from "../../../ui/FormField/CheckboxList/CheckboxList";
 import { Columns } from "../../../ui/Columns/Columns";
+import { Container } from "../../../ui/Container/Container";
 import { Form } from "../../../ui/Form/Form";
 import { Fragment } from "react/jsx-runtime";
+import { Icon } from "../../../ui/Icon/Icon";
 import { Modal } from "../../../ui/Modal/Modal";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Participant } from "../../../models/Participant";
 import { User } from "../../../models/User";
 import { uid } from "../../../service/crypto";
+import { useData } from "../../../store/useData";
 import { useState } from "react";
-import { useStore } from "../../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export type Step3Data = {
@@ -24,6 +26,53 @@ type AddEventStep3Props = {
   onPrevious: (data: Step3Data) => void;
 };
 
+const UserRenderer = ({
+  user,
+  isCurrentUser = false,
+}: {
+  user: User;
+  isCurrentUser?: boolean;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <Columns align="center" gap="s" styles={{ radius: "s" }}>
+      <Container styles={{ display: "inline-block", position: "relative" }}>
+        <Avatar
+          label={isCurrentUser ? t("currentUser.anonymous.name") : user.name}
+          image={user.avatar}
+          size={isCurrentUser ? "l" : "m"}
+        />
+        {isCurrentUser && (
+          <Container
+            styles={{
+              position: "absolute",
+              background: "inverted",
+              color: "inverted",
+              radius: "s",
+              top: "75%",
+              left: "0",
+              display: "inline-block",
+            }}
+          >
+            <Icon name="check" size="s" />
+          </Container>
+        )}
+      </Container>
+      {
+        <div>
+          <Paragraph styles={{ flexGrow: true }}>{user.name}</Paragraph>
+          <Paragraph styles={{ font: "body-smaller" }}>
+            {t("page.events.add.form.participant.share.count", {
+              adults: user.share.adults,
+              children: user.share.children,
+            })}
+          </Paragraph>
+        </div>
+      }
+    </Columns>
+  );
+};
+
 export function AddEventStep3({
   data,
   onNext,
@@ -31,19 +80,12 @@ export function AddEventStep3({
 }: AddEventStep3Props) {
   const { t } = useTranslation();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [currentParticipantId] = useStore("currentParticipantId");
   const [selection, setSelection] = useState<Participant[]>(data.participants);
-  const [account, setAccount] = useStore("account");
+  const [account] = useData("account");
+  const [users, setUsers] = useData("users");
 
   const currentParticipant: Participant = {
-    _id: currentParticipantId,
-    name: account?.name ?? "",
-    updatedAt: new Date(),
-    avatar: account?.avatar ?? "",
-    share: account?.share ?? {
-      adults: 1,
-      children: 0,
-    },
+    ...account.currentUser,
     participantShare: { type: "default" },
   };
 
@@ -63,37 +105,13 @@ export function AddEventStep3({
       participantShare: { type: "default" },
     };
 
-    setAccount((account) => {
-      if (!account) return null;
-
-      return {
-        ...account,
-        users: {
-          ...account.users,
-          [user._id]: user,
-        },
-      };
-    });
+    setUsers((users) => ({
+      ...users,
+      [user._id]: user,
+    }));
     setSelection((s) => [...s, newParticipant]);
     setIsFormOpen(false);
   };
-
-  const itemRenderer = (item: User) => (
-    <Columns align="center" gap="s">
-      <Avatar label={item.name} size="m" />
-      {
-        <div>
-          <Paragraph styles={{ flexGrow: true }}>{item.name}</Paragraph>
-          <Paragraph styles={{ font: "body-smaller" }}>
-            {t("page.events.add.form.participant.share.count", {
-              adults: item.share.adults,
-              children: item.share.children,
-            })}
-          </Paragraph>
-        </div>
-      }
-    </Columns>
-  );
 
   const submit = () => () => {
     onNext({
@@ -130,15 +148,14 @@ export function AddEventStep3({
       {currentParticipant && (
         <Columns align="center" justify="start">
           <Fragment key={currentParticipant._id}>
-            <span style={{ width: "4rem" }}></span>
-            {itemRenderer(currentParticipant)}
+            <UserRenderer user={currentParticipant} isCurrentUser />
           </Fragment>
         </Columns>
       )}
       <CheckboxList
         onChange={onSelectionChange}
-        items={Object.values(account?.users ?? {})
-          .filter((user) => user._id !== currentParticipantId)
+        items={Object.values(users)
+          .filter((user) => user._id !== account?.currentUser._id)
           .map((user) => ({
             label: user.name,
             id: user._id,
@@ -149,7 +166,7 @@ export function AddEventStep3({
           id: value._id,
           value,
         }))}
-        valueRenderer={itemRenderer}
+        valueRenderer={(value) => <UserRenderer user={value} />}
       />
       <Columns justify="center">
         <Button
@@ -173,8 +190,12 @@ export function AddEventStep3({
             },
           }}
           onSubmit={addParticipant}
+          cancel={{
+            label: t("AddEventStep3.modal.addParticipant.cancel"),
+            onCancel: () => setIsFormOpen(false),
+          }}
           submitLabel={t("AddEventStep3.modal.addParticipant.submit")}
-          users={account?.users ?? {}}
+          users={users}
         />
       </Modal>
     </Form>

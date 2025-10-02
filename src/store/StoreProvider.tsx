@@ -1,13 +1,18 @@
-import { DEFAULT_STATE } from "./state";
-import { createContextStore } from "./store";
+import { ReactNode, createContext } from "react";
 
-export const {
-  StoreProvider,
-  useStore,
-  onChange,
-  onPathChange,
-  load,
-  get,
-  update,
-  $store,
-} = createContextStore(DEFAULT_STATE);
+import { LocalStorageAdapter } from "./private/localStorage";
+import { StoreManager } from "./StoreManager";
+
+StoreManager.launch({
+  adapters: [LocalStorageAdapter],
+});
+
+export const StoreContext = createContext(StoreManager.$store);
+
+export function StoreProvider({ children }: { children: ReactNode }) {
+  return (
+    <StoreContext.Provider value={StoreManager.$store}>
+      {children}
+    </StoreContext.Provider>
+  );
+}

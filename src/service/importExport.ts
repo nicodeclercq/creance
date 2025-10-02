@@ -1,31 +1,18 @@
 import * as ArrayFP from "fp-ts/Array";
 import * as Either from "fp-ts/Either";
+import * as TaskEither from "fp-ts/TaskEither";
 import * as z from "zod";
 
-import {
-  depositSchema as defaultDepositSchema,
-  eventSchema as defaultEventSchema,
-  expenseSchema as defaultExpenseSchema,
-  participantSchema as defaultParticipantSchema,
-} from "../adapters/json";
+import { Deposit, depositSchema } from "../models/Deposit";
+import { Event, eventSchema as defaultEventSchema } from "../models/Event";
+import { Expense, expenseSchema } from "../models/Expense";
 import { flow, pipe } from "fp-ts/function";
 
-import { Deposit } from "../models/Deposit";
-import { Event } from "../models/Event";
-import { Expense } from "../models/Expense";
+import { Logger } from "./Logger";
 import { Participant } from "../models/Participant";
-import { uid } from "./crypto";
+import { participantSchema } from "../models/Participant";
 import { withoutKey } from "../helpers/object";
 
-const participantSchema = defaultParticipantSchema.omit({
-  updatedAt: true,
-});
-const expenseSchema = defaultExpenseSchema.omit({
-  updatedAt: true,
-});
-const depositSchema = defaultDepositSchema.omit({
-  updatedAt: true,
-});
 const eventSchema = defaultEventSchema
   .omit({
     updatedAt: true,
@@ -43,15 +30,9 @@ type ExportedData = z.infer<typeof eventSchema>;
 export function toExportedData({ event }: { event: Event }): ExportedData {
   return {
     ...withoutKey(event, "updatedAt"),
-    participants: Object.values(event.participants).map((participant) =>
-      withoutKey(participant, "updatedAt")
-    ),
-    expenses: Object.values(event.expenses).map((expense) =>
-      withoutKey(expense, "updatedAt")
-    ),
-    deposits: Object.values(event.deposits).map((deposit) =>
-      withoutKey(deposit, "updatedAt")
-    ),
+    participants: Object.values(event.participants),
+    expenses: Object.values(event.expenses),
+    deposits: Object.values(event.deposits),
   };
 }
 
@@ -252,7 +233,7 @@ export function readData({
   }).then(
     flow(
       Either.map((data) => JSON.parse(data)),
-      Either.chain((data: unknown) => {
+      Either.chain((data) => {
         const arrayOfEvents = z.array(eventSchema).safeParse(data);
         if (arrayOfEvents.success) {
           return getArrayOfEventsModifications({
@@ -260,6 +241,7 @@ export function readData({
             currentState,
           });
         }
+
         const singleEvent = eventSchema.safeParse(data);
         if (singleEvent.success) {
           return getEventModifications({
@@ -267,7 +249,7 @@ export function readData({
             currentState,
           });
         }
-        console.error("Invalid data format:", singleEvent.error);
+        Logger.error("Invalid data format:")(singleEvent.error);
 
         return Either.left(new Error("Invalid data format."));
       })
@@ -275,101 +257,43 @@ export function readData({
   );
 }
 
-export function importData({ events }: { events: Record<string, Event> }) {
-  return new Promise<
-    Either.Either<
-      Error,
-      {
-        events: Record<string, Event>;
-      }
-    >
-  >((resolve) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      return readData({
-        file,
-        currentState: {
-          events,
-        },
-      })
-        .then((data) => {
-          resolve(data);
+export function importData({
+  events,
+}: {
+  events: Record<string, Event>;
+}): TaskEither.TaskEither<
+  Error,
+  {
+    events: Record<string, Event>;
+  }
+> {
+  return () =>
+    new Promise<
+      Either.Either<
+        Error,
+        {
+          events: Record<string, Event>;
+        }
+      >
+    >((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        return readData({
+          file,
+          currentState: {
+            events,
+          },
         })
-        .catch((error) => {
-          console.error("Import failed:", error);
-          resolve(Either.left(error));
-        });
-    };
-    input.click();
-  });
-}
-
-export function exportEventAsJson(event: Event): string {
-  const data = {
-    name: event.name,
-    description: event.description,
-    period: event.period,
-    participants: Object.values(event.participants).map((participant) =>
-      withoutKey(participant, "updatedAt")
-    ),
-    categories: Object.values(event.categories),
-    expenses: Object.values(event.expenses).map((expense) =>
-      withoutKey(expense, "updatedAt")
-    ),
-    deposits: Object.values(event.deposits).map((deposit) =>
-      withoutKey(deposit, "updatedAt")
-    ),
-    isAutoClose: event.isAutoClose,
-  };
-
-  return JSON.stringify(data, null, 2);
-}
-
-export function importEventFromJson(json: string): Event {
-  const data = JSON.parse(json);
-  const {
-    participants: dataParticipants,
-    expenses,
-    deposits,
-    ...eventData
-  } = data;
-
-  const participants = dataParticipants.reduce(
-    (acc: Record<string, Participant>, participant: Participant) => {
-      acc[participant._id] = participant;
-      return acc;
-    },
-    {}
-  );
-
-  const eventExpenses = expenses.reduce(
-    (acc: Record<string, Expense>, expense: Expense) => {
-      acc[expense._id] = expense;
-      return acc;
-    },
-    {}
-  );
-
-  const eventDeposits = deposits.reduce(
-    (acc: Record<string, Deposit>, deposit: Deposit) => {
-      acc[deposit._id] = deposit;
-      return acc;
-    },
-    {}
-  );
-
-  const event: Event = {
-    _id: uid(),
-    participants,
-    expenses: eventExpenses,
-    deposits: eventDeposits,
-    updatedAt: new Date(),
-    ...eventData,
-  };
-
-  return event;
+          .then(resolve)
+          .catch((error) => {
+            Logger.error("Import failed:")(error);
+            resolve(Either.left(error));
+          });
+      };
+      input.click();
+    });
 }

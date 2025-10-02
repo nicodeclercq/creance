@@ -55,6 +55,7 @@ export function CalendarRangePicker({
 
   return (
     <FormField
+      data-component="CalendarRangePicker"
       {...props}
       id={id}
       isDisabled={isDisabled}

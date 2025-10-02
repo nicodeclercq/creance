@@ -3,11 +3,11 @@ import { ExpenseList } from "./private/ExpenseList";
 import { removeFromObject } from "../../helpers/object";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router";
-import { useStore } from "../../store/StoreProvider";
+import { useData } from "../../store/useData";
 
 export function EventPage() {
   const { eventId } = useParams();
-  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.${eventId}`);
 
   if (!eventId) {
     return <EventNotFoundPage />;

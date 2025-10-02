@@ -25,13 +25,14 @@ export function InputDate({
 
   return (
     <FormField
+      data-component="InputDate"
       id={id}
       {...props}
       isDisabled={isDisabled}
       isRequired={isRequired}
     >
       <DateField
-        value={fromDate(value, "UTC")}
+        value={fromDate(value ?? new Date(), "UTC")}
         granularity="day"
         onChange={(a) => {
           if (a != null) onChange(a.toDate());

@@ -22,7 +22,7 @@ export function EmptyState({
   action,
 }: Props) {
   return (
-    <Card>
+    <Card data-component="EmptyState">
       <Stack alignItems="center" justifyContent="center" gap="l" padding="l">
         <Heading level={titleLevel} styles={{ font: "body-large" }}>
           {title}

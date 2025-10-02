@@ -13,15 +13,18 @@ import { Heading } from "../../../ui/Heading/Heading";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
+import { User } from "../../../models/User";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 type DepositsShareProps = {
   deposits: DepositShare[];
-  participants: Record<string, { name: string }>;
+  participants: Record<string, User>;
 };
 
 export function DepositsShare({ deposits, participants }: DepositsShareProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   const totalDepositAmount = getTotalDepositAmount(deposits);
 
@@ -55,11 +58,18 @@ export function DepositsShare({ deposits, participants }: DepositsShareProps) {
                         ? participants[deposit.participantId].name
                         : "unknwon"
                     }
+                    image={
+                      deposit.participantId in participants
+                        ? participants[deposit.participantId].avatar
+                        : ""
+                    }
                     size="s"
                   />
                   <Paragraph styles={{ font: "body-small" }}>
                     {deposit.participantId in participants
-                      ? participants[deposit.participantId].name
+                      ? isCurrentUser(participants[deposit.participantId])
+                        ? t("currentUser.anonymous.name")
+                        : participants[deposit.participantId].name
                       : deposit.participantId}
                   </Paragraph>
                 </Columns>

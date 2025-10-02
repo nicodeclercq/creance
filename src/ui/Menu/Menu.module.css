@@ -17,6 +17,7 @@
   font: var(--ui-semantic-font-action-default);
   text-decoration: none;
   color: var(--ui-semantic-color-primary-default);
+  text-align: start;
 
   &.isFirst{
     border-top-left-radius: var(--ui-semantic-radius-l);

@@ -39,6 +39,7 @@ export function RadioGroup<T>({
 
   return (
     <FormField
+      data-component="RadioGroup"
       id={id}
       label={label}
       isRequired={isRequired}

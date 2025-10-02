@@ -1,5 +1,3 @@
-import * as Either from "fp-ts/Either";
-
 import {
   exportData,
   importData,
@@ -7,20 +5,23 @@ import {
 } from "../../service/importExport";
 
 import { Button } from "../../ui/Button/Button";
-import { COLLECTIONS } from "../../service/firebase";
+import { COLLECTIONS } from "../../store/private/firebase";
 import { Card } from "../../ui/Card/Card";
 import { Columns } from "../../ui/Columns/Columns";
 import { ConfirmButton } from "../../ui/ConfirmButton/ConfirmButton";
 import { DateFormatter } from "../../ui/DateFormatter/DateFormatter";
+import { Logger } from "../../service/Logger";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
+import { fork } from "../../helpers/fp-ts";
 import { lastUpdate } from "../../service/synchronize";
+import { pipe } from "fp-ts/function";
 import { resetStore } from "../../store/reset";
+import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
 import { useState } from "react";
-import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 function Item({ label, date }: { label: string; date: Date }) {
@@ -43,42 +44,40 @@ export function InformationPage() {
   const { goTo, back } = useRoute();
   const [hasImportError, setHasImportError] = useState(false);
 
-  const [currentParticipantId] = useStore("currentParticipantId");
-  const [events, setEvents] = useStore("events");
+  const [currentParticipantId] = useData("account._id");
+  const [events, setEvents] = useData("events");
 
   const reset = () => {
     goTo("ROOT");
     resetStore();
   };
 
-  const doExportData = () => {
+  const doExportData = () =>
     exportData(
-      "Créance",
+      "Créances",
       Object.values(events).map((event) =>
         toExportedData({
           event,
         })
       )
     );
-  };
-  const doImportData = () => {
-    return importData({
-      events,
-    }).then(
-      Either.fold(
-        (error) => {
-          console.error("Import failed:", error);
+
+  const doImportData = () =>
+    pipe(
+      importData({ events }),
+      fork({
+        onError: (error) => {
+          Logger.error("Import failed:")(error);
           setHasImportError(true);
         },
-        (data) => {
+        onSuccess: (data) => {
           setHasImportError(false);
 
           setEvents((events) => ({ ...events, ...data.events }));
           goTo(ROUTES.ROOT);
-        }
-      )
+        },
+      })
     );
-  };
 
   return (
     <PageTemplate

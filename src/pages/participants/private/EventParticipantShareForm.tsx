@@ -2,7 +2,13 @@ import * as Either from "fp-ts/Either";
 
 import { Button, ButtonProps } from "../../../ui/Button/Button";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { CustomShare, FormShare, fromShare, toShare } from "./formShare";
+import {
+  CustomShare,
+  FormShare,
+  fromShare,
+  getDaysInPeriod,
+  toShare,
+} from "./formParticipantShare";
 import { type Event } from "../../../models/Event";
 import { type ParticipantShare } from "../../../models/ParticipantShare";
 
@@ -20,13 +26,16 @@ import { RadioGroup } from "../../../ui/Form/RadioGroup/RadioGroup";
 import { Stack } from "../../../ui/Stack/Stack";
 import { Switch } from "../../../ui/Switch";
 import { Participant } from "../../../models/Participant";
-import styles from "./ShareForm.module.css";
+import styles from "./EventParticipantShareForm.module.css";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Container } from "../../../ui/Container/Container";
-import { isInInterval } from "../../../utils/date";
+import { dateToKey, isInInterval } from "../../../utils/date";
 import { ErrorMessage } from "../../../ui/FormField/ErrorMessage/ErrorMessage";
 import { Select } from "../../../ui/FormField/Select/Select";
+import { DailyParticipationItem } from "./DailyParticipationItem";
+import { Logger } from "../../../service/Logger";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 
 type ShareFormProps = {
   event: Event;
@@ -317,7 +326,7 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
   );
 }
 
-export function ShareForm({
+export function EventParticipantShareForm({
   event,
   participant,
   defaultValues,
@@ -326,9 +335,10 @@ export function ShareForm({
   cancel,
 }: ShareFormProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   const { handleSubmit, control, formState, watch } = useForm<FormShare>({
-    defaultValues: fromShare(defaultValues),
+    defaultValues: fromShare(defaultValues, event, participant),
     mode: "onChange",
   });
   const { fields, append, remove } = useFieldArray({
@@ -346,12 +356,13 @@ export function ShareForm({
       },
     },
   });
+  const daysInPeriod = getDaysInPeriod(event.period);
   const [showAddForm, setShowAddForm] = useState(fields.length === 0);
 
   const submit = (data: FormShare) => {
     const share = toShare(data);
     if (Either.isLeft(share)) {
-      console.error("Invalid share", share.left);
+      Logger.error("Invalid share")(share.left);
       return;
     }
     onSubmit(share.right);
@@ -380,8 +391,16 @@ export function ShareForm({
         <Stack gap="m">
           <Columns align="center" justify="center">
             <Stack width="auto" gap="s" alignItems="center">
-              <Avatar label={participant.name} size="l" />
-              <Paragraph>{participant.name}</Paragraph>
+              <Avatar
+                label={participant.name}
+                image={participant.avatar}
+                size="l"
+              />
+              <Paragraph>
+                {isCurrentUser(participant)
+                  ? t("currentUser.anonymous.name")
+                  : participant.name}
+              </Paragraph>
             </Stack>
           </Columns>
           <Controller
@@ -401,6 +420,11 @@ export function ShareForm({
                     value: "default",
                   },
                   {
+                    id: "daily",
+                    label: t("page.share.form.type.daily.label"),
+                    value: "daily",
+                  },
+                  {
                     id: "custom",
                     label: t("page.share.form.type.custom.label"),
                     value: "custom",
@@ -414,8 +438,27 @@ export function ShareForm({
               data={type}
               default={t("page.share.form.type.default.description")}
               custom={t("page.share.form.type.custom.description")}
+              daily={t("page.share.form.type.daily.description")}
             />
           </Paragraph>
+          {type === "daily" && (
+            <Stack gap="s">
+              {daysInPeriod.map((day) => (
+                <Controller
+                  key={dateToKey(day)}
+                  control={control}
+                  name={`periods.${dateToKey(day)}`}
+                  render={({ field: { value, onChange } }) => (
+                    <DailyParticipationItem
+                      date={day}
+                      periods={value}
+                      onChange={onChange}
+                    />
+                  )}
+                />
+              ))}
+            </Stack>
+          )}
           {type === "custom" && (
             <Stack>
               {fields.map((item, index) => (

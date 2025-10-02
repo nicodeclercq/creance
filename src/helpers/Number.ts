@@ -1,5 +1,6 @@
 import * as Either from "fp-ts/Either";
 
+import { Logger } from "../service/Logger";
 import { pipe } from "fp-ts/function";
 
 const ALLOWER_CHARS = "0-9.,+*()-/";
@@ -27,14 +28,14 @@ export function calculationAsNumber(
     const withEmptyStringHandling = withoutSpaces === "" ? "0" : withoutSpaces;
     const result = eval(withEmptyStringHandling);
     if (isNaN(result) || !isFinite(result)) {
-      console.error("Invalid calculation:", { value, result });
+      Logger.error("Invalid calculation:")({ value, result });
       return Either.left(
         new Error(`Invalid calculation "${value}" "${result}"`)
       );
     }
     return Either.right(result * 100);
   } catch (error) {
-    console.error("Error in calculation:", { value, error });
+    Logger.error("Error in calculation:")({ value, error });
     return Either.left(new Error(`Invalid calculation "${value}" "${error}"`));
   }
 }
@@ -44,7 +45,7 @@ export function asNumber(value: string): number {
     value,
     calculationAsNumber,
     Either.getOrElse(() => {
-      console.warn("Invalid calculation, returning NaN", value);
+      Logger.warn("Invalid calculation, returning NaN")(value);
       return NaN;
     })
   );

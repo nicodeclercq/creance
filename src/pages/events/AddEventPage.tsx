@@ -5,7 +5,7 @@ import { Stepper } from "../../ui/Stepper/Stepper";
 import { useState } from "react";
 import { Category, DEFAULT_CATEGORIES } from "../../models/Category";
 import { AddEventStep3, Step3Data } from "./private/AddEventStep3";
-import { useStore } from "../../store/StoreProvider";
+import { useData } from "../../store/useData";
 import { Card } from "../../ui/Card/Card";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
@@ -30,10 +30,9 @@ const initialStateStep1 = {
 export function AddEventPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const [_, setEvents] = useStore("events");
+  const [_, setEvents] = useData("events");
   const [currentStep, setCurrentStep] = useState(0);
-  const [account, setAccount] = useStore("account");
-  const [currentUserId] = useStore("currentParticipantId");
+  const [account, setAccount] = useData("account");
   const [step1Data, setStep1Data] = useState<Step1Data>(initialStateStep1);
   const [step2Data, setStep2Data] = useState<Step2Data>({
     categories: DEFAULT_CATEGORIES.map((category) => ({
@@ -44,14 +43,11 @@ export function AddEventPage() {
   const [step3Data, setStep3Data] = useState<Step3Data>({
     participants: [
       {
-        _id: currentUserId,
-        name: account?.name ?? "",
+        _id: account.currentUser._id,
+        name: account.currentUser.name,
         updatedAt: new Date(),
-        avatar: account?.avatar ?? "",
-        share: account?.share ?? {
-          adults: 1,
-          children: 0,
-        },
+        avatar: account.currentUser.avatar,
+        share: account.currentUser.share,
         participantShare: { type: "default" },
       },
     ],
@@ -67,6 +63,15 @@ export function AddEventPage() {
   };
   const goToStep4 = (data: Step3Data) => {
     const eventId = uid();
+
+    const dates =
+      step1Data.dates.start > step1Data.dates.end
+        ? {
+            start: step1Data.dates.end,
+            end: step1Data.dates.start,
+          }
+        : step1Data.dates;
+
     Promise.resolve()
       .then(() => generateKey(uid()))
       .then((eventKey) => {
@@ -88,8 +93,8 @@ export function AddEventPage() {
               {} as Record<string, Participant>
             ),
             period: {
-              start: step1Data.dates.start,
-              end: step1Data.dates.end,
+              start: dates.start,
+              end: dates.end,
               arrival: step1Data.arrival,
               departure: step1Data.departure,
             },
@@ -100,7 +105,9 @@ export function AddEventPage() {
               (acc, category) => ({ ...acc, [category._id]: category }),
               {} as Record<string, Category>
             ),
+            activities: {},
             updatedAt: new Date(),
+            mealManager: {},
           },
         }));
 
@@ -110,7 +117,7 @@ export function AddEventPage() {
             ...account?.events,
             [eventId]: {
               key: eventKey,
-              uid: (account as Account)._id,
+              uid: account.currentUser._id,
             },
           },
         }));

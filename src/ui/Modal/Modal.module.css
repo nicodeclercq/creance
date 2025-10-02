@@ -19,7 +19,10 @@
   min-width: min-content;
   width: max-content;
   max-width: 90vw;
-  padding: var(--ui-semantic-padding-l);
+  --component-layout-padding-x: var(--ui-semantic-padding-x-l);
+  --component-layout-padding-y: var(--ui-semantic-padding-y-l);
+  padding-inline: var(--component-layout-padding-x, 0);
+  padding-block: var(--component-layout-padding-y, 0);
   background-color: var(--ui-background-default);
   border-radius: var(--ui-semantic-radius-m);
   box-shadow: var(--ui-shadow-default);

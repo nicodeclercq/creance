@@ -1,14 +1,22 @@
-import { Account } from "../models/Account";
-import { Event } from "../models/Event";
+import * as z from "zod";
 
-export type State = {
-  currentParticipantId: string;
-  events: Record<string, Event>;
-  account: null | Account;
-};
+import { accountSchema } from "../models/Account";
+import { eventSchema } from "../models/Event";
+import { ANONYMOUS_USER, userSchema } from "../models/User";
+
+export const stateSchema = z.strictObject({
+  users: z.record(z.string().max(100), userSchema),
+  events: z.record(z.string().max(100), eventSchema),
+  account: accountSchema,
+});
+
+export type State = z.infer<typeof stateSchema>;
 
 export const DEFAULT_STATE = {
-  currentParticipantId: "",
-  account: null,
+  account: {
+    currentUser: ANONYMOUS_USER,
+    events: {},
+  },
   events: {},
-} as State;
+  users: {},
+} satisfies State;

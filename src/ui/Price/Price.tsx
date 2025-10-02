@@ -39,7 +39,7 @@ export function Price({
   };
 
   return (
-    <Paragraph styles={styles}>
+    <Paragraph data-component="Price" styles={styles}>
       {pipe(
         calculatedAmount,
         Either.map((a) => centToDecimal(`${a}`)),

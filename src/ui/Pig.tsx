@@ -6,6 +6,7 @@ export const PigImage = ({
   height?: string;
 }) => (
   <svg
+    data-component="PigImage"
     width={width}
     height={height}
     viewBox="0 0 1398 1398"

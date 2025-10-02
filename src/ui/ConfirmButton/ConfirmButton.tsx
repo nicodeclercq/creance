@@ -37,7 +37,7 @@ export function ConfirmButton({
   confirm,
 }: ConfirmProps) {
   return (
-    <DialogTrigger>
+    <DialogTrigger data-component="ConfirmButton">
       <Button
         {...action}
         className={classNames(

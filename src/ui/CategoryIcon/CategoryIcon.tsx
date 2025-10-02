@@ -17,6 +17,7 @@ export function CategoryIcon({ name, size, label }: IconProps) {
 
   return (
     <div
+      data-component="CategoryIcon"
       style={{
         color: "white",
         background: color,

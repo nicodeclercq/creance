@@ -1,12 +1,15 @@
 import { NotFountPage } from "../../error/NotFountPage";
 import { useTranslation } from "react-i18next";
 
-export type ShareNotFoundPageProps = {
+export type EventParticipantNotFoundPageProps = {
   eventId: string;
 };
 
-export function ShareNotFoundPage({ eventId }: ShareNotFoundPageProps) {
+export function EventParticipantNotFoundPage({
+  eventId,
+}: EventParticipantNotFoundPageProps) {
   const { t } = useTranslation();
+
   return (
     <NotFountPage
       title={t("page.event.share.notFound")}
@@ -16,7 +19,7 @@ export function ShareNotFoundPage({ eventId }: ShareNotFoundPageProps) {
           as: "link",
           label: t("page.event.share.edit.actions.backToShares"),
           variant: "primary",
-          to: "SHARES",
+          to: "EVENT_USERS",
           params: { eventId },
         },
         {

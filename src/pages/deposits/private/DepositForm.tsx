@@ -10,6 +10,7 @@ import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Participant } from "../../../models/Participant";
 import { Select } from "../../../ui/FormField/Select/Select";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 type DepositFormProps = {
@@ -32,6 +33,7 @@ export function DepositForm({
   event,
 }: DepositFormProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   const {
     control,
@@ -118,13 +120,18 @@ export function DepositForm({
               trigger("to");
             }}
             valueRenderer={({ value }) => (
-              <Avatar label={participants[value]?.name} size="m" />
+              <Avatar
+                label={participants[value]?.name}
+                image={participants[value]?.avatar}
+                size="m"
+              />
             )}
             options={Object.keys(event.participants).map(
               (participant, index) => ({
                 id: participant ?? index,
-                label:
-                  participants[participant]?.name ?? t("participant.unknown"),
+                label: isCurrentUser(participants[participant])
+                  ? t("currentUser.anonymous.name")
+                  : participants[participant].name ?? t("participant.unknown"),
                 value:
                   participants[participant]?._id ?? t("participant.unknown"),
               })
@@ -150,13 +157,18 @@ export function DepositForm({
               trigger("from");
             }}
             valueRenderer={({ value }) => (
-              <Avatar label={participants[value]?.name} size="m" />
+              <Avatar
+                label={participants[value]?.name}
+                image={participants[value]?.avatar}
+                size="m"
+              />
             )}
             options={Object.keys(event.participants).map(
               (participant, index) => ({
                 id: participant ?? index,
-                label:
-                  participants[participant]?.name ?? t("participant.unknown"),
+                label: isCurrentUser(participants[participant])
+                  ? t("currentUser.anonymous.name")
+                  : participants[participant].name ?? t("participant.unknown"),
                 value:
                   participants[participant]?._id ?? t("participant.unknown"),
               })

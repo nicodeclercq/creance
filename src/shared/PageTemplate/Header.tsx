@@ -8,8 +8,11 @@ import {
   type IconButtonProps,
 } from "../../ui/IconButton/IconButton";
 import { Menu, type MenuProps } from "../../ui/Menu/Menu";
+import { useCurrentUser } from "../../store/useCurrentUser";
+import { Avatar } from "../../ui/Avatar/Avatar";
 
 export type HeaderProps = {
+  gridArea?: string;
   leftAction?:
     | Omit<IconButtonProps<AsLink>, "variant">
     | Omit<IconButtonProps<AsButton>, "variant">;
@@ -17,8 +20,16 @@ export type HeaderProps = {
   rightActions?: MenuProps["actions"];
 };
 
-export function Header({ leftAction, title, rightActions }: HeaderProps) {
+export const HEADER_HEIGHT = "9rem";
+
+export function Header({
+  leftAction,
+  title,
+  rightActions,
+  gridArea,
+}: HeaderProps) {
   const { t } = useTranslation();
+  const { currentUser } = useCurrentUser();
 
   return (
     <Container
@@ -29,15 +40,23 @@ export function Header({ leftAction, title, rightActions }: HeaderProps) {
         position: "sticky",
         top: 0,
         zIndex: 100,
+        gridArea,
       }}
     >
-      <Columns gap="s" align="center">
+      <Columns gap="m" align="center">
         {leftAction && <IconButton {...leftAction} variant="primary" />}
         <Heading
           styles={{ font: "body-large", color: "inverted", flexGrow: true }}
         >
           {title}
         </Heading>
+        {currentUser && (
+          <Avatar
+            label={currentUser.name}
+            image={currentUser.avatar}
+            size="m"
+          />
+        )}
         {rightActions && (
           <Menu
             label={t("component.pageTemplate.actions.more")}

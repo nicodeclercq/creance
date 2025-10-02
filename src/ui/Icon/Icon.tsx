@@ -21,18 +21,20 @@ export function Icon({ name, size }: IconProps) {
   const Icon = ICONS[name];
 
   return (
-    <div
+    <span
+      data-component="Icon"
       style={{
         color: "inherit",
         flex: "none",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: computedSize,
+        transform: "translateY(var(--icon-margin, 0))",
       }}
       aria-hidden="true"
     >
       <Icon />
-    </div>
+    </span>
   );
 }

@@ -13,6 +13,7 @@ export type FormFieldProps = {
   isDisabled: boolean;
   children: ReactNode;
   message?: string;
+  ariaLabelledby?: string;
 };
 
 export function FormField({
@@ -23,17 +24,19 @@ export function FormField({
   isRequired = false,
   isDisabled = false,
   message,
+  ariaLabelledby,
 }: FormFieldProps) {
   const label = isRequired ? providedLabel : `${providedLabel} (optionel)`;
 
   return (
     <div
+      data-component="FormField"
       className={classNames(styles.formField, {
         [styles.isInvalid]: error != null,
         [styles.isDisabled]: isDisabled,
       })}
     >
-      <Label htmlFor={id}>{label}</Label>
+      {!ariaLabelledby && <Label htmlFor={id}>{label}</Label>}
       {children}
       <Text slot="description" />
       {error && <ErrorMessage id={`${id}_error`} message={error} />}

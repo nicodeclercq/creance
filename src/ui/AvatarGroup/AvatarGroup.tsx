@@ -17,6 +17,7 @@ export function AvatarGroup({ avatars, size }: AvatarGroupProps) {
 
   return (
     <div
+      data-component="AvatarGroup"
       className={classNames(styles.group, {
         [styles.isCondensed]: avatars.length > MAX_UNTIL_CONDENSED,
       })}
@@ -29,6 +30,7 @@ export function AvatarGroup({ avatars, size }: AvatarGroupProps) {
           label={
             unshownAvatarNb >= 10 && size === "s" ? "№" : `+${unshownAvatarNb}` // avoid two digit numbers in small size
           }
+          image={""}
           size={size}
         />
       )}

@@ -35,7 +35,7 @@ export function Stepper({
   const { title, description } = steps[currentStepIndex];
 
   return (
-    <div className={styles.stepper}>
+    <div data-component="Stepper" className={styles.stepper}>
       <Heading level={2} styles={{ font: "body-large", textAlign: "center" }}>
         <Text slot="label">{title}</Text>
       </Heading>

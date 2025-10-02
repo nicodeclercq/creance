@@ -32,6 +32,7 @@
   right: 0;
   bottom: 0;
   transition: background 0.2s ease-in;
+  border-radius: var(--layout-container-radius);
 }
 .isOverlay:hover::after{
   background: var(--ui-semantic-color-primary-weaker);

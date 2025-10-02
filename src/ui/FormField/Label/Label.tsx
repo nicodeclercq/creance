@@ -8,7 +8,7 @@ type LabelProps = {
 
 export function Label({ htmlFor, children }: LabelProps) {
   return (
-    <RALabel className={styles.label} htmlFor={htmlFor}>
+    <RALabel data-component="Label" className={styles.label} htmlFor={htmlFor}>
       {children}
     </RALabel>
   );

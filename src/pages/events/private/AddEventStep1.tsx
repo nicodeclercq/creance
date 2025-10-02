@@ -6,7 +6,7 @@ import { DAYS_BEFORE_CLOSE } from "../../../models/Event";
 import { Form } from "../../../ui/Form/Form";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Select } from "../../../ui/FormField/Select/Select";
-import { useStore } from "../../../store/StoreProvider";
+import { useData } from "../../../store/useData";
 import { useTranslation } from "react-i18next";
 
 export type Step1Data = {
@@ -28,7 +28,7 @@ type AddEventStep1Props = {
 
 export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
   const { t } = useTranslation();
-  const [events] = useStore("events");
+  const [events] = useData("events");
   const { control, handleSubmit, formState } = useForm<Step1Data>({
     defaultValues: data,
     mode: "onBlur",

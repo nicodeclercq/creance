@@ -22,6 +22,7 @@ export function Checkbox(props: CheckboxProps | ReactAriaCheckBoxProps) {
   } = props as CheckboxProps;
   return (
     <CheckboxCompo
+      data-component="Checkbox"
       className={styles.checkboxWrapper}
       isSelected={value}
       onChange={onChange}

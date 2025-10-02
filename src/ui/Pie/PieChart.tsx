@@ -16,6 +16,7 @@ type PieProps = {
 export function PieChart({ data, valueFormatter, label }: PieProps) {
   return (
     <Chart
+      data-component="PieChart"
       aria-label={label}
       aria-hidden={label ? undefined : true}
       series={[

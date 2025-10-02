@@ -36,7 +36,7 @@ export function Menu({
   actions,
 }: MenuProps) {
   return (
-    <DialogTrigger>
+    <DialogTrigger data-component="Menu">
       <Button
         className={classNames(
           buttonStyles.button,

@@ -5,15 +5,15 @@ import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Redirect } from "../../Redirect";
 import { useParams } from "react-router-dom";
+import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export function CategoriesPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const { goTo } = useRoute();
-  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.${eventId}`);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;

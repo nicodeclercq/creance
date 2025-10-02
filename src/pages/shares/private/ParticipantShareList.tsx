@@ -23,6 +23,7 @@ import { Select } from "../../../ui/FormField/Select/Select";
 import { Stack } from "../../../ui/Stack/Stack";
 import { pipe } from "fp-ts/function";
 import { sort } from "../../../utils/date";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -38,6 +39,7 @@ export function ParticipantShareList({
   currentParticipantId,
 }: ParticipantShareListProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
   const [participantId, setParticipantId] =
     useState<string>(currentParticipantId);
 
@@ -117,13 +119,23 @@ export function ParticipantShareList({
             value={participantId}
             options={Object.entries(participants).map(([id, participant]) => ({
               value: id,
-              label: participant.name,
+              label: isCurrentUser(participant)
+                ? t("currentUser.anonymous.name")
+                : participant.name,
               id: participant._id,
             }))}
             valueRenderer={(option) => (
               <div>
                 <Columns gap="s" align="center">
-                  <Avatar label={option.label} size="m" />
+                  <Avatar
+                    label={
+                      isCurrentUser(participants[option.id])
+                        ? t("currentUser.anonymous.name")
+                        : option.label
+                    }
+                    image={participants[option.id].avatar}
+                    size="m"
+                  />
                 </Columns>
               </div>
             )}

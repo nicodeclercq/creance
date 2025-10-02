@@ -1,14 +1,15 @@
 import { Avatar } from "../../../ui/Avatar/Avatar";
-import { CalendarDate } from "../../../ui/CalendarDate/CalendarDate";
 import { Category } from "../../../models/Category";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
 import { Columns } from "../../../ui/Columns/Columns";
+import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
 import { Expense } from "../../../models/Expense";
 import { Menu } from "../../../ui/Menu/Menu";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Participant } from "../../../models/Participant";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 type ExpenseItemProps = {
@@ -29,6 +30,7 @@ export function ExpenseItem({
   onDelete,
 }: ExpenseItemProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   const lender = participants[expense.lender];
 
@@ -49,11 +51,25 @@ export function ExpenseItem({
       <Stack>
         <Price>{expense.amount}</Price>
         <Columns align="center" gap="s">
-          <Avatar label={lender.name} size="s" />
-          <Paragraph styles={{ font: "body-small" }}>{lender.name}</Paragraph>
+          <Avatar
+            label={
+              isCurrentUser(lender)
+                ? t("currentUser.anonymous.name")
+                : lender.name
+            }
+            image={lender.avatar}
+            size="s"
+          />
+          <Paragraph styles={{ font: "body-small" }}>
+            {isCurrentUser(lender)
+              ? t("currentUser.anonymous.name")
+              : lender.name}
+          </Paragraph>
         </Columns>
       </Stack>
-      <CalendarDate date={expense.date} styles={{ font: "body-smaller" }} />
+      <DateFormatter styles={{ font: "body-smaller" }}>
+        {expense.date}
+      </DateFormatter>
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}

@@ -6,7 +6,7 @@ type Size = "s" | "m" | "l" | "xl";
 
 export type AvatarProps = {
   label: string;
-  image?: string;
+  image: string;
   size?: Size;
   statusIcon?: IconName;
 };
@@ -52,13 +52,16 @@ export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
 
   return (
     <div
+      data-component="Avatar"
       aria-label={label}
       style={{
         position: "relative",
         aspectRatio: "1/1",
-        background: image
-          ? `url(${image}) ${computedSize}/${computedSize} no-repeat`
-          : computeRandomColor(label),
+        backgroundImage: image ? `url(${image})` : undefined,
+        backgroundColor: computeRandomColor(label),
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         flex: "none",
         display: "flex",
         alignItems: "center",

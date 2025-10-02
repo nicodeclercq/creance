@@ -11,18 +11,18 @@ export function Router() {
           ({
             path,
             component: Component,
-            isPublic = false,
+            isPrivate = false,
           }: RouteDefinition) => (
             <Route
               key={path}
               path={path}
               element={
-                isPublic ? (
-                  <Component />
-                ) : (
+                isPrivate ? (
                   <PrivatePage>
                     <Component />
                   </PrivatePage>
+                ) : (
+                  <Component />
                 )
               }
             />

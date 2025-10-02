@@ -15,6 +15,7 @@ import { PieChart } from "../../../ui/Pie/PieChart";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
 import { centToDecimal } from "../../../helpers/Number";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 type ExpenseShareProps = {
@@ -33,6 +34,7 @@ export function ExpenseShare({
   sharesByCategory,
 }: ExpenseShareProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   return (
     <Card>
@@ -69,11 +71,17 @@ export function ExpenseShare({
                 size="m"
               />
               <Stack>
-                <DateFormatter>{expense.date}</DateFormatter>
+                <DateFormatter format="long">{expense.date}</DateFormatter>
                 <Columns align="center" gap="s">
-                  <Avatar label={participants[expense.lender].name} size="s" />
+                  <Avatar
+                    label={participants[expense.lender].name}
+                    image={participants[expense.lender].avatar}
+                    size="s"
+                  />
                   <Paragraph styles={{ font: "body-small" }}>
-                    {participants[expense.lender].name}
+                    {isCurrentUser(participants[expense.lender])
+                      ? t("currentUser.anonymous.name")
+                      : participants[expense.lender].name}
                   </Paragraph>
                 </Columns>
               </Stack>

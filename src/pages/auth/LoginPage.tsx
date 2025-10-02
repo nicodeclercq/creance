@@ -9,16 +9,16 @@ import { InputText } from "../../ui/FormField/InputText/InputText";
 import { PigImage } from "../../ui/Pig";
 import { Redirect } from "../../Redirect";
 import { Stack } from "../../ui/Stack/Stack";
-import { loginUser } from "../../service/firebase";
+import { loginUser } from "../../store/private/firebase";
 import styles from "./LoginPage.module.css";
-import { useAuthentication } from "../../hooks/useAnthentication";
 import { useRoute } from "../../hooks/useRoute";
+import { useStore } from "../../store/useStore";
 import { useTranslation } from "react-i18next";
 
 export function LoginPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const { state } = useAuthentication();
+  const [state] = useStore();
   const { control, formState, handleSubmit } = useForm({
     defaultValues: {
       email: "",
@@ -26,7 +26,7 @@ export function LoginPage() {
     },
   });
 
-  if (state.type === "authenticated") {
+  if (state.type === "authenticated" && state.data.account) {
     return <Redirect to="EVENT_LIST" />;
   }
 

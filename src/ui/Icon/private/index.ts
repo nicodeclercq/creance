@@ -1,4 +1,5 @@
 import { AddIcon } from "./AddIcon";
+import { CalendarDayIcon } from "./CalendarDayIcon";
 import { CarretDownIcon } from "./CarretDownIcon";
 import { CarretUpIcon } from "./CarretUpIcon";
 import { CheckIcon } from "./CheckIcon";
@@ -14,6 +15,7 @@ import { FolderIcon } from "./FolderIcon";
 import { GiveMoneyIcon } from "./GiveMoneyIcon";
 import { HelpIcon } from "./HelpIcon";
 import { HideIcon } from "./HideIcon";
+import { LinkIcon } from "./LinkIcon";
 import { LockIcon } from "./LockIcon";
 import { MenuIcon } from "./MenuIcon";
 import { MinusIcon } from "./MinusIcon";
@@ -21,6 +23,7 @@ import { PlusIcon } from "./PlusIcon";
 import { ShoppingCartIcon } from "./ShoppingCartIcon";
 import { ShowIcon } from "./ShowIcon";
 import { StarIcon } from "./StarIcon";
+import { TicketIcon } from "./TicketIcon";
 import { TrashIcon } from "./TrashIcon";
 import { UnlockIcon } from "./UnlockIcon";
 import { UploadIcon } from "./UploadIcon";
@@ -34,6 +37,7 @@ export const ICONS = {
   add: AddIcon,
   "carret-down": CarretDownIcon,
   "carret-up": CarretUpIcon,
+  "calendar-day": CalendarDayIcon,
   check: CheckIcon,
   "chevron-down": ChevronDownIcon,
   "chevron-left": ChevronLeftIcon,
@@ -47,6 +51,7 @@ export const ICONS = {
   "give-money": GiveMoneyIcon,
   help: HelpIcon,
   hide: HideIcon,
+  link: LinkIcon,
   lock: LockIcon,
   menu: MenuIcon,
   minus: MinusIcon,
@@ -54,6 +59,7 @@ export const ICONS = {
   "shopping-cart": ShoppingCartIcon,
   show: ShowIcon,
   star: StarIcon,
+  ticket: TicketIcon,
   trash: TrashIcon,
   unlock: UnlockIcon,
   upload: UploadIcon,

@@ -14,6 +14,7 @@ export function LoadingIcon({ size }: LoadingIconProps) {
 
   return (
     <svg
+      data-component="LoadingIcon"
       className={styles.loader}
       width={size ? `${0.8 * factor[size]}rem` : "1em"}
       height={size ? `${0.8 * factor[size]}rem` : "1em"}

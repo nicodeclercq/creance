@@ -10,6 +10,7 @@ export function InputText({
   type,
   value,
   onChange,
+  onBlur,
   isRequired = false,
   isDisabled = false,
   ...props
@@ -18,6 +19,7 @@ export function InputText({
 
   return (
     <FormField
+      data-component="InputText"
       id={id}
       {...props}
       isDisabled={isDisabled}
@@ -32,6 +34,9 @@ export function InputText({
         disabled={isDisabled}
         onChange={(event) => {
           onChange(event.target.value);
+        }}
+        onBlur={(event) => {
+          onBlur?.(event.target.value);
         }}
       />
     </FormField>

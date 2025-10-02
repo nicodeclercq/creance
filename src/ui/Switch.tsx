@@ -1,3 +1,4 @@
+import { Logger } from "../service/Logger";
 import type { ReactNode } from "react";
 
 type SwitchProps<T extends string> = {
@@ -12,6 +13,6 @@ export function Switch<T extends string>({
     return renderers[data] as ReactNode;
   }
 
-  console.warn(data, "not found");
+  Logger.warn("Data not found")(data);
   return null;
 }

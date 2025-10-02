@@ -6,15 +6,15 @@ import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
 import { useParams } from "react-router-dom";
+import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export function EditDepositPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const { eventId, depositId } = useParams();
-  const [event, setEvent] = useStore(`events.${eventId}`);
+  const [event, setEvent] = useData(`events.${eventId}`);
 
   const defaultValue = event.deposits[depositId!];
 

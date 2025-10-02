@@ -3,6 +3,7 @@ import * as Either from "fp-ts/Either";
 
 import {
   CustomParticipantShare,
+  DailyParticipantShare,
   foldParticipantShare,
 } from "../models/ParticipantShare";
 
@@ -92,6 +93,20 @@ export function getCustomParticipantShareCount(shares: CustomParticipantShare) {
   );
 }
 
+export function getDailyParticipantShareCount(shares: DailyParticipantShare) {
+  return pipe(shares.periods, (periods) =>
+    Object.values(periods).reduce((count, period) => {
+      return (
+        count +
+        (period["AM"]?.adults ?? 0) * 2 +
+        (period["PM"]?.adults ?? 0) * 2 +
+        (period["AM"]?.children ?? 0) +
+        (period["PM"]?.children ?? 0)
+      );
+    }, 0)
+  );
+}
+
 function getTotalCount(counts: Record<string, number>) {
   return Object.values(counts).reduce((acc, count) => acc + count, 0);
 }
@@ -112,6 +127,7 @@ function getDefaultExpenseShares({
           [participant._id]: foldParticipantShare({
             onDefault: () =>
               getDefaultParticipantShareCount(event.period, participant),
+            onDaily: (share) => getDailyParticipantShareCount(share),
             onCustom: (share) => getCustomParticipantShareCount(share),
           })(participant.participantShare),
         }),

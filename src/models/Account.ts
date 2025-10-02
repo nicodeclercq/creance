@@ -1,6 +1,16 @@
-import { User } from "./User";
+import * as z from "zod";
 
-export type Account = User & {
-  events: Record<string, { key: string; uid: string }>;
-  users: Record<string, User>;
-};
+import { userSchema } from "./User";
+
+export const accountSchema = z.strictObject({
+  currentUser: userSchema,
+  events: z.record(
+    z.string().max(100),
+    z.object({
+      key: z.string().max(100),
+      uid: z.string().max(100),
+    })
+  ),
+});
+
+export type Account = z.infer<typeof accountSchema>;

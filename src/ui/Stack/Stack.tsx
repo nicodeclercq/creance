@@ -16,7 +16,21 @@ type StackProps = {
   gap?: ContainerStyles["gap"];
   padding?: ContainerStyles["padding"];
   width?: ContainerStyles["width"] | "auto";
-  styles?: ContainerStyles<"background" | "color" | "zIndex">;
+  styles?: ContainerStyles<
+    | "background"
+    | "color"
+    | "zIndex"
+    | "radius"
+    | "shadow"
+    | "border"
+    | "padding"
+    | "overflow"
+    | "height"
+    | "width"
+    | "maxWidth"
+    | "minWidth"
+    | "gridArea"
+  >;
 };
 
 export function Stack({
@@ -41,7 +55,15 @@ export function Stack({
         gap,
         padding,
         width,
+        customCSSProperties:
+          padding && padding !== "none"
+            ? {
+                [`component-layout-padding-x`]: `var(--ui-semantic-padding-x-${padding})`,
+                [`component-layout-padding-y`]: `var(--ui-semantic-padding-y-${padding})`,
+              }
+            : undefined,
       }}
+      data-component="Stack"
     >
       {children}
     </Container>

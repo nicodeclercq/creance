@@ -2,21 +2,21 @@ import { type ReactNode } from "react";
 import { redirect } from "react-router-dom";
 import { EventsPage } from "./pages/events/EventsPage";
 import { Redirect } from "./Redirect";
-import { IconsPage } from "./pages/IconsPage";
 import { AddEventPage } from "./pages/events/AddEventPage";
 import { EventPage } from "./pages/event/EventPage";
 import { AddExpensePage } from "./pages/event/AddExpensePage";
 import { EditExpensePage } from "./pages/event/EditExpensePage";
 import { CategoriesPage } from "./pages/categories/CategoriesPage";
-import { SharesPage } from "./pages/shares/SharesPage";
+import { EventUsersPage } from "./pages/participants/EventUsersPage";
 import { ParticipantSharePage } from "./pages/shares/ParticipantSharePage";
-import { EventParticipantSharePage } from "./pages/shares/EventParticipantSharePage";
+import { EventParticipantSharePage } from "./pages/participants/EventParticipantSharePage";
 import { DistributionPage } from "./pages/distribution/DistributionPage";
 import { ValueOf } from "./utils/object";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { InformationPage } from "./pages/settings/InformationPage";
 import { AddDepositPage } from "./pages/deposits/AddDepositPage";
 import { EditDepositPage } from "./pages/deposits/EditDepositPage";
+import { CalendarPage } from "./pages/calendar/CalendarPage";
 
 export const ROUTES_DEFINITION = {
   ROOT: {
@@ -26,12 +26,10 @@ export const ROUTES_DEFINITION = {
   LOGIN: {
     path: "/login",
     component: LoginPage,
-    isPublic: true,
   },
   INFORMATION: {
     path: "/information",
     component: InformationPage,
-    isPublic: true,
   },
   EVENT_LIST: {
     path: "/events",
@@ -44,6 +42,10 @@ export const ROUTES_DEFINITION = {
   EVENT: {
     path: "/events/:eventId/expenses",
     component: EventPage,
+  },
+  EVENT_CALENDAR: {
+    path: "/events/:eventId/calendar",
+    component: CalendarPage,
   },
   EXPENSE_ADD: {
     path: "/events/:eventId/expenses/add",
@@ -65,12 +67,12 @@ export const ROUTES_DEFINITION = {
     path: "/events/:eventId/deposits/:depositId/edit",
     component: EditDepositPage,
   },
-  SHARES: {
-    path: "/events/:eventId/shares",
-    component: SharesPage,
+  EVENT_USERS: {
+    path: "/events/:eventId/users",
+    component: EventUsersPage,
   },
-  SHARES_EDIT: {
-    path: "/events/:eventId/shares/:shareId/edit",
+  EVENT_USERS_EDIT: {
+    path: "/events/:eventId/users/:participantId/edit",
     component: ParticipantSharePage,
   },
   EVENT_PARTICIPANT_SHARE: {
@@ -85,25 +87,6 @@ export const ROUTES_DEFINITION = {
     path: "/join/:eventId/:shareId",
     component: () => <h1>Join event</h1>,
   },
-  // TECH
-  ICONS: {
-    path: "/icons",
-    component: IconsPage,
-  },
-  /*
-  CREANCE_ADD: "/creances/add",
-  CREANCE_VIEW: "/creances/:creanceId",
-  CREANCE_EDIT: "/creances/:creanceId/edit",
-  EXPENSE_LIST: "/creances/:creanceId/expenses",
-  EXPENSE_ADD: "/creances/:creanceId/expenses/add",
-  EXPENSE_VIEW: "/creances/:creanceId/expenses/:id",
-  EXPENSE_EDIT: "/creances/:creanceId/expenses/:id/edit",
-  DISTRIBUTION: "/creances/:creanceId/distribution",
-  RESULTS: "/creances/:creanceId/summary",
-  PARTICIPANT_LIST: "/creances/:creanceId/participants",
-  CATEGORIES_LIST: "/creances/:creanceId/categories",
-  EXPORT: "/creances/:creanceId/export",
-  */
 } as const satisfies Record<
   string,
   {
@@ -123,7 +106,7 @@ export const DEFAULT_ROUTE: RouteName = ROUTES.ROOT;
 export type LeafRoute = {
   path: ValueOf<typeof ROUTES_DEFINITION>["path"];
   component: () => ReactNode;
-  isPublic?: boolean;
+  isPrivate?: boolean;
 };
 
 export const routes = Object.values(ROUTES_DEFINITION) as LeafRoute[];
@@ -158,13 +141,19 @@ export const getRouteDefinition = (route: RouteName) =>
 
 export const getPath = (
   route: RouteName,
-  parameters?: { [key: string]: string | number }
-) =>
-  (parameters ? Object.entries(parameters) : []).reduce(
+  parameters?: { [key: string]: string | number },
+  hash?: string
+) => {
+  if (!(route in ROUTES_DEFINITION)) {
+    throw new Error(`Route ${route} not found`);
+  }
+
+  return (parameters ? Object.entries(parameters) : []).reduce(
     (acc: string, [key, value]) =>
       acc.replace(new RegExp(`:${key}`, "g"), `${value}`),
-    ROUTES_DEFINITION[route].path
+    `${ROUTES_DEFINITION[route].path}${hash ? `#${hash}` : ""}`
   ) as RouteName;
+};
 
 export const navigate = (
   route: RouteName,

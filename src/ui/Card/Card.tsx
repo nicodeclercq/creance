@@ -20,6 +20,7 @@ export function Card({
   return (
     <Container
       as={as}
+      data-component="Card"
       styles={{
         ...styles,
         display: "block",
@@ -29,6 +30,12 @@ export function Card({
         cursor: isInteractive ? "pointer" : "default",
         radius: "m",
         shadow: "default",
+        customCSSProperties: padding
+          ? {
+              [`component-layout-padding-x`]: `var(--ui-semantic-padding-x-${padding})`,
+              [`component-layout-padding-y`]: `var(--ui-semantic-padding-y-${padding})`,
+            }
+          : undefined,
       }}
     >
       {children}

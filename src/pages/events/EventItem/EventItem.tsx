@@ -29,11 +29,15 @@ export function EventItem({
       styles={{
         position: "relative",
         padding: "m",
-        radius: "s",
+        radius: "m",
         overflow: "hidden",
       }}
     >
-      <Avatar label={name} statusIcon={isClosed ? "lock" : undefined} />
+      <Avatar
+        label={name}
+        image={""}
+        statusIcon={isClosed ? "lock" : undefined}
+      />
       <Stack>
         <Paragraph styles={{ flexGrow: true }}>
           {name} {isClosed && t("page.events.list.closed")}
@@ -43,6 +47,7 @@ export function EventItem({
             size="s"
             avatars={eventParticipantIds.map((participantId) => ({
               label: participants[participantId].name,
+              image: participants[participantId].avatar,
             }))}
           />
         </Columns>

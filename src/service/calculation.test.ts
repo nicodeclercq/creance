@@ -1,8 +1,19 @@
 import * as Either from "fp-ts/Either";
 
+import {
+  CustomParticipantShare,
+  DailyParticipantShare,
+} from "../models/ParticipantShare";
+import {
+  createDeposit,
+  createEvent,
+  createExpense,
+  createParticipant,
+} from "./test-helpers";
 import { describe, expect, it } from "vitest";
 import {
   getCustomParticipantShareCount,
+  getDailyParticipantShareCount,
   getDefaultParticipantShareCount,
   getEventDistribution,
   getEventSharesByParticipant,
@@ -12,77 +23,7 @@ import {
   getTotalExpenseAmount,
 } from "./calculation";
 
-import { CustomParticipantShare } from "../models/ParticipantShare";
-import { Deposit } from "../models/Deposit";
-import { Event } from "../models/Event";
-import { Expense } from "../models/Expense";
-import { Participant } from "../models/Participant";
 import { pipe } from "fp-ts/function";
-import { uid } from "./crypto";
-
-const createEvent = (defaultValues: Partial<Event> = {}): Event => ({
-  _id: uid(),
-  name: "Event Name",
-  description: "",
-  participants: {},
-  categories: {
-    Food: {
-      _id: uid(),
-      name: "Food",
-      icon: "axe",
-    },
-    Transport: {
-      _id: uid(),
-      name: "Transport",
-      icon: "axe",
-    },
-  },
-  deposits: {},
-  expenses: {},
-  isClosed: false,
-  period: {
-    start: new Date("2025-01-01"), // x1
-    arrival: "PM",
-    end: new Date("2025-01-01"),
-    departure: "PM",
-  },
-  updatedAt: new Date(),
-  ...defaultValues,
-});
-const createExpense = (defaultValues: Partial<Expense> = {}): Expense => ({
-  _id: uid(),
-  category: uid(),
-  lender: uid(),
-  date: new Date("2025-01-01"),
-  updatedAt: new Date("2025-01-01"),
-  reason: "Expense Reason",
-  amount: "100",
-  share: { type: "default" },
-  ...defaultValues,
-});
-const createParticipant = (
-  defaultValues: Partial<Participant> = {}
-): Participant => ({
-  _id: uid(),
-  name: "Participant Name",
-  share: {
-    adults: 1,
-    children: 0,
-  },
-  participantShare: { type: "default" },
-  updatedAt: new Date("2025-01-01"),
-  ...defaultValues,
-});
-const createDeposit = (defaultValues: Partial<Deposit> = {}): Deposit => ({
-  _id: uid(),
-  from: uid(),
-  to: uid(),
-  amount: "100",
-  note: "Deposit Reason",
-  date: new Date("2025-01-01"),
-  updatedAt: new Date("2025-01-01"),
-  ...defaultValues,
-});
 
 describe("calcultation", () => {
   describe("getTotalExpenseAmount", () => {
@@ -214,6 +155,37 @@ describe("calcultation", () => {
     });
   });
 
+  describe("getDailyParticipantShareCount", () => {
+    it("should return the daily share count for a participant", () => {
+      const participantShare: DailyParticipantShare = {
+        type: "daily",
+        periods: {
+          "2025-01-01": {
+            // 1 * 2 + 1 = 4
+            PM: { adults: 1, children: 1 },
+          },
+          "2025-01-02": {
+            // 3 * 2 + 2 = 8
+            AM: { adults: 2, children: 1 },
+            PM: { adults: 1, children: 1 },
+          },
+          "2025-01-05": {
+            // 5 * 2 + 4 = 14
+            AM: { adults: 3, children: 2 },
+            PM: { adults: 2, children: 2 },
+          },
+          "2025-01-06": {
+            // 0 * 2 + 2 = 2
+            AM: { adults: 0, children: 3 },
+          },
+        },
+      };
+
+      const share = getDailyParticipantShareCount(participantShare);
+
+      expect(share).toBe(4 + 8 + 14 + 2);
+    });
+  });
   describe("getCustomParticipantShareCount", () => {
     it("should return the custom share count for a participant", () => {
       const customShares: CustomParticipantShare = {

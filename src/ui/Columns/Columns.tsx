@@ -7,6 +7,7 @@ import {
 import type { ReactNode } from "react";
 
 type ColumnsProps = {
+  id?: string;
   isInline?: boolean;
   children: ReactNode;
   as?: "div" | "li";
@@ -18,6 +19,9 @@ type ColumnsProps = {
     | "overflow"
     | "flexGrow"
     | "width"
+    | "radius"
+    | "shadow"
+    | "gridArea"
   >;
   template?: ContainerStyles["gridTemplateColumns"];
   gap?: ContainerStyles["gap"];
@@ -27,6 +31,7 @@ type ColumnsProps = {
 };
 
 export function Columns({
+  id,
   as = "div",
   children,
   template: gridTemplateColumns,
@@ -38,12 +43,23 @@ export function Columns({
   wrap,
 }: ColumnsProps) {
   const displayType = gridTemplateColumns != null ? "grid" : "flex";
+  const { padding, ...otherStyles } = styles;
 
   return (
     <Container
+      id={id}
       as={as}
+      data-component="Columns"
       styles={{
-        ...styles,
+        ...otherStyles,
+        padding,
+        customCSSProperties:
+          padding && padding !== "none"
+            ? {
+                [`component-layout-padding-x`]: `var(--ui-semantic-padding-x-${padding})`,
+                [`component-layout-padding-y`]: `var(--ui-semantic-padding-y-${padding})`,
+              }
+            : undefined,
         display: isInline ? `inline-${displayType}` : displayType,
         alignItems: align,
         gap,

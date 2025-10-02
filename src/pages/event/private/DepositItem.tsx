@@ -1,6 +1,6 @@
 import { AvatarGroup } from "../../../ui/AvatarGroup/AvatarGroup";
-import { CalendarDate } from "../../../ui/CalendarDate/CalendarDate";
 import { Columns } from "../../../ui/Columns/Columns";
+import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
 import { Deposit } from "../../../models/Deposit";
 import { ExchangeMoneyIcon } from "../../../ui/Icon/private/ExchangeMoneyIcon";
 import { Menu } from "../../../ui/Menu/Menu";
@@ -9,6 +9,7 @@ import { Participant } from "../../../models/Participant";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
 import { computeRandomColor } from "../../../ui/Avatar/Avatar";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 type DepositItemProps = {
@@ -27,6 +28,7 @@ export function DepositItem({
   onDelete,
 }: DepositItemProps) {
   const { t } = useTranslation();
+  const { isCurrentUser } = useCurrentUser();
 
   const from = participants[deposit.from];
   const to = participants[deposit.to];
@@ -53,18 +55,25 @@ export function DepositItem({
         <Price styles={{ font: "body-small" }}>{deposit.amount}</Price>
         <Columns align="center" gap="s">
           <AvatarGroup
-            avatars={[{ label: from.name }, { label: to.name }]}
+            avatars={[
+              { label: from.name, image: from.avatar },
+              { label: to.name, image: to.avatar },
+            ]}
             size="s"
           />
           <Paragraph styles={{ font: "body-small" }}>
             {t("page.event.depositItem.participants", {
-              from: from.name,
-              to: to.name,
+              from: isCurrentUser(from)
+                ? t("currentUser.anonymous.name")
+                : from.name,
+              to: isCurrentUser(to) ? t("currentUser.anonymous.name") : to.name,
             })}
           </Paragraph>
         </Columns>
       </Stack>
-      <CalendarDate date={deposit.date} styles={{ font: "body-smaller" }} />
+      <DateFormatter styles={{ font: "body-smaller" }}>
+        {deposit.date}
+      </DateFormatter>
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}

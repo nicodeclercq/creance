@@ -8,17 +8,17 @@ import { Redirect } from "../../Redirect";
 import { uid } from "../../service/crypto";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
+import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { useStore } from "../../store/StoreProvider";
 import { useTranslation } from "react-i18next";
 
 export function AddExpensePage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const { goTo } = useRoute();
-  const [currentEvent, setEvent] = useStore(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.${eventId}`);
   const participants = useEventParticipants(eventId);
-  const [currentParticipantId] = useStore("currentParticipantId");
+  const [currentParticipantId] = useData(`account.events.${eventId}.uid`);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;

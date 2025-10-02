@@ -25,6 +25,18 @@
   --ui-primitive-green-800: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 80%);
   --ui-primitive-green-900: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 90%);
 
+  --ui-primitive-_bright-green-hue: 80;
+  --ui-primitive-_bright-green-saturation: 90%;
+  --ui-primitive-bright-green-100: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 10%);
+  --ui-primitive-bright-green-200: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 20%);
+  --ui-primitive-bright-green-300: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 28%);
+  --ui-primitive-bright-green-400: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 35%);
+  --ui-primitive-bright-green-500: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 50%);
+  --ui-primitive-bright-green-600: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 60%);
+  --ui-primitive-bright-green-700: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 70%);
+  --ui-primitive-bright-green-800: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 80%);
+  --ui-primitive-bright-green-900: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 90%);
+
   --ui-primitive-_red-hue: 355;
   --ui-primitive-_red-saturation: 75%;
   --ui-primitive-red-100: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 10%);
@@ -38,7 +50,7 @@
   --ui-primitive-red-900: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 90%);
 
   --ui-primitive-_orange-hue: 35;
-  --ui-primitive-_orange-saturation: 75%;
+  --ui-primitive-_orange-saturation: 90%;
   --ui-primitive-orange-100: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 10%);
   --ui-primitive-orange-200: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 20%);
   --ui-primitive-orange-300: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 30%);
@@ -89,25 +101,33 @@
   --ui-semantic-color-warning-default: var(--ui-primitive-orange-400);
   --ui-semantic-color-warning-strong: var(--ui-primitive-orange-300);
   --ui-semantic-color-warning-stronger: var(--ui-primitive-orange-200);
+
+  --ui-semantic-color-success-weaker: var(--ui-primitive-bright-green-800);
+  --ui-semantic-color-success-weak: var(--ui-primitive-bright-green-600);
+  --ui-semantic-color-success-default: var(--ui-primitive-bright-green-400);
+  --ui-semantic-color-success-strong: var(--ui-primitive-bright-green-300);
+  --ui-semantic-color-success-stronger: var(--ui-primitive-bright-green-200);
     
   --ui-semantic-radius-round: 9999999rem;
   --ui-semantic-radius-s: 0.2rem;
   --ui-semantic-radius-m: 0.4rem;
   --ui-semantic-radius-l: 0.8rem;
   
+  --ui-semantic-padding-x-none: 0;
   --ui-semantic-padding-x-xs: var(--ui-primitive-spacing-s);
   --ui-semantic-padding-x-s: var(--ui-primitive-spacing-m);
   --ui-semantic-padding-x-m: var(--ui-primitive-spacing-l);
   --ui-semantic-padding-x-l: var(--ui-primitive-spacing-xl);
+  --ui-semantic-padding-y-none: 0;
   --ui-semantic-padding-y-xs: var(--ui-primitive-spacing-xs);
   --ui-semantic-padding-y-s: var(--ui-primitive-spacing-s);
   --ui-semantic-padding-y-m: var(--ui-primitive-spacing-m);
   --ui-semantic-padding-y-l: var(--ui-primitive-spacing-l);
   
-  --ui-semantic-padding-xs: var(--ui-semantic-padding-x-xs) var(--ui-semantic-padding-y-xs);
-  --ui-semantic-padding-s: var(--ui-semantic-padding-x-s) var(--ui-semantic-padding-y-s);
-  --ui-semantic-padding-m: var(--ui-semantic-padding-x-m) var(--ui-semantic-padding-y-m);
-  --ui-semantic-padding-l: var(--ui-semantic-padding-x-l) var(--ui-semantic-padding-y-l);
+  --ui-semantic-padding-xs: var(--ui-semantic-padding-y-xs) var(--ui-semantic-padding-x-xs);
+  --ui-semantic-padding-s: var(--ui-semantic-padding-y-s) var(--ui-semantic-padding-x-s);
+  --ui-semantic-padding-m: var(--ui-semantic-padding-y-m) var(--ui-semantic-padding-x-m);
+  --ui-semantic-padding-l: var(--ui-semantic-padding-y-l) var(--ui-semantic-padding-x-l);
   
   --ui-semantic-padding-action-y: var(--ui-semantic-padding-y-s);
   --ui-semantic-padding-action-x: var(--ui-semantic-padding-x-l);
@@ -122,6 +142,7 @@
   --ui-semantic-borderWeight: 0.1rem;
 
   --ui-border-default: var(--ui-semantic-borderWeight) solid var(--ui-primitive-grey-800);
+  --ui-border-inverted: var(--ui-semantic-borderWeight) solid var(--ui-semantic-color-inverted);
   --ui-background-body: var(--ui-primitive-grey-900);
   --ui-background-default: var(--ui-primitive-grey-1000);
   --ui-background-inverted: var(--ui-primitive-green-200);
@@ -141,12 +162,23 @@
 
 html {
   font-size: 62.5%;
+  margin: 0;
+  /*scrollbar-gutter: stable both-edges !important;*/
+  overflow: visible !important;
+  scrollbar-color: var(--ui-semantic-color-primary-default) var(--ui-background-body);
+  scrollbar-width: thin;
 }
 body {
+  margin: 0;
   font: var(--ui-semantic-font-body-default);
   color: var(--ui-semantic-color-neutral-default);
   background: var(--ui-background-body);
 }
+
+html, body, #root {
+  min-height: 100%;
+}
+
 ul,li, p, h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;

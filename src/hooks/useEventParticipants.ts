@@ -1,10 +1,10 @@
 import { Participant } from "../models/Participant";
-import { useStore } from "../store/StoreProvider";
+import { useData } from "../store/useData";
 
 export function useEventParticipants(
   eventId: string | undefined
 ): Record<string, Participant> {
-  const [event] = useStore(`events.${eventId}`);
+  const [event] = useData(`events.${eventId}`);
 
   if (!eventId) {
     return {};

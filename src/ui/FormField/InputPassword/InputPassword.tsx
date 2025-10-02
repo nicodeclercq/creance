@@ -22,6 +22,7 @@ export function InputPassword({
 
   return (
     <FormField
+      data-component="InputPassword"
       id={id}
       {...props}
       isDisabled={isDisabled}
