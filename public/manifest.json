@@ -1,6 +1,8 @@
 {
   "short_name": "Créances",
   "name": "Créances",
+  "description": "Application de gestion des dépenses partagées",
+  "scope": "/",
   "icons": [
     {
       "src": "favicon.ico",
@@ -30,7 +32,8 @@
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     },
     {
       "src": "logo.svg",
@@ -38,7 +41,7 @@
       "sizes": "any"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#FFFFFF",
