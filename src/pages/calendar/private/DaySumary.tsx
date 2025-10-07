@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { type Presence } from "../../../service/activities";
 import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
-import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Stack } from "../../../ui/Stack/Stack";
 import { Icon } from "../../../ui/Icon/Icon";
 import { Grid } from "../../../ui/Grid/Grid";
@@ -9,7 +8,6 @@ import { dateToKey } from "../../../utils/date";
 import { HEADER_HEIGHT } from "../../../shared/PageTemplate/Header";
 import { User } from "../../../models/User";
 import { Container } from "../../../ui/Container/Container";
-import { Divider } from "../../../ui/Divider/Divider";
 import { Activity } from "../../../models/Activity";
 import { MealManagementCard } from "./MealManagementCard";
 import { ActivityCard } from "./ActivityCard";
@@ -23,6 +21,8 @@ import {
 import { useRef, useState } from "react";
 import { Button } from "../../../ui/Button/Button";
 import { AddActivityModal } from "./AddActivityModal";
+import { Card } from "../../../ui/Card/Card";
+import { Heading } from "../../../ui/Heading/Heading";
 
 type DaySumaryProps = {
   currentUser: User;
@@ -64,49 +64,55 @@ export function DaySumary({
   );
 
   return (
-    <>
+    <Card>
       <Stack gap="m">
-        <Grid
-          gap="s"
-          align="center"
-          columns={["auto", "auto", "max-content", "1fr"]}
-        >
-          {currentDay.current === dateToKey(day) ? (
-            <Container
-              styles={{
-                background: "inverted",
-                display: "inline-block",
-                width: "0.8rem",
-                height: "2.4rem",
-                radius: "m",
-              }}
-            >
-              {undefined}
-            </Container>
-          ) : (
-            <div />
-          )}
-          <Icon name="calendar-day" size="s" />
+        <Grid gap="s" align="center" columns={["auto", "auto", "1fr"]}>
+          <Container
+            styles={{
+              border:
+                currentDay.current === dateToKey(day) ? "none" : "default",
+              background:
+                currentDay.current === dateToKey(day) ? "inverted" : "default",
+              display: "inline-block",
+              width: "0.8rem",
+              height: "3.2rem",
+              radius: "m",
+            }}
+          >
+            {undefined}
+          </Container>
+          <Container
+            styles={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color:
+                currentDay.current === dateToKey(day)
+                  ? "primary-stronger"
+                  : "neutral-default",
+            }}
+          >
+            <Icon name="calendar-day" size="m" />
+          </Container>
+
           <div
             id={dateToKey(day)}
             style={{
               scrollMarginTop: HEADER_HEIGHT,
             }}
           >
-            <DateFormatter
-              format="AbbrNoYear"
+            <Heading
+              level={2}
               styles={{
                 color:
                   currentDay.current === dateToKey(day)
                     ? "primary-stronger"
                     : "neutral-default",
-                font: "body-large",
               }}
             >
-              {day}
-            </DateFormatter>
+              <DateFormatter format="AbbrNoYear">{day}</DateFormatter>
+            </Heading>
           </div>
-          <Divider />
         </Grid>
         <MealManagementCard
           presence={presence}
@@ -116,7 +122,9 @@ export function DaySumary({
           setLunchManager={setLunchManager}
           setDinnerManager={setDinnerManager}
         />
-        <Paragraph>{t("DaySumary.subtilte.activities")}</Paragraph>
+        {sortedActivities.length > 0 && (
+          <Heading level={3}>{t("DaySumary.subtilte.activities")}</Heading>
+        )}
         {sortedActivities.length === 0 && (
           <NoActivityCard
             addActivity={addActivity}
@@ -151,6 +159,6 @@ export function DaySumary({
         onSubmit={addActivity}
         currentUser={currentUser}
       />
-    </>
+    </Card>
   );
 }

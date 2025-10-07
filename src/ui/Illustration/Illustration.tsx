@@ -5,6 +5,7 @@ type Size = "s" | "m" | "l";
 
 export type IconProps = {
   name: IllustrationName;
+  label?: string;
   size?: Size;
   ratio?: "4:3" | "16:9" | "1:1";
 };
@@ -24,7 +25,11 @@ function computeSize(value: Size = "m") {
   return `calc(0.8rem * ${factor[value]})`;
 }
 
-export function Illustration({ name, size, ratio }: IconProps) {
+export function isIllustration(image: string): image is IllustrationName {
+  return image in ILLUSTRATIONS;
+}
+
+export function Illustration({ name, size, ratio, label }: IconProps) {
   const computedSize = computeSize(size);
   const Illustration = ILLUSTRATIONS[name];
 
@@ -33,6 +38,8 @@ export function Illustration({ name, size, ratio }: IconProps) {
   return (
     <div
       data-component="Illustration"
+      aria-label={label}
+      aria-hidden={!label ? undefined : true}
       className={styles.illustration}
       style={{
         width: aspectRatio == null ? computedSize : undefined,

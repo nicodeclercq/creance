@@ -1,10 +1,6 @@
 import { Activity } from "../../../models/Activity";
 import { AddActivityModal } from "./AddActivityModal";
-import { Button } from "../../../ui/Button/Button";
-import { Card } from "../../../ui/Card/Card";
-import { Illustration } from "../../../ui/Illustration/Illustration";
-import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { Stack } from "../../../ui/Stack/Stack";
+import { EmptyState } from "../../../ui/EmptyState/EmptyState";
 import { User } from "../../../models/User";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -25,22 +21,18 @@ export function NoActivityCard({
 
   return (
     <>
-      <Card>
-        <Stack alignItems="center" gap="s">
-          <Illustration name="pig-isle" size="m" ratio="4:3" />
-          <Paragraph styles={{ font: "body-large", color: "neutral-weak" }}>
-            {t("DaySumary.noActivity.title")}
-          </Paragraph>
-          <Button
-            onClick={() => {
-              setIsOpen(true);
-            }}
-            icon={{ name: "add", position: "end" }}
-            label={t("DaySumary.noActivity.button")}
-            variant="tertiary"
-          />
-        </Stack>
-      </Card>
+      <EmptyState
+        title={t("DaySumary.noActivity.title")}
+        description={t("DaySumary.noActivity.description")}
+        illustration="pig-isle"
+        action={{
+          onClick: () => {
+            setIsOpen(true);
+          },
+          icon: { name: "add", position: "end" },
+          label: t("DaySumary.noActivity.button"),
+        }}
+      />
       <AddActivityModal
         defaultDate={defaultDate}
         isOpen={isOpen}

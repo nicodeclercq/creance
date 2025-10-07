@@ -19,7 +19,11 @@
     border-color: transparent;
   }
 
-  &.isActive{
+  &:hover {
     background: var(--ui-semantic-color-primary-strong);
+  }
+
+  &.isActive {
+    background: var(--ui-semantic-color-primary-default);
   }
 }

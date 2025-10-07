@@ -28,13 +28,11 @@ function Item({ label, date }: { label: string; date: Date }) {
   return (
     <Columns wrap gap="s" align="baseline">
       <Paragraph>{label}</Paragraph>
-      <DateFormatter
-        format="medium"
-        withTime
-        styles={{ font: "body-small", color: "neutral-weak" }}
-      >
-        {date}
-      </DateFormatter>
+      <Paragraph styles={{ font: "body-small", color: "neutral-weak" }}>
+        <DateFormatter format="medium" withTime>
+          {date}
+        </DateFormatter>
+      </Paragraph>
     </Columns>
   );
 }
@@ -44,7 +42,7 @@ export function InformationPage() {
   const { goTo, back } = useRoute();
   const [hasImportError, setHasImportError] = useState(false);
 
-  const [currentParticipantId] = useData("account._id");
+  const [currentParticipantId] = useData("account.currentUser._id");
   const [events, setEvents] = useData("events");
 
   const reset = () => {

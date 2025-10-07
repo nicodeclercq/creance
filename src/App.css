@@ -142,6 +142,7 @@
   --ui-semantic-borderWeight: 0.1rem;
 
   --ui-border-default: var(--ui-semantic-borderWeight) solid var(--ui-primitive-grey-800);
+  --ui-border-dashed: var(--ui-semantic-borderWeight) dashed var(--ui-primitive-grey-800);
   --ui-border-inverted: var(--ui-semantic-borderWeight) solid var(--ui-semantic-color-inverted);
   --ui-background-body: var(--ui-primitive-grey-900);
   --ui-background-default: var(--ui-primitive-grey-1000);

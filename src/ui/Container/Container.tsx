@@ -2,15 +2,22 @@ import type { HTMLElementType, ReactNode } from "react";
 
 import classNames from "classnames";
 import { css } from "@emotion/css";
+import { entries } from "../../utils/object";
 import { identity } from "fp-ts/function";
 
-const MEDIA_QUERY_BREAKPOINTS = {
+export const MEDIA_QUERY_BREAKPOINTS = {
   default: 0,
-  sm: 640,
+  sm: 580,
   md: 768,
   lg: 1024,
   xl: 1280,
 };
+
+export const MEDIAS = Object.keys(MEDIA_QUERY_BREAKPOINTS) as Array<
+  keyof typeof MEDIA_QUERY_BREAKPOINTS
+>;
+
+type MediaSize = keyof typeof MEDIA_QUERY_BREAKPOINTS;
 
 type Spacing = "none" | "s" | "m" | "l";
 type Position = "default" | "absolute" | "relative" | "fixed" | "sticky";
@@ -72,7 +79,7 @@ type Color =
   | "success-default"
   | "success-strong"
   | "success-stronger";
-type Display =
+export type Display =
   | "default"
   | "flex"
   | "grid"
@@ -112,6 +119,7 @@ type Radius = "none" | "s" | "m" | "l" | "round";
 type Border =
   | "none"
   | "default"
+  | "dashed"
   | "inverted"
   | Partial<
       Record<
@@ -119,7 +127,10 @@ type Border =
         "none" | "default" | "inverted"
       >
     >;
-type CustomCSSProperties = Record<string, WithMediaQuery<string | number>>;
+type CustomCSSProperties = Record<
+  `--${string}`,
+  WithMediaQuery<string | number>
+>;
 
 type Styles = {
   cursor?: WithMediaQuery<"pointer" | "default">;
@@ -205,12 +216,86 @@ type MediaQuery<S> = {
   xl?: S;
 };
 
+export type Media = keyof typeof MEDIA_QUERY_BREAKPOINTS;
+
 export type WithMediaQuery<S> = S | MediaQuery<S>;
 
 export function isMediaQuery<S>(
   value: WithMediaQuery<S>
 ): value is MediaQuery<S> {
   return typeof value === "object" && value !== null && "default" in value;
+}
+
+export function toMediaQuery<S>(value: WithMediaQuery<S>): MediaQuery<S> {
+  return isMediaQuery(value) ? value : { default: value };
+}
+export function getMediaValue<S>(
+  media: keyof MediaQuery<S>,
+  value: WithMediaQuery<S>
+): S {
+  if (!isMediaQuery(value)) {
+    return value;
+  }
+
+  return media in value ? (value[media] as S) : (value as S);
+}
+
+function getPropertiesValueByMedia<
+  S extends Record<string, WithMediaQuery<unknown>>
+>(values: S) {
+  type Values = {
+    [key in keyof S]: S[key] extends WithMediaQuery<infer T> ? T : undefined;
+  };
+
+  return entries(MEDIA_QUERY_BREAKPOINTS).reduce((acc, [breakpoint]) => {
+    const valuesAtBreakpoint = entries(values).reduce((acc, [key, value]) => {
+      acc[key] = getMediaValue(breakpoint, value);
+      return acc;
+    }, {} as Record<keyof S, S[keyof S]>);
+
+    acc[breakpoint] = valuesAtBreakpoint as Values;
+
+    return acc;
+  }, {} as Record<MediaSize, Values>);
+}
+
+function buildStylesForAllMedia<S extends Record<string, unknown>>(
+  values: Record<MediaSize, S>,
+  transform: (value: S) => string | number | undefined
+): string {
+  return entries(MEDIA_QUERY_BREAKPOINTS).reduce((acc, [breakpoint, size]) => {
+    const value = values[breakpoint];
+
+    if (value == null) {
+      return acc;
+    }
+    if (breakpoint === "default") {
+      return `${acc} ${transform(value)}`;
+    }
+    return `${acc} @media (min-width: ${size}px) { ${transform(value)} }`;
+  }, "");
+}
+
+type FromPropertiesRecord<
+  S extends Record<string, WithMediaQuery<unknown> | undefined>
+> = {
+  [key in keyof S]: S[key] extends WithMediaQuery<infer T>
+    ? T | undefined
+    : undefined;
+};
+
+export function buildStylesForMedia<
+  S extends Record<string, WithMediaQuery<unknown> | undefined>
+>(
+  values: S,
+  transform: (value: FromPropertiesRecord<S>) => string | number | undefined
+): string {
+  const propertiesByMedia = getPropertiesValueByMedia(values);
+  const stylesByMedia = buildStylesForAllMedia(propertiesByMedia, (value) =>
+    transform(value as FromPropertiesRecord<S>)
+  );
+
+  return css(stylesByMedia);
 }
 
 export function withMediaQuery<S>(
@@ -222,13 +307,13 @@ export function withMediaQuery<S>(
     return undefined;
   }
   if (isMediaQuery(value)) {
-    const result = Object.entries(MEDIA_QUERY_BREAKPOINTS)
+    const result = entries(MEDIA_QUERY_BREAKPOINTS)
       .map(([breakpoint, size]) => {
-        if (
-          breakpoint in value &&
-          value[breakpoint as keyof MediaQuery<S>] != null
-        ) {
-          const v = value[breakpoint as keyof MediaQuery<S>];
+        if (breakpoint === "default") {
+          return `${property}: ${toStyle(value[breakpoint] as S)};`;
+        }
+        if (breakpoint in value && value[breakpoint] != null) {
+          const v = value[breakpoint];
           return v != null
             ? `@media (min-width: ${size}px) { ${property}: ${toStyle(v)}; }`
             : undefined;
@@ -261,7 +346,7 @@ type ContainerProps = {
 
 function computeGridTemplate(value: GridTemplate) {
   if (typeof value === "number") {
-    return `repeat(${value}, '1fr')`;
+    return value === 1 ? "1fr" : `repeat(${value}, '1fr')`;
   }
   if (value instanceof Array) {
     return value.join(" ");
@@ -269,6 +354,9 @@ function computeGridTemplate(value: GridTemplate) {
   return undefined;
 }
 
+export function computeDisplay(value: Display = "default") {
+  return value === "default" ? "block" : value;
+}
 export function computePadding(
   value: Spacing | { x?: Spacing; y?: Spacing } = "none"
 ) {
@@ -433,7 +521,7 @@ export function Container({
         withMediaQuery("border-radius", radius, computeRadius),
         withMediaQuery("bottom", bottom, computeDistance),
         withMediaQuery("box-shadow", shadow, computeShadow),
-        withMediaQuery("display", display, identity),
+        withMediaQuery("display", display, computeDisplay),
         withMediaQuery("cursor", cursor, identity),
         computeCustomProperties(customCSSProperties),
         withMediaQuery("color", color, computeColor),

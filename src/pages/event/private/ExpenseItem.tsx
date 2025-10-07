@@ -67,9 +67,9 @@ export function ExpenseItem({
           </Paragraph>
         </Columns>
       </Stack>
-      <DateFormatter styles={{ font: "body-smaller" }}>
-        {expense.date}
-      </DateFormatter>
+      <Paragraph styles={{ font: "body-smaller" }}>
+        <DateFormatter>{expense.date}</DateFormatter>
+      </Paragraph>
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}

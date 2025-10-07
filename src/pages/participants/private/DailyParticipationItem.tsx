@@ -57,7 +57,9 @@ export function DailyParticipationItem({
           color: "inverted",
         }}
       >
-        <DateFormatter format="NoYear">{date}</DateFormatter>
+        <Paragraph>
+          <DateFormatter format="NoYear">{date}</DateFormatter>
+        </Paragraph>
       </Container>
       <Container styles={{ padding: "m" }}>
         <Grid

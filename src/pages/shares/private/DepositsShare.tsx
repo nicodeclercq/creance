@@ -50,7 +50,9 @@ export function DepositsShare({ deposits, participants }: DepositsShareProps) {
                 <ExchangeMoneyIcon strokeWidth={0.5} />
               </span>
               <Stack>
-                <DateFormatter>{deposit.date}</DateFormatter>
+                <Paragraph>
+                  <DateFormatter>{deposit.date}</DateFormatter>
+                </Paragraph>
                 <Columns align="center" gap="s">
                   <Avatar
                     label={

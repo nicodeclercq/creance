@@ -71,7 +71,9 @@ export function ExpenseShare({
                 size="m"
               />
               <Stack>
-                <DateFormatter format="long">{expense.date}</DateFormatter>
+                <Paragraph>
+                  <DateFormatter format="long">{expense.date}</DateFormatter>
+                </Paragraph>
                 <Columns align="center" gap="s">
                   <Avatar
                     label={participants[expense.lender].name}

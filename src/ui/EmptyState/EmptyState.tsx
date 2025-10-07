@@ -5,6 +5,7 @@ import { Paragraph } from "../Paragraph/Paragraph";
 import { Heading } from "../Heading/Heading";
 import { Button, ButtonProps } from "../Button/Button";
 import { Card } from "../Card/Card";
+import { Container } from "../Container/Container";
 
 type Props = {
   title: string;
@@ -16,23 +17,31 @@ type Props = {
 
 export function EmptyState({
   title,
-  titleLevel = 1,
+  titleLevel = 2,
   description,
   illustration,
   action,
 }: Props) {
   return (
-    <Card data-component="EmptyState">
+    <Container
+      styles={{
+        background: "default",
+        padding: "m",
+        border: "dashed",
+        radius: "s",
+        width: "100%",
+      }}
+    >
       <Stack alignItems="center" justifyContent="center" gap="l" padding="l">
         <Heading level={titleLevel} styles={{ font: "body-large" }}>
           {title}
         </Heading>
         <Illustration name={illustration} size="m" />
-        <Paragraph styles={{ color: "neutral-weak", textAlign: "center" }}>
+        <Paragraph styles={{ color: "neutral-default", textAlign: "center" }}>
           {description}
         </Paragraph>
         {action && <Button {...action} />}
       </Stack>
-    </Card>
+    </Container>
   );
 }

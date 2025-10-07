@@ -1,3 +1,5 @@
+import { WithMediaQuery, buildStylesForMedia } from "../Container/Container";
+
 import { entries } from "../../utils/object";
 
 type Direction =
@@ -8,29 +10,29 @@ type Direction =
 
 type BleedProps<D extends Direction> = {
   children: React.ReactNode;
-  direction?: D;
-  spacing?: D extends Array<infer T>
-    ? Record<T extends string ? T : never, string>
-    : Record<D extends string ? D : never, string>;
-  width?: string;
-  height?: string;
+  direction?: WithMediaQuery<D>;
+  spacing?: D extends WithMediaQuery<Array<infer T>>
+    ? WithMediaQuery<Record<T extends string ? T : never, string>>
+    : WithMediaQuery<Record<D extends string ? D : never, string>>;
+  width?: WithMediaQuery<string> | undefined;
+  height?: WithMediaQuery<string> | undefined;
 };
 
 const directionToMargin = {
   top: {
-    property: "marginBlockStart",
+    property: "margin-block-start",
     variable: "--component-layout-padding-y",
   },
   bottom: {
-    property: "marginBlockEnd",
+    property: "margin-block-end",
     variable: "--component-layout-padding-y",
   },
   left: {
-    property: "marginInlineStart",
+    property: "margin-inline-start",
     variable: "--component-layout-padding-x",
   },
   right: {
-    property: "marginInlineEnd",
+    property: "margin-inline-end",
     variable: "--component-layout-padding-x",
   },
 } as const;
@@ -68,17 +70,24 @@ const spacingToDirections = (
   }, {} as Record<"top" | "bottom" | "left" | "right", string | undefined>);
 };
 
-const computeStyles = (
-  direction: Direction,
-  spacing: Record<string, string | undefined>,
-  width: string | undefined,
-  height: string | undefined
-) => {
+type ComputeStylesProps = {
+  direction: Direction;
+  spacing: Record<string, string | undefined> | undefined;
+  width: string | undefined;
+  height: string | undefined;
+};
+
+const computeStyles = ({
+  direction,
+  spacing,
+  width,
+  height,
+}: ComputeStylesProps): string => {
   const styles = {
-    marginBlockStart: "0",
-    marginBlockEnd: "0",
-    marginInlineStart: "0",
-    marginInlineEnd: "0",
+    "margin-block-start": "0",
+    "margin-block-end": "0",
+    "margin-inline-start": "0",
+    "margin-inline-end": "0",
     width,
     height,
   };
@@ -101,7 +110,10 @@ const computeStyles = (
     styles.height = `calc(${height} + ${directionsSpacing.top} + ${directionsSpacing.bottom})`;
   }
 
-  return styles;
+  return Object.entries(styles).reduce(
+    (acc, [property, value]) => `${acc} ${property}: ${value};`,
+    ""
+  );
 };
 
 export function Bleed<D extends Direction>({
@@ -111,10 +123,13 @@ export function Bleed<D extends Direction>({
   width,
   height,
 }: BleedProps<D>) {
-  const styles = computeStyles(direction, spacing, width, height);
+  const styles = buildStylesForMedia(
+    { direction, spacing, width, height },
+    (value) => computeStyles(value as ComputeStylesProps)
+  );
 
   return (
-    <div data-component="Bleed" style={styles}>
+    <div data-component="Bleed" className={styles}>
       {children}
     </div>
   );

@@ -1,5 +1,3 @@
-import { Paragraph, ParagraphProps } from "../Paragraph/Paragraph";
-
 import { useTranslation } from "react-i18next";
 
 export type DateProps = {
@@ -16,7 +14,6 @@ export type DateProps = {
     | "AbbrNoYear";
   isCapitalized?: boolean;
   withTime?: boolean;
-  styles?: ParagraphProps["styles"];
 };
 
 const capitalize = (str: string) => {
@@ -27,7 +24,6 @@ export function DateFormatter({
   children,
   format = "medium",
   isCapitalized = true,
-  styles,
 }: DateProps) {
   const { t } = useTranslation();
 
@@ -45,9 +41,5 @@ export function DateFormatter({
 
   const str = t(formats[format], { date: children });
 
-  return (
-    <Paragraph data-component="DateFormatter" styles={styles}>
-      {isCapitalized ? capitalize(str) : str}
-    </Paragraph>
-  );
+  return isCapitalized ? capitalize(str) : str;
 }

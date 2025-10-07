@@ -52,8 +52,6 @@ const getURLImage = (url: string): Promise<string | undefined> => {
         script.remove();
       });
 
-      console.log(doc);
-
       const selectors = [
         'meta[property="og:image"]',
         'meta[name="twitter:image"]',

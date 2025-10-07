@@ -10,6 +10,8 @@ import {
 import { Menu, type MenuProps } from "../../ui/Menu/Menu";
 import { useCurrentUser } from "../../store/useCurrentUser";
 import { Avatar } from "../../ui/Avatar/Avatar";
+import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
+import { Logo } from "../../ui/Logo/Logo";
 
 export type HeaderProps = {
   gridArea?: string;
@@ -44,6 +46,9 @@ export function Header({
       }}
     >
       <Columns gap="m" align="center">
+        <MediaOnly media={["default", "sm"]} styles={{ width: "min-content" }}>
+          <Logo size="m" show="pig" />
+        </MediaOnly>
         {leftAction && <IconButton {...leftAction} variant="primary" />}
         <Heading
           styles={{ font: "body-large", color: "inverted", flexGrow: true }}

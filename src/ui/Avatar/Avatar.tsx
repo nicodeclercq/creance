@@ -78,7 +78,9 @@ export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
         borderRadius: "var(--ui-semantic-radius-round)",
       }}
     >
-      {image ? undefined : computeFirstLetters(label, 2)}
+      <span aria-hidden="true">
+        {image ? undefined : computeFirstLetters(label, 2)}
+      </span>
       {statusIcon && (
         <div className={styles.statusIcon}>
           <Icon name={statusIcon} size="s" />

@@ -71,9 +71,9 @@ export function DepositItem({
           </Paragraph>
         </Columns>
       </Stack>
-      <DateFormatter styles={{ font: "body-smaller" }}>
-        {deposit.date}
-      </DateFormatter>
+      <Paragraph styles={{ font: "body-smaller" }}>
+        <DateFormatter>{deposit.date}</DateFormatter>
+      </Paragraph>
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}
