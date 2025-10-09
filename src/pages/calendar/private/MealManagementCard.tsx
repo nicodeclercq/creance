@@ -1,11 +1,8 @@
-import { Alert } from "../../../ui/Alert/Alert";
 import { Avatar } from "../../../ui/Avatar/Avatar";
-import { Card } from "../../../ui/Card/Card";
 import { Columns } from "../../../ui/Columns/Columns";
 import { Container } from "../../../ui/Container/Container";
 import { Grid } from "../../../ui/Grid/Grid";
 import { Heading } from "../../../ui/Heading/Heading";
-import { Illustration } from "../../../ui/Illustration/Illustration";
 import { MediaCard } from "../../../ui/MediaCard/MediaCard";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Pill } from "../../../ui/Pill/Pill";

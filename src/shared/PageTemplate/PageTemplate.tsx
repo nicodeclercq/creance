@@ -10,7 +10,6 @@ import { Header, HeaderProps } from "./Header";
 import { RouteName } from "../../routes";
 import { Logo } from "../../ui/Logo/Logo";
 import { MediaHidden } from "../../ui/MediaHidden/MediaHidden";
-import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 
 type PageTemplateProps<R extends RouteName> = {
   title: string;

@@ -4,7 +4,6 @@ import { Stack } from "../Stack/Stack";
 import { Paragraph } from "../Paragraph/Paragraph";
 import { Heading } from "../Heading/Heading";
 import { Button, ButtonProps } from "../Button/Button";
-import { Card } from "../Card/Card";
 import { Container } from "../Container/Container";
 
 type Props = {

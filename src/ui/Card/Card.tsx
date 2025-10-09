@@ -9,7 +9,9 @@ type CardProps = {
   as?: "div" | "li";
   padding?: ContainerStyles["padding"];
   isInteractive?: boolean;
-  styles?: ContainerStyles<"padding" | "position" | "maxWidth" | "textAlign">;
+  styles?: ContainerStyles<
+    "padding" | "position" | "maxWidth" | "textAlign" | "breakInside"
+  >;
 };
 
 export function Card({
@@ -28,6 +30,7 @@ export function Card({
       styles={{
         ...styles,
         display: "block",
+        width: "100%",
         background: "default",
         position: "relative",
         padding,

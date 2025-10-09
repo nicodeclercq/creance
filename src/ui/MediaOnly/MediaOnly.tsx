@@ -1,11 +1,10 @@
+import { Container, type ContainerStyles } from "../Container/Container";
 import {
-  Container,
-  type ContainerStyles,
   type Display,
   type Media,
   MEDIAS,
   type WithMediaQuery,
-} from "../Container/Container";
+} from "../Container/styles";
 
 import { type ReactNode } from "react";
 

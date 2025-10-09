@@ -1,9 +1,6 @@
 import { type ReactNode } from "react";
-import {
-  Container,
-  ContainerStyles,
-  WithMediaQuery,
-} from "../Container/Container";
+import { Container, type ContainerStyles } from "../Container/Container";
+import type { WithMediaQuery } from "../Container/styles";
 
 type GridProps = {
   columns: WithMediaQuery<number | string[]>;
@@ -11,18 +8,27 @@ type GridProps = {
   gap?: ContainerStyles["gap"];
   align?: ContainerStyles["alignItems"];
   justify?: ContainerStyles["justifyContent"];
+  styles?: ContainerStyles<"maxWidth" | "width" | "minWidth">;
 };
 
-export function Grid({ children, columns, gap, align, justify }: GridProps) {
+export function Grid({
+  children,
+  columns,
+  gap,
+  align,
+  justify,
+  styles,
+}: GridProps) {
   return (
     <Container
       data-component="Grid"
       styles={{
+        ...styles,
         display: "grid",
         gap,
         alignItems: align,
         justifyContent: justify,
-        width: "100%",
+        width: styles?.width ?? "100%",
         gridTemplateColumns: columns,
       }}
     >

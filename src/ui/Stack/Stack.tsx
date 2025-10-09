@@ -1,4 +1,4 @@
-import { Container, ContainerStyles } from "../Container/Container";
+import { Container, type ContainerStyles } from "../Container/Container";
 
 import type { ReactNode } from "react";
 
@@ -54,12 +54,12 @@ export function Stack({
         justifyContent,
         gap,
         padding,
-        width,
+        width: styles?.width ?? width,
         customCSSProperties:
           padding && padding !== "none"
             ? {
-                [`component-layout-padding-x`]: `var(--ui-semantic-padding-x-${padding})`,
-                [`component-layout-padding-y`]: `var(--ui-semantic-padding-y-${padding})`,
+                [`--component-layout-padding-x`]: `var(--ui-semantic-padding-x-${padding})`,
+                [`--component-layout-padding-y`]: `var(--ui-semantic-padding-y-${padding})`,
               }
             : undefined,
       }}

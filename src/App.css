@@ -168,7 +168,12 @@ html {
   overflow: visible !important;
   scrollbar-color: var(--ui-semantic-color-primary-default) var(--ui-background-body);
   scrollbar-width: thin;
+
+  @media print {
+    font-size: 6px;
+  }
 }
+
 body {
   margin: 0;
   font: var(--ui-semantic-font-body-default);

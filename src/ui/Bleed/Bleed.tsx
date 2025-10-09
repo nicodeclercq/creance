@@ -1,4 +1,4 @@
-import { WithMediaQuery, buildStylesForMedia } from "../Container/Container";
+import { WithMediaQuery, buildStylesForMedia } from "../Container/styles";
 
 import { entries } from "../../utils/object";
 

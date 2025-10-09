@@ -18,22 +18,19 @@ export function calculationAsNumber(
   value: string
 ): Either.Either<Error, number> {
   try {
-    const trimmedValue = value.trim();
-    const withoutUnknownChars = trimmedValue.replace(
-      new RegExp(`[^${ALLOWER_CHARS}]`, "g"),
-      ""
+    return pipe(
+      value
+        .trim()
+        .replace(new RegExp(`[^${ALLOWER_CHARS}]`, "g"), "") // Remove unallowed characters
+        .replace(/^0+/g, "") // Remove leading zeros
+        .replace(/ /g, ""), // Remove spaces
+      (a) => (a === "" ? "0" : a), // Replace empty string with 0
+      (a) => eval(a), // Evaluate the expression
+      (a) =>
+        isNaN(a) || !isFinite(a)
+          ? Either.left(new Error(`Invalid calculation "${value}" "${a}"`))
+          : Either.right(a * 100)
     );
-    const withoutTrailingZeros = withoutUnknownChars.replace(/^0+/g, "");
-    const withoutSpaces = withoutTrailingZeros.replace(/ /g, "");
-    const withEmptyStringHandling = withoutSpaces === "" ? "0" : withoutSpaces;
-    const result = eval(withEmptyStringHandling);
-    if (isNaN(result) || !isFinite(result)) {
-      Logger.error("Invalid calculation:")({ value, result });
-      return Either.left(
-        new Error(`Invalid calculation "${value}" "${result}"`)
-      );
-    }
-    return Either.right(result * 100);
   } catch (error) {
     Logger.error("Error in calculation:")({ value, error });
     return Either.left(new Error(`Invalid calculation "${value}" "${error}"`));

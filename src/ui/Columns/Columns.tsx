@@ -1,9 +1,6 @@
-import {
-  ColorStyles,
-  Container,
-  ContainerStyles,
-} from "../Container/Container";
+import { Container, ContainerStyles } from "../Container/Container";
 
+import type { ColorStyles } from "../Container/styles";
 import type { ReactNode } from "react";
 
 type ColumnsProps = {
@@ -56,11 +53,12 @@ export function Columns({
         customCSSProperties:
           padding && padding !== "none"
             ? {
-                [`component-layout-padding-x`]: `var(--ui-semantic-padding-x-${padding})`,
-                [`component-layout-padding-y`]: `var(--ui-semantic-padding-y-${padding})`,
+                [`--component-layout-padding-x`]: `var(--ui-semantic-padding-x-${padding})`,
+                [`--component-layout-padding-y`]: `var(--ui-semantic-padding-y-${padding})`,
               }
             : undefined,
         display: isInline ? `inline-${displayType}` : displayType,
+        width: styles?.width ?? isInline ? undefined : "100%",
         alignItems: align,
         gap,
         gridTemplateColumns,
