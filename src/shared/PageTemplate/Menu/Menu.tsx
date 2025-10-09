@@ -26,6 +26,7 @@ export function Menu({ actions, gridArea }: MenuProps) {
       styles={{
         zIndex: 1,
         gridArea,
+        width: "100%",
         background: "inverted",
         color: "inverted",
         display: "flex",
