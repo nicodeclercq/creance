@@ -1,6 +1,5 @@
 import { Store, StoreManager } from "./store/StoreManager";
 
-import { Account } from "./models/Account";
 import { Container } from "./ui/Container/Container";
 import { FormData } from "./pages/participants/ParticipantForm";
 import { LoadingIcon } from "./ui/Button/LoadingIcon";
@@ -23,22 +22,19 @@ export function PrivatePage({ children }: Props) {
   const submit = (data: FormData) => {
     setStore((oldValue: Store<State>): Store<State> => {
       if (StoreManager.hasData(oldValue)) {
-        const newCurrentParticipantId = oldValue.data.account?._id ?? uid();
-        const baseValue = {
-          _id: newCurrentParticipantId,
-          events: {},
-          ...(oldValue.data.account ?? {}),
-          updatedAt: new Date(),
-        } as Account;
+        const newCurrentParticipantId = uid();
 
         return {
           type: oldValue.type,
           data: {
             ...oldValue.data,
-            events: oldValue.data.events,
             account: {
-              ...baseValue,
-              ...data,
+              ...(oldValue.data.account ?? {}),
+              currentUser: {
+                _id: newCurrentParticipantId,
+                updatedAt: new Date(),
+                ...data,
+              },
             },
           },
         };

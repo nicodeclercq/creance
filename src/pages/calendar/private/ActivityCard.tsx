@@ -29,7 +29,7 @@ export function ActivityCard({ activity, updateActivity }: ActivityCardProps) {
   return (
     <>
       <MediaCard
-        image={activity.image}
+        image={activity.image ?? ""}
         color={computeRandomColor(activity.name)}
       >
         <Stack gap="s">

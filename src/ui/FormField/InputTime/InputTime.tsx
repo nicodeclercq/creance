@@ -38,10 +38,10 @@ export function InputTime<T extends string | number = string>({
   label,
   message,
   onChange,
+  onBlur,
   isRequired = false,
   isDisabled = false,
   ariaLabelledby,
-  ...props
 }: InputTimeProps<T>) {
   const ref = useRef<HTMLInputElement>(null);
   const id = useId();
@@ -53,10 +53,12 @@ export function InputTime<T extends string | number = string>({
       })}
       data-component="InputTime"
       ref={ref}
-      {...props}
       value={toTimeValue(value)}
       onChange={(newValue) => {
         onChange(fromTimeValue(newValue));
+      }}
+      onBlur={() => {
+        onBlur?.(value as T);
       }}
       id={id}
       aria-labelledby={ariaLabelledby}

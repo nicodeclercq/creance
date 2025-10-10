@@ -1,17 +1,12 @@
 import * as Either from "fp-ts/Either";
 import { identity } from "fp-ts/function";
 import * as TaskEither from "fp-ts/TaskEither";
-import * as RX from "rxjs";
 import * as z from "zod";
 
 import {
-  DatabaseReference,
-  DataSnapshot,
   get,
   getDatabase,
-  onValue,
   ref,
-  set,
 } from "firebase/database";
 
 import { type ZodSchema } from "zod";
@@ -40,7 +35,6 @@ export const COLLECTIONS = {
   EVENTS: firebaseConfig.collections.EVENTS,
   USERS: firebaseConfig.collections.USERS,
 } as const;
-type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -79,7 +73,7 @@ const listenToAuthChanges = (
       if (user?.uid && key != null) {
         get(ref(db, `${COLLECTIONS.USERS}/${user.uid}`))
           .then((snapshot) => (snapshot.exists() ? snapshot.val() : undefined))
-          .then((data) => {
+          .then((data): Promise<Either.Either<Error, Account | null>> => {
             if (data == null) {
               return Promise.resolve(
                 Either.right(null) as Either.Either<Error, Account | null>
@@ -88,9 +82,17 @@ const listenToAuthChanges = (
             return z.string().safeParse(data).success
               ? decrypt(data, key)
                   .then(fromFirebaseData(accountSchema))
+                  .then((result) =>
+                    Either.isRight(result)
+                      ? (Either.right(result.right) as Either.Either<
+                          Error,
+                          Account | null
+                        >)
+                      : (result as Either.Either<Error, Account | null>)
+                  )
                   .catch((error) => {
                     Logger.error("Failed to decrypt user data:")(error, data);
-                    return Either.left(error);
+                    return Either.left(error) as Either.Either<Error, Account | null>;
                   })
               : Promise.reject(new Error("Failed to decrypt user data"));
           })
@@ -98,13 +100,13 @@ const listenToAuthChanges = (
             (error: Error) =>
               Either.left(error) as Either.Either<Error, Account | null>
           )
-          .then(
-            Either.fold(
-              (error) => {
+          .then((result: Either.Either<Error, Account | null>) =>
+            Either.fold<Error, Account | null, void>(
+              (error: Error) => {
                 Logger.error("Error loading account data")(error);
                 updateStore(() => ({ type: "error", error: error.message }));
               },
-              (accountData) => {
+              (accountData: Account | null) => {
                 Logger.log(`User ${user.uid} authenticated with data:`)(
                   accountData
                 );
@@ -135,7 +137,7 @@ const listenToAuthChanges = (
                   return newStore;
                 });
               }
-            )
+            )(result)
           );
       } else {
         localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -144,17 +146,8 @@ const listenToAuthChanges = (
   });
 };
 
-const hasAccountChanged = (a: Account | null, b: Account | null): boolean => {
-  if (a == null && b == null) return false;
-  if (a == null || b == null) return true;
-  return (
-    a._id !== b._id ||
-    a.name !== b.name ||
-    a.events !== b.events ||
-    JSON.stringify(a.events) !== JSON.stringify(b.events)
-  );
-};
-
+// Unused function removed - variable declared but never used
+/*
 const listenToRemoteCollection = <LocalData>(
   collection: DatabaseReference,
   adapter: (d: unknown) => Promise<LocalData> = identity as (
@@ -223,20 +216,13 @@ const listenToRemoteCollection = <LocalData>(
     },
   });
 };
+*/
 
-const listenToRemoteChanges = <LocalData>(
-  collectionName: CollectionName,
-  adapter: (d: unknown) => Promise<LocalData> = identity as (
-    d: unknown
-  ) => Promise<LocalData>,
-  onChange: (data: Either.Either<Error, LocalData>) => void
-) => {
-  const collectionRef = ref(db, collectionName);
-  listenToRemoteCollection(collectionRef, adapter, onChange);
-};
-
+// Unused function removed - variable declared but never used
+/*
 const toFirebaseData = <Data>(data: Data): Promise<string> =>
   Promise.resolve(data).then((a) => JSON.stringify(a));
+*/
 
 const fromFirebaseData =
   <Data>(schema: Schema<Data>) =>
@@ -265,7 +251,9 @@ const fromFirebaseData =
       });
   };
 
-function getAccountData(): Promise<Either.Either<Error, Account | null>> {
+function getAccountData(): Promise<
+  Either.Either<Error, Account | null>
+> {
   return Promise.resolve()
     .then(() => auth.authStateReady())
     .then(() => {
@@ -277,19 +265,26 @@ function getAccountData(): Promise<Either.Either<Error, Account | null>> {
     })
     .then((collectionRef) => get(collectionRef))
     .then((snapshot) => (snapshot.exists() ? snapshot.val() : undefined))
-    .then((data) => {
+    .then((data): Promise<Either.Either<Error, Account | null>> => {
       if (data == null) {
         return Promise.resolve(
           Either.right(null) as Either.Either<Error, Account | null>
         );
       }
       return z.string().safeParse(data).success
-        ? decrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "").then(
-            fromFirebaseData(accountSchema)
-          )
+        ? decrypt(data, localStorage.getItem(LOCAL_STORAGE_KEY) ?? "")
+            .then(fromFirebaseData(accountSchema))
+            .then((result) =>
+              Either.isRight(result)
+                ? (Either.right(result.right) as Either.Either<
+                    Error,
+                    Account | null
+                  >)
+                : (result as Either.Either<Error, Account | null>)
+            )
         : Promise.reject(new Error("Failed to decrypt user data"));
     })
-    .catch((error) => Either.left(error));
+    .catch((error) => Either.left(error) as Either.Either<Error, Account | null>);
 }
 
 export function signUpParticipant({
@@ -360,6 +355,8 @@ export function logoutUser() {
   });
 }
 
+// Unused function removed - variable declared but never used
+/*
 function save<Data extends { _id: string }>({
   collectionName,
   transform = toFirebaseData,
@@ -378,7 +375,10 @@ function save<Data extends { _id: string }>({
       )
     );
 }
+*/
 
+// Unused function removed - variable declared but never used
+/*
 function deleteData(collectionName: CollectionName, id: string) {
   const collectionRef = ref(db, `${collectionName}/${id}`);
   return set(collectionRef, null).catch((error) => {
@@ -387,6 +387,7 @@ function deleteData(collectionName: CollectionName, id: string) {
     );
   });
 }
+*/
 
 export const FirebaseAdapter: StoreAdapter<State> = {
   initializer: (state, updateStore) =>

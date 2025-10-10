@@ -84,7 +84,11 @@ export function Select<T>({
 }: SelectProps<T>) {
   const id = useId();
   const selectedOption = options.find((option) => option.value === value);
-  const onSelectionChange = (key: Key) => {
+  const onSelectionChange = (key: Key | null) => {
+    if (key === null) {
+      return;
+    }
+
     const selected = options.find((option) => option.value === key);
     if (selected) {
       onChange(selected.value);

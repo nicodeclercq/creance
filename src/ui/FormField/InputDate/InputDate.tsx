@@ -17,6 +17,7 @@ export function InputDate({
   type,
   value,
   onChange,
+  onBlur,
   isRequired = false,
   isDisabled = false,
   ...props
@@ -37,7 +38,11 @@ export function InputDate({
         onChange={(a) => {
           if (a != null) onChange(a.toDate());
         }}
-        {...props}
+        onBlur={() => {
+          onBlur?.(value);
+        }}
+        id={id}
+        aria-labelledby={props.ariaLabelledby}
       >
         <Group className={styles.group}>
           <DateInput className={styles.input}>

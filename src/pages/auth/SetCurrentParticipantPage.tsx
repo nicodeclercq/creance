@@ -18,7 +18,7 @@ export function SetCurrentParticipantPage({
   onSubmit,
 }: SetCurrentParticipantPageProps) {
   const { t } = useTranslation();
-  const [account] = useData("account");
+  const [users] = useData("users");
 
   return (
     <Container
@@ -50,7 +50,7 @@ export function SetCurrentParticipantPage({
                   children: 0,
                 },
               }}
-              users={account?.users ?? {}}
+              users={users ?? {}}
               onSubmit={onSubmit}
               submitLabel={t("page.setCurrentParticipant.actions.submit")}
             />
