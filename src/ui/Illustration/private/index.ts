@@ -1,6 +1,7 @@
 import { CardBoxIllustration } from "./CardBoxIllustration";
 import { CardOutOfStackIllustration } from "./CardOutOfStaskIllustration";
 import { CardStackIllustration } from "./CardStackIllustration";
+import { EmptyBoxIllustration } from "./EmptyBoxIllustration";
 import { NoodlesIllustration } from "./NoodlesIllustration";
 import { PigHappyIllustration } from "./PigHappyIllustration";
 import { PigIsleIllustration } from "./PigIsleIllustration";
@@ -11,6 +12,7 @@ export const ILLUSTRATIONS = {
   "card-box": CardBoxIllustration,
   "pig-happy": PigHappyIllustration,
   "pig-isle": PigIsleIllustration,
+  "empty-box": EmptyBoxIllustration,
   noodles: NoodlesIllustration,
 } as const;
 

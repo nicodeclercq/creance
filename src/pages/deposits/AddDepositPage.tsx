@@ -1,4 +1,6 @@
 import { Card } from "../../ui/Card/Card";
+import { Columns } from "../../ui/Columns/Columns";
+import { ContextualMenu } from "../../ui/ContextualMenu/ContextualMenu";
 import { Deposit } from "../../models/Deposit";
 import { DepositForm } from "./private/DepositForm";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
@@ -6,8 +8,8 @@ import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { ROUTES } from "../../routes";
 import { Stack } from "../../ui/Stack/Stack";
 import { uid } from "../../service/crypto";
-import { useParams } from "react-router-dom";
 import { useData } from "../../store/useData";
+import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
 
@@ -39,9 +41,35 @@ export function AddDepositPage() {
   };
 
   return (
-    <PageTemplate title={t("page.addDeposit.title")}>
+    <PageTemplate
+      title={t("page.addDeposit.title")}
+      leftAction={{
+        as: "link",
+        to: "EVENT",
+        label: t("page.event.add.actions.backToList"),
+        icon: "chevron-left",
+        params: { eventId: event._id },
+      }}
+    >
       <Card>
-        <Stack>
+        <Stack gap="m">
+          <Columns justify="center">
+            <ContextualMenu
+              currentAction="deposit"
+              actions={{
+                expense: {
+                  label: t("AddExpensePage.menu.expense"),
+                  onClick: () =>
+                    goTo(ROUTES.EXPENSE_ADD, { eventId: event._id }),
+                },
+                deposit: {
+                  label: t("AddExpensePage.menu.deposit"),
+                  onClick: () =>
+                    goTo(ROUTES.DEPOSIT_ADD, { eventId: event._id }),
+                },
+              }}
+            />
+          </Columns>
           <Paragraph>{t("page.addDeposit.description")}</Paragraph>
           <DepositForm
             event={event}

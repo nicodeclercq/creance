@@ -9,7 +9,7 @@ import { Menu, MenuProps } from "./Menu/Menu";
 import { Header, HeaderProps } from "./Header";
 import { RouteName } from "../../routes";
 import { Logo } from "../../ui/Logo/Logo";
-import { MediaHidden } from "../../ui/MediaHidden/MediaHidden";
+import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 
 type PageTemplateProps<R extends RouteName> = {
   title: string;
@@ -47,8 +47,8 @@ export function PageTemplate<R extends RouteName>({
         },
       }}
     >
-      <MediaHidden
-        media={["default", "sm"]}
+      <MediaOnly
+        media="md"
         styles={{
           padding: "s",
           display: "flex",
@@ -60,7 +60,21 @@ export function PageTemplate<R extends RouteName>({
         }}
       >
         <Logo size="l" show="text" />
-      </MediaHidden>
+      </MediaOnly>
+      <MediaOnly
+        media={["lg", "xl"]}
+        styles={{
+          padding: "s",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "s",
+          gridArea: "logo",
+          color: "inverted",
+        }}
+      >
+        <Logo size="l" show="both" />
+      </MediaOnly>
       <Header
         leftAction={leftAction}
         title={title}

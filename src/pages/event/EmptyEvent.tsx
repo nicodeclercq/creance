@@ -17,7 +17,7 @@ export function EmptyEvent({ event }: Props) {
           ? "page.event.empty.description.closed"
           : "page.event.empty.description"
       )}
-      illustration="card-stack"
+      illustration="empty-box"
       action={
         event.isClosed
           ? undefined

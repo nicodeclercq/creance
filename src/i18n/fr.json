@@ -142,7 +142,7 @@
   "page.event.add.form.field.lender.label": "Créancier",
   "page.event.add.form.field.amount.label": "Montant",
   "page.event.add.form.field.date.label": "Date",
-  "page.event.add.form.actions.submit": "Ajouter la dépense",
+  "page.event.add.form.actions.submit": "Ajouter",
   "page.event.add.form.actions.cancel": "Annuler",
   "page.event.add.form.field.amount.validation.isNumber": "Le montant doit être un nombre ou un calcule valide",
   "page.event.add.form.field.amount.validation.positive": "Le montant doit être supérieur à 0{isCalculated, select, true { ({calculation} = {result})} other {}}",
@@ -343,5 +343,7 @@
   "AddActivityModal.actions.cancel": "Annuler",
   "AddActivityModal.actions.submit": "Valider",
   "ActivityCard.actions.edit": "Modifier",
-  "ExternalLink.actions.click": "Ouvrir dans un nouvel onglet"
+  "ExternalLink.actions.click": "Ouvrir dans un nouvel onglet",
+  "AddExpensePage.menu.expense": "Dépense",
+  "AddExpensePage.menu.deposit": "Avance"
 }

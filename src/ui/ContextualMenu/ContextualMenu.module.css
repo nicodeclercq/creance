@@ -1,0 +1,43 @@
+.ContextualMenu {
+  overflow: hidden;
+  border: var(--ui-border-default);
+  border-radius: var(--ui-semantic-radius-l);
+
+  &:focus-visible{
+    outline: none;
+    box-shadow: var(--ui-shadow-focus);
+  }
+}
+
+.action {
+  position: relative;
+  padding: var(--ui-semantic-padding-action);
+  border: none;
+  font: var(--ui-semantic-font-action-default);
+  text-decoration: none;
+  text-align: start;
+}
+
+.action:not(.isActive) {
+  color: var(--ui-semantic-color-primary-default);
+  background: var(--ui-background-default);
+
+  &:hover {
+    background: var(--ui-semantic-color-primary-weaker);
+  }
+  &:active {
+    background: var(--ui-semantic-color-primary-weak);
+  }
+}
+
+.action.isActive {
+  color: var(--ui-background-default);
+  background: var(--ui-semantic-color-primary-default);;
+
+  &:hover {
+    background: var(--ui-semantic-color-primary-strong);
+  }
+  &:active {
+    background: var(--ui-semantic-color-primary-stronger);
+  }
+}

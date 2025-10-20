@@ -38,6 +38,7 @@ export function ActivityCard({ activity, updateActivity }: ActivityCardProps) {
               font: "body-small",
               color: "neutral-strong",
               display: "grid",
+              width: "100%",
               gap: "s",
               gridTemplateColumns: ["1fr", "max-content"],
               alignItems: "center",
