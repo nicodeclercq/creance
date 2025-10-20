@@ -51,13 +51,6 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
       to: "TRANSACTION_ADD",
       params: { eventId: event._id },
     } as Action<"TRANSACTION_ADD">,
-    {
-      label: t("page.event.list.actions.addDeposit"),
-      icon: "exchange-money",
-      as: "link",
-      to: "TRANSACTION_ADD",
-      params: { eventId: event._id },
-    } as Action<"TRANSACTION_ADD">,
   ] satisfies Action<RouteName>[];
 
   const eventActions = event.isClosed
