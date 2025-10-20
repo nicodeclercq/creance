@@ -48,16 +48,16 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
       label: t("page.event.list.actions.addExpense"),
       icon: "shopping-cart",
       as: "link",
-      to: "EXPENSE_ADD",
+      to: "TRANSACTION_ADD",
       params: { eventId: event._id },
-    } as Action<"EXPENSE_ADD">,
+    } as Action<"TRANSACTION_ADD">,
     {
       label: t("page.event.list.actions.addDeposit"),
       icon: "exchange-money",
       as: "link",
-      to: "DEPOSIT_ADD",
+      to: "TRANSACTION_ADD",
       params: { eventId: event._id },
-    } as Action<"DEPOSIT_ADD">,
+    } as Action<"TRANSACTION_ADD">,
   ] satisfies Action<RouteName>[];
 
   const eventActions = event.isClosed

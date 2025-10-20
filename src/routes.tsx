@@ -4,8 +4,8 @@ import { EventsPage } from "./pages/events/EventsPage";
 import { Redirect } from "./Redirect";
 import { AddEventPage } from "./pages/events/AddEventPage";
 import { EventPage } from "./pages/event/EventPage";
-import { AddExpensePage } from "./pages/event/AddExpensePage";
-import { EditExpensePage } from "./pages/event/EditExpensePage";
+import { AddTransactionPage } from "./pages/event/AddTransactionPage";
+import { EditTransactionPage } from "./pages/event/EditTransactionPage";
 import { CategoriesPage } from "./pages/categories/CategoriesPage";
 import { EventUsersPage } from "./pages/participants/EventUsersPage";
 import { ParticipantSharePage } from "./pages/shares/ParticipantSharePage";
@@ -14,8 +14,6 @@ import { DistributionPage } from "./pages/distribution/DistributionPage";
 import { ValueOf } from "./utils/object";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { InformationPage } from "./pages/settings/InformationPage";
-import { AddDepositPage } from "./pages/deposits/AddDepositPage";
-import { EditDepositPage } from "./pages/deposits/EditDepositPage";
 import { CalendarPage } from "./pages/calendar/CalendarPage";
 
 export const ROUTES_DEFINITION = {
@@ -47,25 +45,17 @@ export const ROUTES_DEFINITION = {
     path: "/events/:eventId/calendar",
     component: CalendarPage,
   },
-  EXPENSE_ADD: {
-    path: "/events/:eventId/expenses/add",
-    component: AddExpensePage,
+  TRANSACTION_ADD: {
+    path: "/events/:eventId/transactions/add",
+    component: AddTransactionPage,
   },
-  EXPENSE_EDIT: {
-    path: "/events/:eventId/expenses/:expenseId/edit",
-    component: EditExpensePage,
+  TRANSACTION_EDIT: {
+    path: "/events/:eventId/transactions/:transactionId/edit",
+    component: EditTransactionPage,
   },
   CATEGORIES_EDIT: {
     path: "/events/:eventId/categories/edit",
     component: CategoriesPage,
-  },
-  DEPOSIT_ADD: {
-    path: "/events/:eventId/deposits/add",
-    component: AddDepositPage,
-  },
-  DEPOSIT_EDIT: {
-    path: "/events/:eventId/deposits/:depositId/edit",
-    component: EditDepositPage,
   },
   EVENT_USERS: {
     path: "/events/:eventId/users",

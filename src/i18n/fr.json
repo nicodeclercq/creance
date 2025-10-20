@@ -345,5 +345,9 @@
   "ActivityCard.actions.edit": "Modifier",
   "ExternalLink.actions.click": "Ouvrir dans un nouvel onglet",
   "AddExpensePage.menu.expense": "Dépense",
-  "AddExpensePage.menu.deposit": "Avance"
+  "AddExpensePage.menu.deposit": "Avance",
+  "transactionForm.mode.label": "Type de transaction",
+  "transactionForm.mode.option.expense.label": "Dépense",
+  "transactionForm.mode.option.deposit.label": "Avance",
+  "validation.maxLength": "Le champ {{field}} ne peut pas dépasser {{max}} caractères"
 }

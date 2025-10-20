@@ -90,7 +90,7 @@ export function ExpenseList({
                 <Button
                   label={t("page.event.list.actions.addExpense")}
                   as="link"
-                  to="EXPENSE_ADD"
+                  to="TRANSACTION_ADD"
                   params={{ eventId: event._id }}
                   variant="primary"
                 />

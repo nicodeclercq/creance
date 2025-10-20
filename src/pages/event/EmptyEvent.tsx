@@ -24,7 +24,7 @@ export function EmptyEvent({ event }: Props) {
           : {
               as: "link",
               label: t("page.event.empty.actions.add"),
-              to: "EXPENSE_ADD",
+              to: "TRANSACTION_ADD",
               params: { eventId: event._id },
             }
       }

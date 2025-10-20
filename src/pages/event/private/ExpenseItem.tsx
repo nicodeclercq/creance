@@ -79,8 +79,8 @@ export function ExpenseItem({
               variant: "primary",
               icon: "edit",
               label: t("page.event.expenseList.actions.edit"),
-              to: "EXPENSE_EDIT",
-              params: { eventId, expenseId: expense._id },
+              to: "TRANSACTION_EDIT",
+              params: { eventId, transactionId: expense._id },
             },
             {
               icon: "trash",

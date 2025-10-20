@@ -83,8 +83,8 @@ export function DepositItem({
               variant: "primary",
               icon: "edit",
               label: t("page.event.depositItem.actions.edit"),
-              to: "DEPOSIT_EDIT",
-              params: { eventId, depositId: deposit._id },
+              to: "TRANSACTION_EDIT",
+              params: { eventId, transactionId: deposit._id },
             },
             {
               icon: "trash",
