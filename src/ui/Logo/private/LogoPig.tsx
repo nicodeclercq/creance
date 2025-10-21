@@ -6,7 +6,7 @@ type LogoPigProps = {
 export function LogoPig({ height, hasBackground }: LogoPigProps) {
   return (
     <svg
-      height={height}
+      style={{ height }}
       viewBox="0 0 711 570"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

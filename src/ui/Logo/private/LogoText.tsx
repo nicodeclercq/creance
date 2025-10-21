@@ -6,7 +6,7 @@ type LogoTextProps = {
 export function LogoText({ height, hasBackground }: LogoTextProps) {
   return (
     <svg
-      height={height}
+      style={{ height }}
       viewBox="0 0 1463 570"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

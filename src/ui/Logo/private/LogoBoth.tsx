@@ -6,7 +6,7 @@ type LogoBothProps = {
 export function LogoBoth({ height, hasBackground }: LogoBothProps) {
   return (
     <svg
-      height={height}
+      style={{ height }}
       viewBox="0 0 1552 410"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
