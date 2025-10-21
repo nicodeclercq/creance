@@ -1,4 +1,5 @@
 import { Illustration, isIllustration } from "../Illustration/Illustration";
+
 import { Bleed } from "../Bleed/Bleed";
 import { Card } from "../Card/Card";
 import { Container } from "../Container/Container";
@@ -59,7 +60,7 @@ export function MediaCard({
 }: MediaCardProps) {
   return (
     <Card>
-      <Grid columns={{ default: 1, md: ["15rem", "auto"] }} gap="m">
+      <Grid columns={{ default: 1, sm: ["15rem", "auto"] }} gap="m">
         {isIllustration(image) ? (
           <Container
             styles={{

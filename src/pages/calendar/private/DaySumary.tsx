@@ -140,7 +140,13 @@ export function DaySumary({
           />
         ))}
         {sortedActivities.length > 0 && (
-          <Container styles={{ display: "flex", justifyContent: "center" }}>
+          <Container
+            styles={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
             <Button
               variant="tertiary"
               icon={{ name: "add", position: "end" }}
