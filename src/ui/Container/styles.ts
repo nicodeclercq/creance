@@ -236,7 +236,7 @@ function getMediaValue<S>(
   return media in value ? (value[media] as S) : undefined;
 }
 
-function getPropertiesValueByMedia<
+export function getPropertiesValueByMedia<
   S extends Record<string, WithMediaQuery<unknown>>
 >(values: S) {
   type Values = {

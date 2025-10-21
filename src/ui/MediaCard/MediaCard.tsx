@@ -85,7 +85,7 @@ export function MediaCard({
               default: ["top", "left", "right"],
               [mediaBreakpoint]: ["top", "left", "bottom"],
             }}
-            width={{ default: "100%", [mediaBreakpoint]: "100%" }}
+            width="100%"
             height={{ default: "10rem", [mediaBreakpoint]: "100%" }}
           >
             <Image image={image} color={color} />

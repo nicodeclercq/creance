@@ -1,5 +1,9 @@
+import {
+  buildStylesForMedia,
+  getPropertiesValueByMedia,
+} from "../Container/styles";
+
 import type { WithMediaQuery } from "../Container/styles";
-import { buildStylesForMedia } from "../Container/styles";
 import { entries } from "../../utils/object";
 
 type Direction =
@@ -88,12 +92,13 @@ type ComputeStylesProps = {
   height: string | undefined;
 };
 
-const computeStyles = ({
-  direction,
-  spacing,
-  width,
-  height,
-}: ComputeStylesProps): string => {
+const computeStyles = (
+  { direction, spacing, width, height }: ComputeStylesProps,
+  defaultDimensions: { width: string | undefined; height: string | undefined }
+): string => {
+  const w = width ?? defaultDimensions.width;
+  const h = height ?? defaultDimensions.height;
+
   const styles = {
     "margin-block-start": "0",
     "margin-block-end": "0",
@@ -114,13 +119,13 @@ const computeStyles = ({
     }
   });
 
-  if (width && width !== "inherit") {
-    styles.width = `calc(${width} + ${
+  if (w && w !== "inherit") {
+    styles.width = `calc(${w} + ${
       directions.left ? directionsSpacing.left : "0px"
     } + ${directions.right ? directionsSpacing.right : "0px"})`;
   }
-  if (height && height !== "inherit") {
-    styles.height = `calc(${height} + ${
+  if (h && h !== "inherit") {
+    styles.height = `calc(${h} + ${
       directions.top ? directionsSpacing.top : "0px"
     } + ${directions.bottom ? directionsSpacing.bottom : "0px"})`;
   }
@@ -138,9 +143,13 @@ export function Bleed<D extends Direction>({
   width,
   height,
 }: BleedProps<D>) {
+  const defaultDimensions = getPropertiesValueByMedia({
+    width,
+    height,
+  }).default;
   const styles = buildStylesForMedia(
     { direction, spacing, width, height },
-    (value) => computeStyles(value as ComputeStylesProps)
+    (value) => computeStyles(value as ComputeStylesProps, defaultDimensions)
   );
 
   return (
