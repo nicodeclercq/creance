@@ -1,7 +1,7 @@
 import { Button } from "../../ui/Button/Button";
 import { Card } from "../../ui/Card/Card";
 import { EmptyEventList } from "./EmptyEventList";
-import { Event } from "../../models/Event";
+import type { Event } from "../../models/Event";
 import { EventItem } from "./EventItem/EventItem";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";

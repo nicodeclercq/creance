@@ -1,15 +1,15 @@
-import {
-  CATEGORY_ICONS,
-  CategoryIconName,
-} from "../../../ui/CategoryIcon/private";
-import { Controller, useForm } from "react-hook-form";
-
-import { Category } from "../../../models/Category";
+import { CATEGORY_ICONS } from "../../../ui/CategoryIcon/private";
+import type { Category } from "../../../models/Category";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
+import type { CategoryIconName } from "../../../ui/CategoryIcon/private";
+import { Controller } from "react-hook-form";
 import { Form } from "../../../ui/Form/Form";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Select } from "../../../ui/FormField/Select/Select";
+import { categorySchema } from "../../../models/Category";
+import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 type CategoryFormProps = {
   data: Category;
@@ -19,6 +19,12 @@ type CategoryFormProps = {
   submitLabel: string;
   cancelLabel: string;
 };
+
+const categoryFormSchema = z.object({
+  _id: categorySchema.shape._id,
+  name: categorySchema.shape.name,
+  icon: categorySchema.shape.icon,
+});
 
 export function CategoryForm({
   submitLabel,
@@ -33,9 +39,19 @@ export function CategoryForm({
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<Category>({
-    defaultValues: data,
-  });
+  } = useForm(
+    categoryFormSchema.refine(
+      (value) =>
+        !categories.some(
+          (category) =>
+            category._id !== data._id && category.name === value.name
+        ),
+      t("page.events.add.form.field.categoryName.validation.isUnique")
+    ),
+    {
+      defaultValues: data,
+    }
+  );
 
   const hasError = Object.keys(errors).length > 0;
 
@@ -77,27 +93,6 @@ export function CategoryForm({
       />
       <Controller
         control={control}
-        rules={{
-          required: t(
-            "page.events.add.form.field.categoryName.validation.required"
-          ),
-          maxLength: {
-            value: 100,
-            message: t("categoryForm.name.validation.maxLength", { max: 100 }),
-          },
-          validate: {
-            isUnique: (value) => {
-              const isUnique = !categories.some(
-                (category) =>
-                  category._id !== data._id && category.name === value
-              );
-              return (
-                isUnique ||
-                t("page.events.add.form.field.categoryName.validation.isUnique")
-              );
-            },
-          },
-        }}
         name="name"
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputText

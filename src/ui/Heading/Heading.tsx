@@ -1,4 +1,5 @@
-import { Container, ContainerStyles } from "../Container/Container";
+import type { ContainerStyles } from "../Container/Container";
+import { Container } from "../Container/Container";
 
 import type { ReactNode } from "react";
 import type { TypographyStyles } from "../Container/styles";

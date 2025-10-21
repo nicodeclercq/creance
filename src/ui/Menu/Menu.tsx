@@ -1,17 +1,19 @@
 import classNames from "classnames";
 import { Button, Dialog, DialogTrigger, Popover } from "react-aria-components";
 import { Icon } from "../Icon/Icon";
-import { AsButton, AsLink, type ButtonProps } from "../Button/Button";
+import type { AsButton, AsLink } from "../Button/Button";
+import { type ButtonProps } from "../Button/Button";
 import styles from "./Menu.module.css";
 import buttonStyles from "../Button/Button.module.css";
 import iconButtonStyles from "../IconButton/IconButton.module.css";
 import { type IconName } from "../Icon/private";
-import { DistributiveOmit } from "../../helpers/DistributiveOmit";
+import type { DistributiveOmit } from "../../helpers/DistributiveOmit";
 import { Stack } from "../Stack/Stack";
 import { Columns } from "../Columns/Columns";
 import { Link } from "react-router-dom";
 import { getPath } from "../../routes";
-import { ConfirmButton, ConfirmProps } from "../ConfirmButton/ConfirmButton";
+import type { ConfirmProps } from "../ConfirmButton/ConfirmButton";
+import { ConfirmButton } from "../ConfirmButton/ConfirmButton";
 
 type Action =
   | (DistributiveOmit<ButtonProps<AsLink>, "icon"> & {
@@ -41,7 +43,7 @@ export function Menu({
         className={classNames(
           buttonStyles.button,
           iconButtonStyles.button,
-          buttonStyles[`hasVariant-${variant}`]
+          buttonStyles[`hasVariant-${variant}`],
         )}
         aria-label={label}
       >

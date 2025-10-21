@@ -1,12 +1,14 @@
 import { useId, type ReactNode } from "react";
+import type {
+  ListBoxItemProps,
+  Key,
+} from "react-aria-components";
 import {
   ListBox,
   Popover,
   Select as RASelect,
   Button,
-  type ListBoxItemProps,
   ListBoxItem,
-  Key,
   TooltipTrigger,
   Tooltip,
 } from "react-aria-components";
@@ -15,7 +17,6 @@ import styles from "./Select.module.css";
 import classNames from "classnames";
 import { Columns } from "../../Columns/Columns";
 import { Label } from "../Label/Label";
-
 type Option<T> = { id: string; label: string; value: T };
 
 type SelectProps<T> = {

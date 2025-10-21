@@ -1,8 +1,8 @@
 import * as Either from "fp-ts/Either";
 
-import { State, stateSchema } from "../store/state";
-
+import type { State } from "../store/state";
 import type { ZodError } from "zod";
+import { stateSchema } from "../store/state";
 
 export const toState = (data: unknown): Either.Either<ZodError, State> => {
   const parsed = stateSchema.safeParse(data);

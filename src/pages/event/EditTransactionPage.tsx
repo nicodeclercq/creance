@@ -1,15 +1,15 @@
 import { Card } from "../../ui/Card/Card";
-import { Deposit } from "../../models/Deposit";
+import type { Deposit } from "../../models/Deposit";
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
-import { Expense } from "../../models/Expense";
+import type { Expense } from "../../models/Expense";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";
 import { Redirect } from "../../Redirect";
-import { Transaction } from "../../models/Transaction";
+import type { Transaction } from "../../models/Transaction";
 import { TransactionForm } from "./private/TransactionForm";
+import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
-import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
 
@@ -33,8 +33,10 @@ export function EditTransactionPage() {
   }
 
   // Try to find in expenses first, then deposits
-  const currentExpense: Expense | undefined = currentEvent.expenses[transactionId];
-  const currentDeposit: Deposit | undefined = currentEvent.deposits[transactionId];
+  const currentExpense: Expense | undefined =
+    currentEvent.expenses[transactionId];
+  const currentDeposit: Deposit | undefined =
+    currentEvent.deposits[transactionId];
 
   const isExpense = !!currentExpense;
   const isDeposit = !!currentDeposit;
@@ -44,23 +46,24 @@ export function EditTransactionPage() {
   }
 
   // Get default values as Transaction type
-  const defaultValues: Transaction = isExpense && currentExpense
-    ? { type: "expense", data: currentExpense }
-    : isDeposit && currentDeposit
-    ? { type: "deposit", data: currentDeposit }
-    : {
-        type: "expense",
-        data: {
-          _id: "",
-          reason: "",
-          category: Object.values(currentEvent.categories)[0]?._id || "",
-          lender: Object.values(participants)[0]?._id || "",
-          amount: "0",
-          date: new Date(),
-          share: { type: "default" },
-          updatedAt: new Date(),
-        },
-      };
+  const defaultValues: Transaction =
+    isExpense && currentExpense
+      ? { type: "expense", data: currentExpense }
+      : isDeposit && currentDeposit
+      ? { type: "deposit", data: currentDeposit }
+      : {
+          type: "expense",
+          data: {
+            _id: "",
+            reason: "",
+            category: Object.values(currentEvent.categories)[0]?._id || "",
+            lender: Object.values(participants)[0]?._id || "",
+            amount: "0",
+            date: new Date(),
+            share: { type: "default" },
+            updatedAt: new Date(),
+          },
+        };
 
   const handleSubmit = (transaction: Transaction) => {
     if (transaction.type === "expense") {

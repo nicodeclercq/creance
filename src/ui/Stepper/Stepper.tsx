@@ -5,7 +5,6 @@ import { Heading } from "../Heading/Heading";
 import { Text } from "react-aria-components";
 import { Paragraph } from "../Paragraph/Paragraph";
 import { useTranslation } from "react-i18next";
-
 type Step = {
   title: string;
   description: string;

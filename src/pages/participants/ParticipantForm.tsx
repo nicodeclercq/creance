@@ -5,17 +5,43 @@ import { Container } from "../../ui/Container/Container";
 import { Form } from "../../ui/Form/Form";
 import { InputNumber } from "../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../ui/FormField/InputText/InputText";
-import { User } from "../../models/User";
+import type { User } from "../../models/User";
 import { useTranslation } from "react-i18next";
+import { userSchema } from "../../models/User";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-export type FormData = {
-  name: string;
-  avatar: string;
-  share: {
-    adults: number;
-    children: number;
-  };
-};
+const createParticipantFormSchema = (
+  t: ReturnType<typeof useTranslation>["t"],
+  users: Record<string, User>
+) =>
+  z
+    .object({
+      name: userSchema.shape.name
+        .min(1)
+        .refine(
+          (value) => !Object.values(users).some((user) => user.name === value),
+          t("participantForm.name.validation.unique")
+        ),
+      avatar: userSchema.shape.avatar,
+      share: userSchema.shape.share,
+    })
+    .superRefine((data, ctx) => {
+      if (data.share.adults + data.share.children === 0) {
+        ctx.addIssue({
+          code: "custom",
+          message: t("participantForm.multipliers.validation.min"),
+          path: ["share", "adults"],
+        });
+        ctx.addIssue({
+          code: "custom",
+          message: t("participantForm.multipliers.validation.min"),
+          path: ["share", "children"],
+        });
+      }
+    });
+
+export type FormData = z.infer<ReturnType<typeof createParticipantFormSchema>>;
 
 type ParticipantFormProps = {
   defaultValue: FormData;
@@ -41,11 +67,11 @@ export function ParticipantForm({
     handleSubmit,
     watch,
     trigger,
-    getValues,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: defaultValue,
     mode: "onChange",
+    resolver: zodResolver(createParticipantFormSchema(t, users)),
   });
 
   const hasError = Object.keys(errors).length > 0;
@@ -80,20 +106,6 @@ export function ParticipantForm({
       <Controller
         name="name"
         control={control}
-        rules={{
-          required: true,
-          maxLength: {
-            value: 100,
-            message: t("participantForm.name.validation.maxLength", {
-              max: 100,
-            }),
-          },
-          validate: (value) => {
-            if (Object.values(users).some((user) => user.name === value)) {
-              return t("participantForm.name.validation.unique");
-            }
-          },
-        }}
         render={({ field: { value, onChange } }) => (
           <InputText
             type="text"
@@ -107,19 +119,6 @@ export function ParticipantForm({
       <Controller
         control={control}
         name="share.adults"
-        rules={{
-          required: t("participantForm.adults.validation.required"),
-          min: {
-            value: 0,
-            message: t("participantForm.adults.validation.min"),
-          },
-          validate: (value) => {
-            const children = getValues("share.children");
-            if (value + children === 0) {
-              return t("participantForm.multipliers.validation.min");
-            }
-          },
-        }}
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputNumber
             type="number"
@@ -138,19 +137,6 @@ export function ParticipantForm({
       <Controller
         control={control}
         name="share.children"
-        rules={{
-          required: t("participantForm.multipliers.validation.min"),
-          min: {
-            value: 0,
-            message: t("participantForm.children.validation.required"),
-          },
-          validate: (value) => {
-            const adults = getValues("share.adults");
-            if (value + adults === 0) {
-              return t("participantForm.multipliers.validation.min");
-            }
-          },
-        }}
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputNumber
             type="number"

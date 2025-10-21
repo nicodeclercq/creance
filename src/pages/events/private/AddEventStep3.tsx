@@ -1,17 +1,17 @@
-import { FormData, ParticipantForm } from "../../participants/ParticipantForm";
-
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import { Button } from "../../../ui/Button/Button";
 import { CheckboxList } from "../../../ui/FormField/CheckboxList/CheckboxList";
 import { Columns } from "../../../ui/Columns/Columns";
 import { Container } from "../../../ui/Container/Container";
 import { Form } from "../../../ui/Form/Form";
+import type { FormData } from "../../participants/ParticipantForm";
 import { Fragment } from "react/jsx-runtime";
 import { Icon } from "../../../ui/Icon/Icon";
 import { Modal } from "../../../ui/Modal/Modal";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { Participant } from "../../../models/Participant";
-import { User } from "../../../models/User";
+import type { Participant } from "../../../models/Participant";
+import { ParticipantForm } from "../../participants/ParticipantForm";
+import type { User } from "../../../models/User";
 import { uid } from "../../../service/crypto";
 import { useData } from "../../../store/useData";
 import { useState } from "react";

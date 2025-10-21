@@ -8,14 +8,13 @@ import {
 import { type ZonedDateTime, fromDate } from "@internationalized/date";
 import classNames from "classnames";
 
-import { InputProps } from "../private/InputProps";
+import type { InputProps } from "../private/InputProps";
 import { FormField } from "../FormField";
 import { useId } from "react";
 import styles from "./CalendarRangePicker.module.css";
 import buttonStyles from "../../Button/Button.module.css";
 import iconButtonStyles from "../../IconButton/IconButton.module.css";
 import { Icon } from "../../Icon/Icon";
-
 export type CalendarRangePickerProps = InputProps<
   "calendar-range-picker",
   { start: Date; end: Date }
@@ -43,12 +42,12 @@ export function CalendarRangePicker({
     const start = new Date(
       newValue.start.year,
       newValue.start.month - 1,
-      newValue.start.day + 1
+      newValue.start.day + 1,
     );
     const end = new Date(
       newValue.end.year,
       newValue.end.month - 1,
-      newValue.end.day + 1
+      newValue.end.day + 1,
     );
     onChange({ start, end });
   };
@@ -76,7 +75,7 @@ export function CalendarRangePicker({
               styles.button,
               buttonStyles.button,
               buttonStyles["hasVariant-tertiary"],
-              iconButtonStyles.button
+              iconButtonStyles.button,
             )}
           >
             <Icon name="chevron-left" />
@@ -88,7 +87,7 @@ export function CalendarRangePicker({
               styles.button,
               buttonStyles.button,
               buttonStyles["hasVariant-tertiary"],
-              iconButtonStyles.button
+              iconButtonStyles.button,
             )}
           >
             <Icon name="chevron-right" />

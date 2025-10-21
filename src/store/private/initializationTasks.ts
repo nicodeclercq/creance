@@ -1,7 +1,7 @@
 import * as RecordFP from "fp-ts/Record";
 
-import { State } from "../state";
-import { StoreAdapter } from "../StoreManager";
+import type { State } from "../state";
+import type { StoreAdapter } from "../StoreManager";
 import { flow } from "fp-ts/function";
 import { pipe } from "fp-ts/function";
 import { shouldCloseEvent } from "../../models/Event";

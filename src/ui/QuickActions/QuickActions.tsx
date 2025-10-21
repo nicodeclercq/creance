@@ -7,12 +7,12 @@ import {
 } from "../IconButton/IconButton";
 
 import { Icon } from "../Icon/Icon";
-import { IconName } from "../Icon/private";
+import type { IconName } from "../Icon/private";
 import buttonStyles from "../Button/Button.module.css";
 import classNames from "classnames";
 import iconButtonStyles from "../IconButton/IconButton.module.css";
 import styles from "./QuickActions.module.css";
-import { RouteName } from "../../routes";
+import type { RouteName } from "../../routes";
 
 export type Action<R extends RouteName> =
   IconButtonPropsWhithoutVariantAndOverlays<AsLink<R> | AsButton>;
@@ -36,7 +36,7 @@ export function QuickActions<R extends RouteName>({
             buttonStyles.button,
             iconButtonStyles.button,
             buttonStyles["hasVariant-primary"],
-            styles.button
+            styles.button,
           )}
           aria-label={label}
         >

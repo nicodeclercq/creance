@@ -1,13 +1,13 @@
 import { Button } from "../../../ui/Button/Button";
 import { Card } from "../../../ui/Card/Card";
-import { Deposit } from "../../../models/Deposit";
+import type { Deposit } from "../../../models/Deposit";
 import { DepositItem } from "./DepositItem";
 import { EmptyEvent } from "../EmptyEvent";
-import { Event } from "../../../models/Event";
+import type { Event } from "../../../models/Event";
 import { EventPageTemplate } from "../../../shared/PageTemplate/EventPageTemplate";
-import { Expense } from "../../../models/Expense";
+import type { Expense } from "../../../models/Expense";
 import { ExpenseItem } from "./ExpenseItem";
-import { Participant } from "../../../models/Participant";
+import type { Participant } from "../../../models/Participant";
 import { Stack } from "../../../ui/Stack/Stack";
 import { TotalAmount } from "./TotalAmount";
 import { sort } from "../../../utils/date";

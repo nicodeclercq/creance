@@ -1,12 +1,11 @@
 import { Illustration, isIllustration } from "../Illustration/Illustration";
-
 import { Bleed } from "../Bleed/Bleed";
 import { Card } from "../Card/Card";
 import { Container } from "../Container/Container";
 import { Grid } from "../Grid/Grid";
 import { MediaHidden } from "../MediaHidden/MediaHidden";
 import { MediaOnly } from "../MediaOnly/MediaOnly";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type MediaCardProps = {
   children: ReactNode;

@@ -1,16 +1,13 @@
 import * as z from "zod";
 
-import {
-  CATEGORY_ICONS_NAMES,
-  CategoryIconName,
-} from "../ui/CategoryIcon/private";
-
+import { CATEGORY_ICONS_NAMES } from "../ui/CategoryIcon/private";
+import type { CategoryIconName } from "../ui/CategoryIcon/private";
 import { uid } from "../service/crypto";
 
 export const categorySchema = z.strictObject({
-  _id: z.string().max(100),
-  name: z.string().max(100),
-  icon: z.enum(CATEGORY_ICONS_NAMES),
+  _id: z.string().max(100, "Category.validation.id.maxLength"),
+  name: z.string().max(100, "Category.validation.name.maxLength"),
+  icon: z.enum(CATEGORY_ICONS_NAMES, "Category.validation.icon.invalid"),
 });
 
 export type Category = z.infer<typeof categorySchema>;

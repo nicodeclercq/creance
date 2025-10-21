@@ -1,6 +1,6 @@
-import { ICONS, IconName } from "../ui/Icon/private";
-
+import { ICONS } from "../ui/Icon/private";
 import { Icon } from "../ui/Icon/Icon";
+import type { IconName } from "../ui/Icon/private";
 import { PageTemplate } from "../shared/PageTemplate/PageTemplate";
 import { useTranslation } from "react-i18next";
 

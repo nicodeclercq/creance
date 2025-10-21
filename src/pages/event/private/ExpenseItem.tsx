@@ -1,12 +1,12 @@
 import { Avatar } from "../../../ui/Avatar/Avatar";
-import { Category } from "../../../models/Category";
+import type { Category } from "../../../models/Category";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
 import { Columns } from "../../../ui/Columns/Columns";
 import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
-import { Expense } from "../../../models/Expense";
+import type { Expense } from "../../../models/Expense";
 import { Menu } from "../../../ui/Menu/Menu";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { Participant } from "../../../models/Participant";
+import type { Participant } from "../../../models/Participant";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
 import { useCurrentUser } from "../../../store/useCurrentUser";

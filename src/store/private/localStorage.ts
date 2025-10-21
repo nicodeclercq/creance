@@ -1,10 +1,12 @@
 import * as Either from "fp-ts/Either";
 
-import { DEFAULT_STATE, State } from "../state";
-import { FirstStoreAdapter, StoreManager } from "../StoreManager";
 import { fromState, toState } from "../../adapters/json";
 
+import { DEFAULT_STATE } from "../state";
+import type { FirstStoreAdapter } from "../StoreManager";
 import { Logger } from "../../service/Logger";
+import type { State } from "../state";
+import { StoreManager } from "../StoreManager";
 import { pipe } from "fp-ts/function";
 
 function getStateFromLocalStorage(): Either.Either<Error, State> {

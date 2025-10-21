@@ -1,9 +1,9 @@
-import { AsLink, ButtonProps } from "../../../ui/Button/Button";
+import type { AsLink, ButtonProps } from "../../../ui/Button/Button";
 
 import { Container } from "../../../ui/Container/Container";
-import { DistributiveOmit } from "../../../helpers/DistributiveOmit";
+import type { DistributiveOmit } from "../../../helpers/DistributiveOmit";
 import { Icon } from "../../../ui/Icon/Icon";
-import { IconName } from "../../../ui/Icon/private";
+import type { IconName } from "../../../ui/Icon/private";
 import { NavLink } from "react-router-dom";
 import classNames from "classnames";
 import { getPath } from "../../../routes";
@@ -23,6 +23,7 @@ export type MenuProps = {
 export function Menu({ actions, gridArea }: MenuProps) {
   return (
     <Container
+      data-component="Menu"
       styles={{
         zIndex: 1,
         gridArea,

@@ -2,7 +2,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 
 import { AddCategoryForm } from "./AddCategoryForm";
 import { Button } from "../../../ui/Button/Button";
-import { Category } from "../../../models/Category";
+import type { Category } from "../../../models/Category";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
 import { FormLayout } from "../../../ui/Form/Form";
 import { Fragment } from "react/jsx-runtime";

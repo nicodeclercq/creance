@@ -1,5 +1,5 @@
-import { WithMediaQuery, buildStylesForMedia } from "../Container/styles";
-
+import type { WithMediaQuery } from "../Container/styles";
+import { buildStylesForMedia } from "../Container/styles";
 import { entries } from "../../utils/object";
 
 type Direction =

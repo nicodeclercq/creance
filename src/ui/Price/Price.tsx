@@ -1,11 +1,10 @@
 import * as Either from "fp-ts/Either";
 
-import { Paragraph, ParagraphProps } from "../Paragraph/Paragraph";
+import type { ParagraphProps } from "../Paragraph/Paragraph";
+import { Paragraph } from "../Paragraph/Paragraph";
 import { calculationAsNumber, centToDecimal } from "../../helpers/Number";
-
 import { pipe } from "fp-ts/function";
 import { useTranslation } from "react-i18next";
-
 type PriceProps = {
   children: string | number;
   type?: "default" | "sum" | "total";
@@ -51,8 +50,8 @@ export function Price({
                 value: value.startsWith("-") ? value.slice(1) : value,
               })}
             </>
-          )
-        )
+          ),
+        ),
       )}
     </Paragraph>
   );

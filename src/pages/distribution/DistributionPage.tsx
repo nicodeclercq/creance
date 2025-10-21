@@ -9,9 +9,9 @@ import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";
 import { Stack } from "../../ui/Stack/Stack";
 import { getEventDistribution } from "../../service/calculation";
 import { pipe } from "fp-ts/function";
+import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
-import { useData } from "../../store/useData";
 import { useTranslation } from "react-i18next";
 
 export function DistributionPage() {

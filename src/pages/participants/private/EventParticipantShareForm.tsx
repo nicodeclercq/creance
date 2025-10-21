@@ -1,22 +1,17 @@
 import * as Either from "fp-ts/Either";
 
-import { Button, ButtonProps } from "../../../ui/Button/Button";
+import type { ButtonProps } from "../../../ui/Button/Button";
+import { Button } from "../../../ui/Button/Button";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import {
-  CustomShare,
-  FormShare,
-  fromShare,
-  getDaysInPeriod,
-  toShare,
-} from "./formParticipantShare";
+import type { CustomShare, FormShare } from "./formParticipantShare";
+import { fromShare, getDaysInPeriod, toShare } from "./formParticipantShare";
 import { type Event } from "../../../models/Event";
 import { type ParticipantShare } from "../../../models/ParticipantShare";
-
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import { CalendarRangePicker } from "../../../ui/FormField/CalendarRangePicker/CalendarRangePicker";
 import { Card } from "../../../ui/Card/Card";
 import { Columns } from "../../../ui/Columns/Columns";
-import { DistributiveOmit } from "../../../helpers/DistributiveOmit";
+import type { DistributiveOmit } from "../../../helpers/DistributiveOmit";
 import { Form } from "../../../ui/Form/Form";
 import { IconButton } from "../../../ui/IconButton/IconButton";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
@@ -25,7 +20,7 @@ import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { RadioGroup } from "../../../ui/Form/RadioGroup/RadioGroup";
 import { Stack } from "../../../ui/Stack/Stack";
 import { Switch } from "../../../ui/Switch";
-import { Participant } from "../../../models/Participant";
+import type { Participant } from "../../../models/Participant";
 import styles from "./EventParticipantShareForm.module.css";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";

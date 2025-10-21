@@ -13,16 +13,17 @@ export const ANONYMOUS_USER = {
 } satisfies User;
 
 export const userSchema = z.strictObject({
-  _id: z.string().max(100),
-  name: z.string().max(100),
-  avatar: z.string().max(100),
+  _id: z.string().max(100, "User.validation.id.maxLength"),
+  name: z.string().max(100, "User.validation.name.maxLength"),
+  avatar: z.string().max(100, "User.validation.avatar.maxLength"),
   share: z.strictObject({
-    adults: z.number(),
-    children: z.number(),
+    adults: z.number("User.validation.share.adults.invalid"),
+    children: z.number("User.validation.share.children.invalid"),
   }),
-  updatedAt: z
-    .string()
-    .transform((date) => (date == null ? new Date() : new Date(date))),
+  updatedAt: z.union(
+    [z.string().transform((date) => new Date(date)), z.date()],
+    "User.validation.updatedAt.invalid"
+  ),
 });
 
 export type User = z.infer<typeof userSchema>;

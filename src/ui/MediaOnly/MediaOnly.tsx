@@ -7,7 +7,6 @@ import {
 } from "../Container/styles";
 
 import { type ReactNode } from "react";
-
 type MediaOnlyProps = {
   children: ReactNode;
   media: Media | Media[];
@@ -23,7 +22,7 @@ export function MediaOnly({ children, media, styles = {} }: MediaOnlyProps) {
       ...acc,
       [key]: medias.includes(key) ? display : "none",
     }),
-    {}
+    {},
   ) as WithMediaQuery<Display>;
 
   return (

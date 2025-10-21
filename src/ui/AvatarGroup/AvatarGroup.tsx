@@ -1,5 +1,5 @@
-import { Avatar, AvatarProps } from "../Avatar/Avatar";
-
+import { Avatar } from "../Avatar/Avatar";
+import type { AvatarProps } from "../Avatar/Avatar";
 import classNames from "classnames";
 import styles from "./AvatarGroup.module.css";
 

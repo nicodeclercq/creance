@@ -3,29 +3,28 @@ import { identity } from "fp-ts/function";
 import * as TaskEither from "fp-ts/TaskEither";
 import * as z from "zod";
 
-import {
-  get,
-  getDatabase,
-  ref,
-} from "firebase/database";
+import { get, getDatabase, ref } from "firebase/database";
 
 import { type ZodSchema } from "zod";
 import { firebaseConfig } from "../../secrets";
+import type { User } from "firebase/auth";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  User,
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { pipe } from "fp-ts/function";
-
-import { DEFAULT_STATE, State } from "../state";
+import type { State } from "../state";
+import { DEFAULT_STATE } from "../state";
 import { decrypt, generateKey } from "../../service/crypto";
-import { Account, accountSchema } from "../../models/Account";
-import { Store, StoreAdapter, StoreManager } from "../StoreManager";
-import { Fn } from "../../helpers/function";
+import type { Account } from "../../models/Account";
+import { accountSchema } from "../../models/Account";
+import type { Store } from "../StoreManager";
+import type { StoreAdapter } from "../StoreManager";
+import { StoreManager } from "../StoreManager";
+import type { Fn } from "../../helpers/function";
 import { Logger } from "../../service/Logger";
 
 type Schema<Data> = ZodSchema<Data, any, any>;
@@ -92,7 +91,10 @@ const listenToAuthChanges = (
                   )
                   .catch((error) => {
                     Logger.error("Failed to decrypt user data:")(error, data);
-                    return Either.left(error) as Either.Either<Error, Account | null>;
+                    return Either.left(error) as Either.Either<
+                      Error,
+                      Account | null
+                    >;
                   })
               : Promise.reject(new Error("Failed to decrypt user data"));
           })
@@ -251,9 +253,7 @@ const fromFirebaseData =
       });
   };
 
-function getAccountData(): Promise<
-  Either.Either<Error, Account | null>
-> {
+function getAccountData(): Promise<Either.Either<Error, Account | null>> {
   return Promise.resolve()
     .then(() => auth.authStateReady())
     .then(() => {
@@ -284,7 +284,9 @@ function getAccountData(): Promise<
             )
         : Promise.reject(new Error("Failed to decrypt user data"));
     })
-    .catch((error) => Either.left(error) as Either.Either<Error, Account | null>);
+    .catch(
+      (error) => Either.left(error) as Either.Either<Error, Account | null>
+    );
 }
 
 export function signUpParticipant({

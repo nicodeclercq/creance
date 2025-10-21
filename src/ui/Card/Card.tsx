@@ -1,5 +1,4 @@
 import { Container, type ContainerStyles } from "../Container/Container";
-
 import { createContext, useContext, type ReactNode } from "react";
 
 const CardContext = createContext(false);

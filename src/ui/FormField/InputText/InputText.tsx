@@ -3,7 +3,6 @@ import { type InputProps } from "../private/InputProps";
 import { FormField } from "../FormField";
 import styles from "./InputText.module.css";
 import { useId } from "react";
-
 export type InputTextProps = InputProps<"text" | "email", string>;
 
 export function InputText({

@@ -1,6 +1,6 @@
 import * as E from "fp-ts/Either";
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 

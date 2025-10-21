@@ -1,25 +1,46 @@
 import { Controller, useForm } from "react-hook-form";
+import { DAYS_BEFORE_CLOSE, eventSchema } from "../../../models/Event";
 
 import { CalendarRangePicker } from "../../../ui/FormField/CalendarRangePicker/CalendarRangePicker";
 import { Checkbox } from "../../../ui/FormField/Checkbox/Checkbox";
-import { DAYS_BEFORE_CLOSE } from "../../../models/Event";
+import type { Event } from "../../../models/Event";
 import { Form } from "../../../ui/Form/Form";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Select } from "../../../ui/FormField/Select/Select";
+import { periodSchema } from "../../../models/Period";
 import { useData } from "../../../store/useData";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-export type Step1Data = {
-  name: string;
-  description: string;
-  dates: {
-    start: Date;
-    end: Date;
-  };
-  arrival: "AM" | "PM";
-  departure: "AM" | "PM";
-  isAutoClose: boolean;
-};
+const createStep1DataSchema = (
+  t: ReturnType<typeof useTranslation>["t"],
+  events: Record<string, Event>
+) =>
+  z.object({
+    name: eventSchema.shape.name
+      .min(
+        3,
+        t("page.events.add.form.field.name.validation.minLength", { min: 3 })
+      )
+      .refine(
+        (value) =>
+          !Object.values(events).some(
+            (event) => event.name.toLowerCase() === value.toLowerCase()
+          ),
+        t("page.events.add.form.field.name.validation.isUnique")
+      ),
+    description: eventSchema.shape.description,
+    dates: z.object({
+      start: z.date(),
+      end: z.date(),
+    }),
+    arrival: periodSchema.shape.arrival,
+    departure: periodSchema.shape.departure,
+    isAutoClose: eventSchema.shape.isAutoClose,
+  });
+
+export type Step1Data = z.infer<ReturnType<typeof createStep1DataSchema>>;
 
 type AddEventStep1Props = {
   onNext: (data: Step1Data) => void;
@@ -32,6 +53,7 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
   const { control, handleSubmit, formState } = useForm<Step1Data>({
     defaultValues: data,
     mode: "onBlur",
+    resolver: zodResolver(createStep1DataSchema(t, events)),
   });
   const hasError = Object.keys(formState.errors).length > 0;
   return (
@@ -51,32 +73,6 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
       <Controller
         name="name"
         control={control}
-        rules={{
-          required: t("page.events.add.form.field.name.validation.required"),
-          minLength: {
-            value: 3,
-            message: t("page.events.add.form.field.name.validation.minLength", {
-              min: 3,
-            }),
-          },
-          maxLength: {
-            value: 100,
-            message: t("eventForm.name.validation.maxLength", {
-              max: 100,
-            }),
-          },
-          validate: {
-            isUnique: (value) => {
-              const isUnique = !Object.values(events).some(
-                (events) => events.name.toLowerCase() === value.toLowerCase()
-              );
-              return (
-                isUnique ||
-                t("page.events.add.form.field.name.validation.isUnique")
-              );
-            },
-          },
-        }}
         render={({ field: { onChange, value }, fieldState }) => (
           <InputText
             type="text"
@@ -91,17 +87,6 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
       <Controller
         name="description"
         control={control}
-        rules={{
-          maxLength: {
-            value: 100,
-            message: t(
-              "page.events.add.form.field.description.validation.maxLength",
-              {
-                max: 100,
-              }
-            ),
-          },
-        }}
         render={({ field: { onChange, value }, fieldState }) => (
           <InputText
             type="text"
@@ -179,7 +164,7 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
             label={t("page.events.add.form.field.isAutoClose.label", {
               delay: DAYS_BEFORE_CLOSE,
             })}
-            value={value}
+            value={value ?? false}
             onChange={onChange}
           />
         )}

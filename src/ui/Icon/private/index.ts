@@ -32,7 +32,6 @@ import { UserGroupIcon } from "./UserGroupIcon";
 import { UserIcon } from "./UserIcon";
 import { UserShareIcon } from "./UserShareIcon";
 import { WarningIcon } from "./WarningIcon";
-
 export const ICONS = {
   add: AddIcon,
   "carret-down": CarretDownIcon,

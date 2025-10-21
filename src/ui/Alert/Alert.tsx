@@ -10,7 +10,10 @@ type AlertProps = {
 
 export function Alert({ children, type = "prominent" }: AlertProps) {
   return (
-    <div className={classNames(styles.alert, styles[`type-${type}`])} data-component="Alert">
+    <div
+      className={classNames(styles.alert, styles[`type-${type}`])}
+      data-component="Alert"
+    >
       <div className={styles.icon}>
         <Icon name="warning" size={type === "prominent" ? "l" : "m"} />
       </div>

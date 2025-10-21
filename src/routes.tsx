@@ -11,7 +11,7 @@ import { EventUsersPage } from "./pages/participants/EventUsersPage";
 import { ParticipantSharePage } from "./pages/shares/ParticipantSharePage";
 import { EventParticipantSharePage } from "./pages/participants/EventParticipantSharePage";
 import { DistributionPage } from "./pages/distribution/DistributionPage";
-import { ValueOf } from "./utils/object";
+import type { ValueOf } from "./utils/object";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { InformationPage } from "./pages/settings/InformationPage";
 import { CalendarPage } from "./pages/calendar/CalendarPage";

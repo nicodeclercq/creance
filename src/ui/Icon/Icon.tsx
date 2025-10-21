@@ -1,5 +1,4 @@
 import { type IconName, ICONS } from "./private";
-
 type Size = "s" | "m" | "l";
 
 export type IconProps = {

@@ -10,12 +10,15 @@ export type DefaultParticipantShare = z.infer<
 export const dailyParticipantShareSchema = z.strictObject({
   type: z.literal("daily"),
   periods: z.record(
-    z.string().min(8).max(10),
+    z
+      .string()
+      .min(8, "ParticipantShare.validation.periods.key.minLength")
+      .max(10, "ParticipantShare.validation.periods.key.maxLength"),
     z.partialRecord(
       z.union([z.literal("AM"), z.literal("PM")]),
       z.strictObject({
-        adults: z.number(),
-        children: z.number(),
+        adults: z.number("ParticipantShare.validation.adults.invalid"),
+        children: z.number("ParticipantShare.validation.children.invalid"),
       })
     )
   ),
@@ -26,16 +29,32 @@ export const customParticipantShareSchema = z.strictObject({
   type: z.literal("custom"),
   shares: z.array(
     z.strictObject({
-      label: z.string().max(100),
+      label: z.string().max(100, "ParticipantShare.validation.label.maxLength"),
       multiplier: z.strictObject({
-        adults: z.number(),
-        children: z.number(),
+        adults: z.number(
+          "ParticipantShare.validation.multiplier.adults.invalid"
+        ),
+        children: z.number(
+          "ParticipantShare.validation.multiplier.children.invalid"
+        ),
       }),
       period: z.strictObject({
-        start: z.string().transform((date) => new Date(date)),
-        end: z.string().transform((date) => new Date(date)),
-        arrival: z.enum(["AM", "PM"]),
-        departure: z.enum(["AM", "PM"]),
+        start: z.union([
+          z.string().transform((date) => new Date(date)),
+          z.date(),
+        ]),
+        end: z.union([
+          z.string().transform((date) => new Date(date)),
+          z.date(),
+        ]),
+        arrival: z.union(
+          [z.literal("AM"), z.literal("PM")],
+          "ParticipantShare.validation.period.arrival.invalid"
+        ),
+        departure: z.union(
+          [z.literal("AM"), z.literal("PM")],
+          "ParticipantShare.validation.period.departure.invalid"
+        ),
       }),
     })
   ),

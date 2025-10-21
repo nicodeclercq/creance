@@ -1,19 +1,17 @@
 import * as Either from "fp-ts/Either";
 
-import { Controller, UseFormSetError, useForm } from "react-hook-form";
-import { asNumber, isValidCalculation } from "../../../helpers/Number";
+import { Controller, type UseFormSetError } from "react-hook-form";
+import type { Expense } from "../../../models/Expense";
+import { expenseSchema } from "../../../models/Expense";
 import { fromExpense, toExpense } from "./formExpense";
-import { i18n } from "i18next";
-
 import { Avatar } from "../../../ui/Avatar/Avatar";
-import { ButtonProps } from "../../../ui/Button/Button";
+import type { ButtonProps } from "../../../ui/Button/Button";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
-import { CategoryIconName } from "../../../ui/CategoryIcon/private";
+import type { CategoryIconName } from "../../../ui/CategoryIcon/private";
 import { Columns } from "../../../ui/Columns/Columns";
-import { DistributiveOmit } from "../../../helpers/DistributiveOmit";
+import type { DistributiveOmit } from "../../../helpers/DistributiveOmit";
 import { ErrorMessage } from "../../../ui/FormField/ErrorMessage/ErrorMessage";
-import { Event } from "../../../models/Event";
-import { Expense } from "../../../models/Expense";
+import type { Event } from "../../../models/Event";
 import { Form } from "../../../ui/Form/Form";
 import { Grid } from "../../../ui/Grid/Grid";
 import { InputDate } from "../../../ui/FormField/InputDate/InputDate";
@@ -21,39 +19,105 @@ import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Logger } from "../../../service/Logger";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { Participant } from "../../../models/Participant";
+import type { Participant } from "../../../models/Participant";
 import { RadioGroup } from "../../../ui/Form/RadioGroup/RadioGroup";
 import { Select } from "../../../ui/FormField/Select/Select";
-import { Transaction } from "../../../models/Transaction";
+import type { Transaction } from "../../../models/Transaction";
+import { asNumber } from "../../../helpers/Number";
+import { depositSchema } from "../../../models/Deposit";
+import type { i18n } from "i18next";
 import { pipe } from "fp-ts/function";
 import { useCurrentUser } from "../../../store/useCurrentUser";
+import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
-type FormData = {
-  mode: "expense" | "deposit";
-  amount: string;
-  date: Date;
-  note: string;
-  from: string;
-  _id: string;
-  updatedAt: Date;
-  category: string;
-  share: {
-    type: "default" | "percentage" | "fixed";
-    percentageParticipant: Record<string, string>;
-    fixedParticipant: Record<string, string>;
-  };
-  to: string;
-};
+const formSchema = z
+  .object({
+    mode: z.enum(["expense", "deposit"]),
+    amount: expenseSchema.shape.amount,
+    date: expenseSchema.shape.date,
+    note: expenseSchema.shape.reason,
+    from: expenseSchema.shape.lender,
+    _id: expenseSchema.shape._id,
+    updatedAt: expenseSchema.shape.updatedAt,
+    category: expenseSchema.shape.category,
+    share: z.object({
+      type: z.enum(["default", "percentage", "fixed"]),
+      percentageParticipant: z.record(z.string(), z.string()),
+      fixedParticipant: z.record(z.string(), z.string()),
+    }),
+    to: depositSchema.shape.to,
+  })
+  .superRefine((data, ctx) => {
+    // Deposit mode: from and to must be different
+    if (data.mode === "deposit" && data.from === data.to) {
+      ctx.addIssue({
+        code: "custom",
+        message: "TransactionForm.validation.from.isDifferent",
+        path: ["from"],
+      });
+    }
 
-export type Props = {
-  event: Event;
-  participants: Record<string, Participant>;
-  defaultValues: Transaction;
-  submitLabel: string;
-  onSubmit: (result: Transaction) => void;
-  cancel: DistributiveOmit<ButtonProps, "variant">;
-};
+    // Expense mode: validate share
+    if (data.mode === "expense") {
+      if (data.share.type === "percentage") {
+        const sum = Object.values(data.share.percentageParticipant).reduce(
+          (acc: number, val) => acc + asNumber(val),
+          0
+        );
+
+        if (sum === 0) {
+          ctx.addIssue({
+            code: "custom",
+            message: "TransactionForm.validation.share.percentageSum",
+            path: ["share"],
+          });
+        }
+
+        // Check for negative percentages
+        Object.entries(data.share.percentageParticipant).forEach(
+          ([_participantId, value]) => {
+            if (asNumber(value) < 0) {
+              ctx.addIssue({
+                code: "custom",
+                message: "TransactionForm.validation.share.positive",
+                path: ["share"],
+              });
+            }
+          }
+        );
+      } else if (data.share.type === "fixed") {
+        const sum = Object.values(data.share.fixedParticipant).reduce(
+          (acc: number, val) => acc + asNumber(val),
+          0
+        );
+
+        if (sum !== asNumber(data.amount)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "TransactionForm.validation.share.fixedSum",
+            path: ["share"],
+          });
+        }
+
+        // Check for negative fixed amounts
+        Object.entries(data.share.fixedParticipant).forEach(
+          ([_participantId, value]) => {
+            if (asNumber(value) < 0) {
+              ctx.addIssue({
+                code: "custom",
+                message: "TransactionForm.validation.share.positive",
+                path: ["share"],
+              });
+            }
+          }
+        );
+      }
+    }
+  });
+
+type FormData = z.infer<typeof formSchema>;
 
 const toFormData = (
   transaction: Transaction,
@@ -135,6 +199,15 @@ const fromFormData = (
       });
 };
 
+export type Props = {
+  event: Event;
+  participants: Record<string, Participant>;
+  defaultValues: Transaction;
+  submitLabel: string;
+  onSubmit: (result: Transaction) => void;
+  cancel: DistributiveOmit<ButtonProps, "variant">;
+};
+
 export function TransactionForm({
   event,
   participants,
@@ -153,132 +226,9 @@ export function TransactionForm({
     setError,
     watch,
     trigger,
-  } = useForm<FormData>({
+  } = useForm(formSchema, {
     defaultValues: toFormData(defaultValues, participants, event),
     mode: "onChange",
-    resolver: (data) => {
-      const errors: Record<string, { message: string }> = {};
-
-      if (data.amount.length > 100) {
-        errors.amount = {
-          message: t("validation.maxLength", { field: "amount", max: 100 }),
-        };
-      }
-
-      if (!isValidCalculation(data.amount)) {
-        errors.amount = {
-          message: t("page.event.add.form.field.amount.validation.isNumber"),
-        };
-      }
-      const amount = asNumber(data.amount);
-      if (amount <= 0) {
-        const params = /[+*-/]/.test(data.amount)
-          ? {
-              isCalculated: true,
-              result: amount,
-              calculation: data.amount,
-            }
-          : { isCalculated: false };
-        errors.amount = {
-          message: t(
-            "page.event.add.form.field.amount.validation.positive",
-            params
-          ),
-        };
-      }
-
-      if (data.note.length > 100) {
-        errors.note = {
-          message: t("validation.maxLength", { field: "note", max: 100 }),
-        };
-      }
-
-      if (data.from.length > 100) {
-        errors.from = {
-          message: t("validation.maxLength", { field: "from", max: 100 }),
-        };
-      }
-
-      if (data.mode === "expense") {
-        if (data.category.length > 100) {
-          errors.category = {
-            message: t("validation.maxLength", { field: "category", max: 100 }),
-          };
-        }
-        if (data.share.type === "percentage") {
-          const sum = Object.values(data.share.percentageParticipant).reduce(
-            (acc, val) => acc + asNumber(val),
-            0
-          );
-
-          if (sum === 0) {
-            errors.share = {
-              message: t(
-                "page.event.add.form.field.share.percentage.validation.sum"
-              ),
-            };
-          }
-        } else if (data.share.type === "fixed") {
-          const sum = Object.values(data.share.fixedParticipant).reduce(
-            (acc, val) => acc + asNumber(val),
-            0
-          );
-
-          if (sum !== asNumber(data.amount)) {
-            errors.share = {
-              message: t(
-                "page.event.add.form.field.share.fixed.validation.sum",
-                {
-                  sum,
-                  amount: data.amount,
-                }
-              ),
-            };
-          }
-
-          Object.values(participants).forEach((participant) => {
-            if (data.share.type === "fixed") {
-              const value = asNumber(
-                data.share.fixedParticipant[participant._id]
-              );
-              if (value < 0) {
-                errors.share = {
-                  message: t(
-                    "page.event.add.form.field.share.fixed.validation.positive"
-                  ),
-                };
-              }
-            }
-            if (data.share.type === "percentage") {
-              const value = asNumber(
-                data.share.percentageParticipant[participant._id]
-              );
-              if (value < 0) {
-                errors.share = {
-                  message: t(
-                    "page.event.add.form.field.share.fixed.validation.positive"
-                  ),
-                };
-              }
-            }
-          });
-        }
-      } else if (data.mode === "deposit") {
-        if (data.to.length > 100) {
-          errors.to = {
-            message: t("validation.maxLength", { field: "to", max: 100 }),
-          };
-        }
-
-        if (data.from === data.to) {
-          errors.from = {
-            message: t("depositForm.participants.validation.isDifferent"),
-          };
-        }
-      }
-
-      return { values: data, errors };
-    },
   });
 
   const submit = (data: FormData) => {
@@ -293,8 +243,6 @@ export function TransactionForm({
   const hasError = Object.keys(errors).length > 0;
   const currentMode = watch("mode");
   const currentShareType = watch("share.type");
-  const currentFrom = watch("from");
-  const currentTo = watch("to");
 
   return (
     <Form
@@ -309,7 +257,6 @@ export function TransactionForm({
       <Controller
         name="mode"
         control={control}
-        rules={{ required: true }}
         render={({ field: { value, onChange } }) => (
           <RadioGroup
             label={t("transactionForm.mode.label")}
@@ -335,12 +282,6 @@ export function TransactionForm({
       <Controller
         name="from"
         control={control}
-        rules={{
-          validate: (value) =>
-            currentMode === "deposit" && value === currentTo
-              ? t("depositForm.participants.validation.isDifferent")
-              : true,
-        }}
         render={({ field: { value, onChange } }) => (
           <Select
             label={
@@ -406,12 +347,6 @@ export function TransactionForm({
         <Controller
           name="to"
           control={control}
-          rules={{
-            validate: (value) =>
-              value === currentFrom
-                ? t("depositForm.participants.validation.isDifferent")
-                : true,
-          }}
           render={({ field: { value, onChange } }) => (
             <Select
               label={t("depositForm.to")}
@@ -446,35 +381,7 @@ export function TransactionForm({
       <Controller
         name="amount"
         control={control}
-        rules={{
-          required: true,
-          validate: {
-            isNumber: (value) =>
-              isValidCalculation(value)
-                ? true
-                : t("page.event.add.form.field.amount.validation.isNumber"),
-            positive: (value) => {
-              const result = asNumber(value);
-
-              if (result > 0) {
-                return true;
-              }
-              const params = /[+*-/]/.test(value)
-                ? {
-                    isCalculated: true,
-                    result,
-                    calculation: value,
-                  }
-                : { isCalculated: false };
-
-              return t(
-                "page.event.add.form.field.amount.validation.positive",
-                params
-              );
-            },
-          },
-        }}
-        render={({ field: { value, onChange }, fieldState }) => (
+        render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputNumber
             as="string"
             type="number"
@@ -483,28 +390,28 @@ export function TransactionForm({
             value={value}
             isRequired
             onChange={onChange}
-            error={fieldState.error?.message}
+            error={error?.message}
           />
         )}
       />
       <Controller
         name="date"
         control={control}
-        rules={{ required: true }}
-        render={({ field: { value, onChange } }) => (
+        render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputDate
             type="date"
             label={t("page.event.add.form.field.date.label")}
             isRequired
             value={value}
             onChange={onChange}
+            error={error?.message}
           />
         )}
       />
       <Controller
         name="note"
         control={control}
-        render={({ field: { value, onChange } }) => (
+        render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputText
             type="text"
             label={
@@ -514,6 +421,7 @@ export function TransactionForm({
             }
             value={value}
             onChange={onChange}
+            error={error?.message}
           />
         )}
       />
@@ -523,7 +431,6 @@ export function TransactionForm({
           <Controller
             name="share.type"
             control={control}
-            rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
               <RadioGroup
                 label={t("page.event.add.form.field.share.type.label")}
@@ -569,9 +476,6 @@ export function TransactionForm({
                 key={participant._id}
                 name={`share.percentageParticipant.${participant._id}`}
                 control={control}
-                rules={{
-                  required: true,
-                }}
                 render={({
                   field: { value, onChange },
                   fieldState: { error },
@@ -613,9 +517,6 @@ export function TransactionForm({
                 key={participant._id}
                 name={`share.fixedParticipant.${participant._id}`}
                 control={control}
-                rules={{
-                  required: true,
-                }}
                 render={({
                   field: { value, onChange },
                   fieldState: { error },

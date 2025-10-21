@@ -1,6 +1,6 @@
 import * as Either from "fp-ts/Either";
 
-import {
+import type {
   DefaultShare,
   Expense,
   FixedShare,
@@ -8,10 +8,10 @@ import {
 } from "../../../models/Expense";
 
 import { Logger } from "../../../service/Logger";
-import { Participant } from "../../../models/Participant";
-import { UseFormSetError } from "react-hook-form";
+import type { Participant } from "../../../models/Participant";
+import type { UseFormSetError } from "react-hook-form";
 import { calculationAsNumber } from "../../../helpers/Number";
-import { i18n } from "i18next";
+import type { i18n } from "i18next";
 import { pipe } from "fp-ts/function";
 
 export type FormExpense = Omit<Expense, "amount" | "share" | "date"> & {

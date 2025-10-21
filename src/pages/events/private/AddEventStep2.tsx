@@ -1,5 +1,5 @@
 import { CategoriesForm } from "./CategoriesForm";
-import { Category } from "../../../models/Category";
+import type { Category } from "../../../models/Category";
 import { useTranslation } from "react-i18next";
 
 export type Step2Data = {

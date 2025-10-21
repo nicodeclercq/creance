@@ -3,9 +3,9 @@ import { type IllustrationName } from "../Illustration/private";
 import { Stack } from "../Stack/Stack";
 import { Paragraph } from "../Paragraph/Paragraph";
 import { Heading } from "../Heading/Heading";
-import { Button, ButtonProps } from "../Button/Button";
+import type { ButtonProps } from "../Button/Button";
+import { Button } from "../Button/Button";
 import { Container } from "../Container/Container";
-
 type Props = {
   title: string;
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;

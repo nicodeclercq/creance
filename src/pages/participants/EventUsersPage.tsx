@@ -2,8 +2,8 @@ import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventParticipantsList } from "./private/EventParticipantsList";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Redirect } from "../../Redirect";
-import { useParams } from "react-router-dom";
 import { useData } from "../../store/useData";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 export function EventUsersPage() {

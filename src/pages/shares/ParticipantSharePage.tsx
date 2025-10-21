@@ -2,11 +2,11 @@ import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventParticipantNotFoundPage } from "../participants/private/EventParticipantNotFoundPage";
 import { EventParticipantShareForm } from "../participants/private/EventParticipantShareForm";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
-import { ParticipantShare } from "../../models/ParticipantShare";
+import type { ParticipantShare } from "../../models/ParticipantShare";
 import { Redirect } from "../../Redirect";
+import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
-import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
 

@@ -3,13 +3,16 @@ import * as Either from "fp-ts/Either";
 import * as TaskEither from "fp-ts/TaskEither";
 import * as z from "zod";
 
-import { Deposit, depositSchema } from "../models/Deposit";
-import { Event, eventSchema as defaultEventSchema } from "../models/Event";
-import { Expense, expenseSchema } from "../models/Expense";
 import { flow, pipe } from "fp-ts/function";
 
+import type { Deposit } from "../models/Deposit";
+import type { Event } from "../models/Event";
+import type { Expense } from "../models/Expense";
 import { Logger } from "./Logger";
-import { Participant } from "../models/Participant";
+import type { Participant } from "../models/Participant";
+import { eventSchema as defaultEventSchema } from "../models/Event";
+import { depositSchema } from "../models/Deposit";
+import { expenseSchema } from "../models/Expense";
 import { participantSchema } from "../models/Participant";
 import { withoutKey } from "../helpers/object";
 

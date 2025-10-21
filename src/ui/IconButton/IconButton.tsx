@@ -3,9 +3,9 @@ import buttonStyles from "../Button/Button.module.css";
 import styles from "./IconButton.module.css";
 import { Icon, type IconProps } from "../Icon/Icon";
 import { Link } from "react-router-dom";
-import { getPath, Params, RouteName } from "../../routes";
+import type { Params, RouteName } from "../../routes";
+import { getPath } from "../../routes";
 import { Button, Tooltip, TooltipTrigger } from "react-aria-components";
-
 type CommonProps = {
   label: string;
   icon: IconProps["name"];
@@ -30,24 +30,24 @@ export type AsButton = {
 };
 
 export type IconButtonPropsWhithoutVariantAndOverlays<
-  T extends AsLink<RouteName> | AsButton = AsLink<RouteName> | AsButton
+  T extends AsLink<RouteName> | AsButton = AsLink<RouteName> | AsButton,
 > = CommonProps & T;
 
 export type IconButtonProps<
-  T extends AsLink<RouteName> | AsButton = AsLink<RouteName> | AsButton
+  T extends AsLink<RouteName> | AsButton = AsLink<RouteName> | AsButton,
 > = IconButtonPropsWhithoutVariantAndOverlays<T> & {
   variant?: "primary" | "secondary" | "tertiary";
   overlays?: boolean;
 };
 
 export function isButton<R extends RouteName>(
-  props: IconButtonProps<AsLink<R> | AsButton>
+  props: IconButtonProps<AsLink<R> | AsButton>,
 ): props is CommonProps & AsButton {
   return props.as === "button" || props.as == null;
 }
 
 export function IconButton<T extends AsLink<RouteName> | AsButton>(
-  props: IconButtonProps<T>
+  props: IconButtonProps<T>,
 ) {
   const {
     icon,
@@ -65,7 +65,7 @@ export function IconButton<T extends AsLink<RouteName> | AsButton>(
       buttonStyles[`hasVariant-${variant}`],
       {
         [buttonStyles.isOverlay]: overlays,
-      }
+      },
     ),
     children: <Icon name={icon} size="m" />,
     ...otherProps,

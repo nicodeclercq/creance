@@ -1,7 +1,8 @@
 import type { HTMLElementType, ReactNode } from "react";
-import { Styles, computeStyles } from "./styles";
 
+import type { Styles } from "./styles";
 import classNames from "classnames";
+import { computeStyles } from "./styles";
 import { css } from "@emotion/css";
 
 export type ContainerStyles<K extends keyof Styles = keyof Styles> = Pick<

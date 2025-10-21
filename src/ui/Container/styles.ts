@@ -475,7 +475,10 @@ const transformers = {
   right: { computeIfUndefined: false, transformer: computeDistance },
   textAlign: { computeIfUndefined: false, transformer: computeTextAlign },
   top: { computeIfUndefined: false, transformer: computeDistance },
-  zIndex: { computeIfUndefined: false, transformer: identity },
+  zIndex: {
+    computeIfUndefined: false,
+    transformer: (value) => `${value}`,
+  },
   breakInside: { computeIfUndefined: false, transformer: identity },
 } as const satisfies {
   [K in keyof Omit<Styles, "customCSSProperties">]: {

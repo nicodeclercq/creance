@@ -1,11 +1,10 @@
 import * as Either from "fp-ts/Either";
 
 import { addDays, dateToKey } from "../../../utils/date";
-
-import { Event } from "../../../models/Event";
-import { ParticipantShare } from "../../../models/ParticipantShare";
-import { Period } from "../../../models/Period";
-import { User } from "../../../models/User";
+import type { Event } from "../../../models/Event";
+import type { ParticipantShare } from "../../../models/ParticipantShare";
+import type { Period } from "../../../models/Period";
+import type { User } from "../../../models/User";
 
 export type CustomShare = {
   label: string;
@@ -51,7 +50,7 @@ export type FormShare = {
 };
 
 export const toShare = (
-  data: FormShare
+  data: FormShare,
 ): Either.Either<Error, ParticipantShare> => {
   switch (data.type) {
     case "default":
@@ -88,51 +87,54 @@ export const toShare = (
 export const getDaysInPeriod = (period: Period): Date[] => {
   return Array.from(
     { length: period.end.getDate() - period.start.getDate() + 1 },
-    (_, i) => addDays(i, period.start)
+    (_, i) => addDays(i, period.start),
   );
 };
 
 export const getDefaultPeriods = (
   defaultPeriods: FormShare["periods"],
   event: Event,
-  user: User
+  user: User,
 ): FormShare["periods"] => {
   const adults = user.share.adults;
   const children = user.share.children;
   const defaultValues = { AM: { adults, children }, PM: { adults, children } };
-  return getDaysInPeriod(event.period).reduce((acc, cur) => {
-    const key = dateToKey(cur);
-    if (
-      event.period.arrival === "PM" &&
-      dateToKey(event.period.start) === key
-    ) {
-      acc[key] = {
-        PM: defaultPeriods[key]?.["PM"] ?? defaultValues["PM"],
-      };
-    } else if (
-      event.period.departure === "AM" &&
-      dateToKey(event.period.end) === key
-    ) {
-      acc[key] = { AM: defaultPeriods[key]?.["AM"] ?? defaultValues["AM"] };
-    } else {
-      acc[key] = defaultPeriods[key] ?? defaultValues;
-    }
+  return getDaysInPeriod(event.period).reduce(
+    (acc, cur) => {
+      const key = dateToKey(cur);
+      if (
+        event.period.arrival === "PM" &&
+        dateToKey(event.period.start) === key
+      ) {
+        acc[key] = {
+          PM: defaultPeriods[key]?.["PM"] ?? defaultValues["PM"],
+        };
+      } else if (
+        event.period.departure === "AM" &&
+        dateToKey(event.period.end) === key
+      ) {
+        acc[key] = { AM: defaultPeriods[key]?.["AM"] ?? defaultValues["AM"] };
+      } else {
+        acc[key] = defaultPeriods[key] ?? defaultValues;
+      }
 
-    return acc;
-  }, {} as FormShare["periods"]);
+      return acc;
+    },
+    {} as FormShare["periods"],
+  );
 };
 
 export const fromShare = (
   data: ParticipantShare,
   event: Event,
-  user: User
+  user: User,
 ): FormShare => {
   return {
     type: data.type,
     periods: getDefaultPeriods(
       "periods" in data ? data.periods : {},
       event,
-      user
+      user,
     ),
     shares:
       "shares" in data

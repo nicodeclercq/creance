@@ -1,7 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Route as RouteDefinition, routes } from "./routes";
 
 import { PrivatePage } from "./PrivatePage";
+import type { Route as RouteDefinition } from "./routes";
+import { routes } from "./routes";
 
 export function Router() {
   return (

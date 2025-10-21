@@ -1,26 +1,15 @@
-import { useReducer } from "react";
+import { useForm as useFormHook } from "react-hook-form";
+import { type z } from "zod";
+import { useTranslation } from "react-i18next";
+import { createFormattedResolver } from "../service/validation";
+export const useForm = <TFieldValues extends Record<string, any>>(
+  schema: z.ZodSchema<TFieldValues>,
+  form: Omit<Parameters<typeof useFormHook<TFieldValues>>[0], "resolver"> = {}
+) => {
+  const { t } = useTranslation();
 
-type ChangeAction<K extends keyof T, T extends Record<string, unknown>> = {
-  key: K;
-  payload: T[K];
-};
-
-export const useForm = <T extends Record<string, unknown>>(initialState: T) => {
-  const onChange = <K extends keyof T>(
-    state: T,
-    { key, payload }: ChangeAction<K, T>
-  ) => {
-    return { ...state, [key]: payload };
-  };
-
-  const [form, setReducer] = useReducer(onChange, initialState);
-
-  return {
-    form,
-    setValue:
-      <K extends keyof T>(key: K) =>
-      (payload: T[K]) => {
-        setReducer({ key, payload });
-      },
-  } as const;
+  return useFormHook<TFieldValues>({
+    ...form,
+    resolver: createFormattedResolver(schema, t),
+  });
 };

@@ -1,6 +1,6 @@
-import { Category, DEFAULT_CATEGORY_ICON } from "../../../models/Category";
-
+import type { Category } from "../../../models/Category";
 import { CategoryForm } from "./CategoryForm";
+import { DEFAULT_CATEGORY_ICON } from "../../../models/Category";
 import { uid } from "../../../service/crypto";
 import { useTranslation } from "react-i18next";
 

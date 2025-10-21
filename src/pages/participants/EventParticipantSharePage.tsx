@@ -2,9 +2,9 @@ import { EmptyEvent } from "../event/EmptyEvent";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";
 import { ParticipantShareList } from "../shares/private/ParticipantShareList";
+import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
-import { useData } from "../../store/useData";
 
 export function EventParticipantSharePage() {
   const { eventId } = useParams();

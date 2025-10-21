@@ -1,14 +1,14 @@
 import classNames from "classnames";
 import { Button } from "react-aria-components";
-import { AsButton, AsLink, type ButtonProps } from "../Button/Button";
-import { DistributiveOmit } from "../../helpers/DistributiveOmit";
+import type { AsButton, AsLink } from "../Button/Button";
+import { type ButtonProps } from "../Button/Button";
+import type { DistributiveOmit } from "../../helpers/DistributiveOmit";
 import { Columns } from "../Columns/Columns";
 import { Link } from "react-router-dom";
 import { getPath } from "../../routes";
 import styles from "./ContextualMenu.module.css";
 import { entries } from "../../utils/object";
 import { Icon } from "../Icon/Icon";
-
 type Action =
   | DistributiveOmit<ButtonProps<AsLink>, "icon">
   | DistributiveOmit<ButtonProps<AsButton>, "icon" | "variant">;

@@ -1,9 +1,9 @@
-import { Button, ButtonProps } from "../../ui/Button/Button";
-
+import { Button } from "../../ui/Button/Button";
+import type { ButtonProps } from "../../ui/Button/Button";
 import { Card } from "../../ui/Card/Card";
 import { Heading } from "../../ui/Heading/Heading";
 import { Illustration } from "../../ui/Illustration/Illustration";
-import { IllustrationName } from "../../ui/Illustration/private";
+import type { IllustrationName } from "../../ui/Illustration/private";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { Stack } from "../../ui/Stack/Stack";

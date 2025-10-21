@@ -1,13 +1,12 @@
 import { Container, type ContainerStyles } from "../Container/Container";
-import {
-  type Display,
-  type Media,
-  MEDIAS,
+import type {
+  Display,
+  Media,
   WithMediaQuery,
 } from "../Container/styles";
+import { MEDIAS } from "../Container/styles";
 
 import { type ReactNode } from "react";
-
 type MediaHiddenProps = {
   children: ReactNode;
   media: Media | Media[];
@@ -27,7 +26,7 @@ export function MediaHidden({
       ...acc,
       [key]: medias.includes(key) ? "none" : display,
     }),
-    {}
+    {},
   ) as WithMediaQuery<Display>;
 
   return (

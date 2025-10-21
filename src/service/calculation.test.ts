@@ -1,6 +1,6 @@
 import * as Either from "fp-ts/Either";
 
-import {
+import type {
   CustomParticipantShare,
   DailyParticipantShare,
 } from "../models/ParticipantShare";

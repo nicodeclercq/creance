@@ -11,7 +11,12 @@ type ModalProps = {
 
 export function Modal({ children, title, isOpen }: ModalProps) {
   return (
-    <ModalOverlay data-component="Modal" isDismissable isOpen={isOpen} className={styles.overlay}>
+    <ModalOverlay
+      data-component="Modal"
+      isDismissable
+      isOpen={isOpen}
+      className={styles.overlay}
+    >
       <RAModal className={styles.modal}>
         <Dialog>
           <Heading level={2} styles={{ font: "body-large" }}>

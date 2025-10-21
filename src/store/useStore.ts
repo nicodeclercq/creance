@@ -1,11 +1,12 @@
 import * as RX from "rxjs";
 
-import { Store, StoreManager } from "./StoreManager";
 import { useContext, useEffect, useState } from "react";
 
 import { Logger } from "../service/Logger";
-import { State } from "./state";
+import type { State } from "./state";
+import type { Store } from "./StoreManager";
 import { StoreContext } from "./StoreProvider";
+import { StoreManager } from "./StoreManager";
 
 export function useStore() {
   const store = useContext(StoreContext);

@@ -6,10 +6,10 @@ import { Heading } from "../../../ui/Heading/Heading";
 import { MediaCard } from "../../../ui/MediaCard/MediaCard";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Pill } from "../../../ui/Pill/Pill";
-import { Presence } from "../../../service/activities";
+import type { Presence } from "../../../service/activities";
 import { Select } from "../../../ui/FormField/Select/Select";
 import { Stack } from "../../../ui/Stack/Stack";
-import { User } from "../../../models/User";
+import type { User } from "../../../models/User";
 import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 

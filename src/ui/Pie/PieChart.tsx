@@ -1,5 +1,4 @@
 import { PieChart as Chart, pieArcLabelClasses } from "@mui/x-charts";
-
 type Data = {
   id: string;
   label: string;

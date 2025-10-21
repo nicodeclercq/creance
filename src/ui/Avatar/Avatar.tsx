@@ -1,5 +1,5 @@
 import { Icon } from "../Icon/Icon";
-import { IconName } from "../Icon/private";
+import type { IconName } from "../Icon/private";
 import styles from "./Avatar.module.css";
 
 type Size = "s" | "m" | "l" | "xl";

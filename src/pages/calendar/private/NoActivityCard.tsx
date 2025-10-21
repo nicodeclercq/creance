@@ -1,7 +1,7 @@
-import { Activity } from "../../../models/Activity";
+import type { Activity } from "../../../models/Activity";
 import { AddActivityModal } from "./AddActivityModal";
 import { EmptyState } from "../../../ui/EmptyState/EmptyState";
-import { User } from "../../../models/User";
+import type { User } from "../../../models/User";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

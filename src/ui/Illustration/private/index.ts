@@ -5,7 +5,6 @@ import { EmptyBoxIllustration } from "./EmptyBoxIllustration";
 import { NoodlesIllustration } from "./NoodlesIllustration";
 import { PigHappyIllustration } from "./PigHappyIllustration";
 import { PigIsleIllustration } from "./PigIsleIllustration";
-
 export const ILLUSTRATIONS = {
   "card-stack": CardStackIllustration,
   "card-out-of-stack": CardOutOfStackIllustration,

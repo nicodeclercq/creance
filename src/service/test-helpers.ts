@@ -1,7 +1,7 @@
-import { Deposit } from "../models/Deposit";
-import { Event } from "../models/Event";
-import { Expense } from "../models/Expense";
-import { Participant } from "../models/Participant";
+import type { Deposit } from "../models/Deposit";
+import type { Event } from "../models/Event";
+import type { Expense } from "../models/Expense";
+import type { Participant } from "../models/Participant";
 import { uid } from "./crypto";
 
 export const createEvent = (defaultValues: Partial<Event> = {}): Event => ({

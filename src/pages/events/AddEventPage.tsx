@@ -1,17 +1,21 @@
-import { AddEventStep1, Step1Data } from "./private/AddEventStep1";
-import { AddEventStep2, Step2Data } from "./private/AddEventStep2";
+import type { Step1Data } from "./private/AddEventStep1";
+import { AddEventStep1 } from "./private/AddEventStep1";
+import type { Step2Data } from "./private/AddEventStep2";
+import { AddEventStep2 } from "./private/AddEventStep2";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Stepper } from "../../ui/Stepper/Stepper";
 import { useState } from "react";
-import { Category, DEFAULT_CATEGORIES } from "../../models/Category";
-import { AddEventStep3, Step3Data } from "./private/AddEventStep3";
+import type { Category } from "../../models/Category";
+import { DEFAULT_CATEGORIES } from "../../models/Category";
+import type { Step3Data } from "./private/AddEventStep3";
+import { AddEventStep3 } from "./private/AddEventStep3";
 import { useData } from "../../store/useData";
 import { Card } from "../../ui/Card/Card";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
 import { generateKey, uid } from "../../service/crypto";
-import { Participant } from "../../models/Participant";
-import { Account } from "../../models/Account";
+import type { Participant } from "../../models/Participant";
+import type { Account } from "../../models/Account";
 
 const now = new Date();
 

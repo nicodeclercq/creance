@@ -1,8 +1,8 @@
-import { Container, ContainerStyles } from "../Container/Container";
+import type { ContainerStyles } from "../Container/Container";
+import { Container } from "../Container/Container";
 import { Icon } from "../Icon/Icon";
-import { IconName } from "../Icon/private";
+import type { IconName } from "../Icon/private";
 import { Paragraph } from "../Paragraph/Paragraph";
-
 type PillProps = {
   children: string;
   icon: IconName;

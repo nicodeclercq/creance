@@ -1,5 +1,4 @@
 import { type FormFieldProps } from "../FormField";
-
 export type InputProps<Name extends string, T> = {
   id?: string;
   type: Name;

@@ -1,14 +1,16 @@
 import { useRef, useState, type ReactNode } from "react";
 import { PageTemplate } from "./PageTemplate";
-import { Event } from "../../models/Event";
+import type { Event } from "../../models/Event";
 import { useTranslation } from "react-i18next";
-import { Action, QuickActions } from "../../ui/QuickActions/QuickActions";
+import type { Action } from "../../ui/QuickActions/QuickActions";
+import { QuickActions } from "../../ui/QuickActions/QuickActions";
 import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { RouteName, ROUTES } from "../../routes";
+import type { RouteName } from "../../routes";
+import { ROUTES } from "../../routes";
 import { dateToKey } from "../../utils/date";
 import { AddActivityModal } from "../../pages/calendar/private/AddActivityModal";
-import { Activity } from "../../models/Activity";
+import type { Activity } from "../../models/Activity";
 import { useCurrentUser } from "../../store/useCurrentUser";
 
 type EventPageTemplateProps = {

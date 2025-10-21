@@ -1,18 +1,18 @@
 import * as ArrayFP from "fp-ts/Array";
 import * as Either from "fp-ts/Either";
 
-import {
+import type {
   CustomParticipantShare,
   DailyParticipantShare,
-  foldParticipantShare,
 } from "../models/ParticipantShare";
 
-import { Deposit } from "../models/Deposit";
-import { Event } from "../models/Event";
-import { Expense } from "../models/Expense";
-import { Participant } from "../models/Participant";
-import { Period } from "../models/Period";
+import type { Deposit } from "../models/Deposit";
+import type { Event } from "../models/Event";
+import type { Expense } from "../models/Expense";
+import type { Participant } from "../models/Participant";
+import type { Period } from "../models/Period";
 import { calculationAsNumber } from "../helpers/Number";
+import { foldParticipantShare } from "../models/ParticipantShare";
 import { pipe } from "fp-ts/function";
 import { sequence } from "../ui/Either";
 

@@ -1,5 +1,5 @@
-import { Activity } from "../models/Activity";
-import { Event } from "../models/Event";
+import type { Activity } from "../models/Activity";
+import type { Event } from "../models/Event";
 import { dateToKey } from "../utils/date";
 
 function getDaysInInterval(startDate: Date, endDate: Date) {

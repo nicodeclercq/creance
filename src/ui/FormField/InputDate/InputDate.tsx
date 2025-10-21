@@ -6,11 +6,10 @@ import {
 } from "react-aria-components";
 
 import { FormField } from "../FormField";
-import { InputProps } from "../private/InputProps";
+import type { InputProps } from "../private/InputProps";
 import { fromDate } from "@internationalized/date";
 import styles from "./InputDate.module.css";
 import { useId } from "react";
-
 export type InputDateProps = InputProps<"date", Date>;
 
 export function InputDate({

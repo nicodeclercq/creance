@@ -1,9 +1,7 @@
 import { Tooltip, TooltipTrigger } from "react-aria-components";
-
 import { Icon } from "../Icon/Icon";
 import styles from "./ExternalLink.module.css";
 import { useTranslation } from "react-i18next";
-
 type ExternalLinkProps = {
   url: string;
   children: string;

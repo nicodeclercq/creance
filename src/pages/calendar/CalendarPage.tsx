@@ -4,7 +4,7 @@ import {
 } from "../../service/activities";
 import { useLocation, useParams } from "react-router-dom";
 
-import { Activity } from "../../models/Activity";
+import type { Activity } from "../../models/Activity";
 import { DaySumary } from "./private/DaySumary";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";

@@ -1,4 +1,4 @@
-import { Activity } from "../../../models/Activity";
+import type { Activity } from "../../../models/Activity";
 import { ActivityForm } from "./ActivityForm";
 import { Modal } from "../../../ui/Modal/Modal";
 import { useTranslation } from "react-i18next";

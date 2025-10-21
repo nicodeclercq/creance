@@ -1,11 +1,11 @@
 import { Card } from "../../ui/Card/Card";
 import { CategoriesForm } from "../events/private/CategoriesForm";
-import { Category } from "../../models/Category";
+import type { Category } from "../../models/Category";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Redirect } from "../../Redirect";
-import { useParams } from "react-router-dom";
 import { useData } from "../../store/useData";
+import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
 

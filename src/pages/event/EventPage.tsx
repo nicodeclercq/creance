@@ -1,9 +1,9 @@
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
 import { ExpenseList } from "./private/ExpenseList";
 import { removeFromObject } from "../../helpers/object";
+import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router";
-import { useData } from "../../store/useData";
 
 export function EventPage() {
   const { eventId } = useParams();

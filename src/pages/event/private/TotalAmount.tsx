@@ -4,9 +4,9 @@ import {
 } from "../../../service/calculation";
 
 import { Card } from "../../../ui/Card/Card";
-import { Category } from "../../../models/Category";
+import type { Category } from "../../../models/Category";
 import { Either } from "../../../ui/Either";
-import { Expense } from "../../../models/Expense";
+import type { Expense } from "../../../models/Expense";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { PieChart } from "../../../ui/Pie/PieChart";
 import { Stack } from "../../../ui/Stack/Stack";

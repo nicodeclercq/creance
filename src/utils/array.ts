@@ -1,4 +1,4 @@
-import { Fn } from "../helpers/function";
+import type { Fn } from "../helpers/function";
 
 type Direction = "asc" | "desc";
 

@@ -1,10 +1,10 @@
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import { AvatarGroup } from "../../../ui/AvatarGroup/AvatarGroup";
 import { Columns } from "../../../ui/Columns/Columns";
-import { Event } from "../../../models/Event";
+import type { Event } from "../../../models/Event";
 import { IconButton } from "../../../ui/IconButton/IconButton";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { Participant } from "../../../models/Participant";
+import type { Participant } from "../../../models/Participant";
 import { Stack } from "../../../ui/Stack/Stack";
 import { useTranslation } from "react-i18next";
 

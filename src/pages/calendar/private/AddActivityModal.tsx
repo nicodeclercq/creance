@@ -1,7 +1,7 @@
-import { Activity } from "../../../models/Activity";
+import type { Activity } from "../../../models/Activity";
 import { ActivityForm } from "./ActivityForm";
 import { Modal } from "../../../ui/Modal/Modal";
-import { User } from "../../../models/User";
+import type { User } from "../../../models/User";
 import { uid } from "../../../service/crypto";
 import { useTranslation } from "react-i18next";
 

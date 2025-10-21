@@ -5,7 +5,6 @@ import styles from "./InputNumber.module.css";
 import { useId, useRef } from "react";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
-
 export type InputNumberProps<T extends string | number> = InputProps<
   "number",
   T
@@ -65,7 +64,11 @@ export function InputNumber<T extends string | number = string>({
             const num = Number(event.target.value);
 
             onChange(
-              (as === "string" ? event.target.value : isNaN(num) ? 0 : num) as T
+              (as === "string"
+                ? event.target.value
+                : isNaN(num)
+                  ? 0
+                  : num) as T,
             );
           }}
           inputMode="numeric"

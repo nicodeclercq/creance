@@ -1,11 +1,11 @@
 import { AvatarGroup } from "../../../ui/AvatarGroup/AvatarGroup";
 import { Columns } from "../../../ui/Columns/Columns";
 import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
-import { Deposit } from "../../../models/Deposit";
+import type { Deposit } from "../../../models/Deposit";
 import { ExchangeMoneyIcon } from "../../../ui/Icon/private/ExchangeMoneyIcon";
 import { Menu } from "../../../ui/Menu/Menu";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
-import { Participant } from "../../../models/Participant";
+import type { Participant } from "../../../models/Participant";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
 import { computeRandomColor } from "../../../ui/Avatar/Avatar";

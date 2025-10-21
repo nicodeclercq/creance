@@ -1,4 +1,4 @@
-import { AsButton, ButtonProps } from "../Button/Button";
+import type { AsButton, ButtonProps } from "../Button/Button";
 import {
   Button,
   Dialog,
@@ -43,7 +43,7 @@ export function ConfirmButton({
         className={classNames(
           action.className,
           buttonStyles.button,
-          buttonStyles[`hasVariant-${action.variant}`]
+          buttonStyles[`hasVariant-${action.variant}`],
         )}
         onClick={undefined}
       >
@@ -68,7 +68,7 @@ export function ConfirmButton({
                   slot="close"
                   className={classNames(
                     buttonStyles.button,
-                    buttonStyles["hasVariant-tertiary"]
+                    buttonStyles["hasVariant-tertiary"],
                   )}
                   onClick={cancel.onClick}
                 >
@@ -79,7 +79,7 @@ export function ConfirmButton({
                 slot="close"
                 className={classNames(
                   buttonStyles.button,
-                  buttonStyles["hasVariant-primary"]
+                  buttonStyles["hasVariant-primary"],
                 )}
                 onClick={confirm.onClick}
               >

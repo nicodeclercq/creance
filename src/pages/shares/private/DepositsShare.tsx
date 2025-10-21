@@ -1,19 +1,17 @@
 import { Avatar, computeRandomColor } from "../../../ui/Avatar/Avatar";
-import {
-  DepositShare,
-  getTotalDepositAmount,
-} from "../../../service/calculation";
 
 import { Card } from "../../../ui/Card/Card";
 import { Columns } from "../../../ui/Columns/Columns";
 import { DateFormatter } from "../../../ui/DateFormatter/DateFormatter";
+import type { DepositShare } from "../../../service/calculation";
 import { Divider } from "../../../ui/Divider/Divider";
 import { ExchangeMoneyIcon } from "../../../ui/Icon/private/ExchangeMoneyIcon";
 import { Heading } from "../../../ui/Heading/Heading";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
-import { User } from "../../../models/User";
+import type { User } from "../../../models/User";
+import { getTotalDepositAmount } from "../../../service/calculation";
 import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 

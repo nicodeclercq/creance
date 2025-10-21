@@ -1,4 +1,4 @@
-import { Activity } from "../../../models/Activity";
+import type { Activity } from "../../../models/Activity";
 import { Container } from "../../../ui/Container/Container";
 import { EditActivityModal } from "./EditActivityModal";
 import { ExternalLink } from "../../../ui/ExternalLink/ExternalLink";

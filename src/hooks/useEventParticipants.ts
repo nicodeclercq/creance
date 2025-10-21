@@ -1,4 +1,4 @@
-import { Participant } from "../models/Participant";
+import type { Participant } from "../models/Participant";
 import { useData } from "../store/useData";
 
 export function useEventParticipants(

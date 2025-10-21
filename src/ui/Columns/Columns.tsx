@@ -1,4 +1,5 @@
-import { Container, ContainerStyles } from "../Container/Container";
+import type { ContainerStyles } from "../Container/Container";
+import { Container } from "../Container/Container";
 
 import type { ColorStyles } from "../Container/styles";
 import type { ReactNode } from "react";
@@ -58,7 +59,7 @@ export function Columns({
               }
             : undefined,
         display: isInline ? `inline-${displayType}` : displayType,
-        width: styles?.width ?? isInline ? undefined : "100%",
+        width: (styles?.width ?? isInline) ? undefined : "100%",
         alignItems: align,
         gap,
         gridTemplateColumns,

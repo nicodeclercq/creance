@@ -5,7 +5,6 @@ import styles from "./InputPassword.module.css";
 import { useId, useState } from "react";
 import { IconButton } from "../../IconButton/IconButton";
 import { useTranslation } from "react-i18next";
-
 export type InputPasswordProps = InputProps<"password", string>;
 
 export function InputPassword({

@@ -5,7 +5,6 @@ import * as Option from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 import { Checkbox } from "../Checkbox/Checkbox";
 import { type ReactNode } from "react";
-
 type Item<T> = {
   label: string;
   id: string;
@@ -38,9 +37,9 @@ export function CheckboxList<T>({
           Array.from,
           ArrayFP.map((value) => items.find((i) => i.id === value)),
           ArrayFP.filterMap((item) =>
-            Option.fromNullable(item ? item.value : undefined)
+            Option.fromNullable(item ? item.value : undefined),
           ),
-          onChange
+          onChange,
         )
       }
     >

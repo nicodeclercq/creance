@@ -1,22 +1,25 @@
-import { Controller, useForm } from "react-hook-form";
 import { addTime, addTimeToDate, getTimeGap } from "../../../utils/date";
 import { useEffect, useRef, useState } from "react";
 
-import { Activity } from "../../../models/Activity";
+import type { Activity } from "../../../models/Activity";
 import { Bleed } from "../../../ui/Bleed/Bleed";
-import { ButtonProps } from "../../../ui/Button/Button";
+import type { ButtonProps } from "../../../ui/Button/Button";
 import { Checkbox } from "../../../ui/FormField/Checkbox/Checkbox";
 import { Columns } from "../../../ui/Columns/Columns";
 import { Container } from "../../../ui/Container/Container";
-import { DistributiveOmit } from "../../../helpers/DistributiveOmit";
+import { Controller } from "react-hook-form";
+import type { DistributiveOmit } from "../../../helpers/DistributiveOmit";
 import { Form } from "../../../ui/Form/Form";
 import { InputDate } from "../../../ui/FormField/InputDate/InputDate";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { InputTime } from "../../../ui/FormField/InputTime/InputTime";
 import { LoadingIcon } from "../../../ui/Button/LoadingIcon";
 import { Stack } from "../../../ui/Stack/Stack";
+import { activitySchema } from "../../../models/Activity";
 import { uid } from "../../../service/crypto";
+import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 type ActivityFormProps = {
   defaultValue: Activity;
@@ -25,17 +28,19 @@ type ActivityFormProps = {
   cancel: DistributiveOmit<ButtonProps, "variant">;
 };
 
-type FormActivity = {
-  image?: string;
-  name: string;
-  description: string;
-  isAllDay: boolean;
-  date: Date;
-  startTime: string;
-  endTime?: string;
-  url?: string;
-  reservationRequired: boolean;
-};
+const activityFormSchema = z.object({
+  image: activitySchema.shape.image,
+  name: activitySchema.shape.name,
+  description: activitySchema.shape.description,
+  isAllDay: activitySchema.shape.isAllDay,
+  date: z.date(),
+  startTime: z.string(),
+  endTime: z.string().optional(),
+  url: activitySchema.shape.url,
+  reservationRequired: activitySchema.shape.reservationRequired,
+});
+
+type FormActivity = z.infer<typeof activityFormSchema>;
 
 const getURLImage = (url: string): Promise<string | undefined> => {
   // Use CORS proxy to fetch the website
@@ -164,7 +169,7 @@ export function ActivityForm({
     getValues,
     setValue,
     watch,
-  } = useForm<FormActivity>({
+  } = useForm(activityFormSchema, {
     defaultValues: activityToFormActivity(defaultValue),
     mode: "onChange",
   });
@@ -273,7 +278,6 @@ export function ActivityForm({
         <Controller
           name="name"
           control={control}
-          rules={{ required: true }}
           render={({ field: { value, onChange } }) => (
             <InputText
               type="text"
@@ -288,7 +292,6 @@ export function ActivityForm({
           <Controller
             name="date"
             control={control}
-            rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
               <InputDate
                 type="date"
@@ -353,14 +356,6 @@ export function ActivityForm({
         <Controller
           name="url"
           control={control}
-          rules={{
-            maxLength: {
-              value: 250,
-              message: t("ActivityForm.url.validation.maxLength", {
-                max: 250,
-              }),
-            },
-          }}
           render={({ field: { value, onChange } }) => (
             <InputText
               type="text"
@@ -375,14 +370,6 @@ export function ActivityForm({
         <Controller
           name="description"
           control={control}
-          rules={{
-            maxLength: {
-              value: 100,
-              message: t("ActivityForm.description.validation.maxLength", {
-                max: 100,
-              }),
-            },
-          }}
           render={({ field: { value, onChange } }) => (
             <InputText
               type="text"

@@ -1,8 +1,8 @@
-import { ReactNode, createContext } from "react";
+import type { ReactNode } from "react";
+import { createContext } from "react";
 
 import { LocalStorageAdapter } from "./private/localStorage";
 import { StoreManager } from "./StoreManager";
-
 StoreManager.launch({
   adapters: [LocalStorageAdapter],
 });

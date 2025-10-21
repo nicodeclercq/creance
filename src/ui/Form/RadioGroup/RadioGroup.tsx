@@ -1,10 +1,8 @@
 import { RadioGroup as Group, Radio } from "react-aria-components";
-
 import { FormField } from "../../FormField/FormField";
 import classNames from "classnames";
 import styles from "./RadioGroup.module.css";
 import { useId } from "react";
-
 type Option<T> = { id: string; label: string; value: T };
 
 type RadioGroupProps<T> = {

@@ -1,9 +1,9 @@
-import { Fn, runSequentially } from "../helpers/function";
-
 import { BehaviorSubject } from "rxjs";
+import type { Fn } from "../helpers/function";
 import { Logger } from "../service/Logger";
-import { State } from "./state";
+import type { State } from "./state";
 import { isDefined } from "@mui/x-charts/internals";
+import { runSequentially } from "../helpers/function";
 
 export type StoreLoading = {
   type: "loading";

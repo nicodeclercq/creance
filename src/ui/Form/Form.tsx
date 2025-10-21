@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from "react";
 import { Stack } from "../Stack/Stack";
 import styles from "./Form.module.css";
-import { AsButton, Button, ButtonProps } from "../Button/Button";
-import { DistributiveOmit } from "../../helpers/DistributiveOmit";
-import { FieldValues, type UseFormHandleSubmit } from "react-hook-form";
+import type { AsButton, ButtonProps } from "../Button/Button";
+import { Button } from "../Button/Button";
+import type { DistributiveOmit } from "../../helpers/DistributiveOmit";
+import type { FieldValues } from "react-hook-form";
+import { type UseFormHandleSubmit } from "react-hook-form";
 
 type FormProps<TFieldValues extends FieldValues, TTransformedValues> = {
   hasError: boolean;

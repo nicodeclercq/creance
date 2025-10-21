@@ -4,7 +4,7 @@ import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { ROUTES } from "../../routes";
 import { Redirect } from "../../Redirect";
 import { Stack } from "../../ui/Stack/Stack";
-import { Transaction } from "../../models/Transaction";
+import type { Transaction } from "../../models/Transaction";
 import { TransactionForm } from "./private/TransactionForm";
 import { uid } from "../../service/crypto";
 import { useData } from "../../store/useData";

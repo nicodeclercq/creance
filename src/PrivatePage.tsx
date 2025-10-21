@@ -1,12 +1,12 @@
-import { Store, StoreManager } from "./store/StoreManager";
-
 import { Container } from "./ui/Container/Container";
-import { FormData } from "./pages/participants/ParticipantForm";
+import type { FormData } from "./pages/participants/ParticipantForm";
 import { LoadingIcon } from "./ui/Button/LoadingIcon";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Redirect } from "./Redirect";
 import { SetCurrentParticipantPage } from "./pages/auth/SetCurrentParticipantPage";
-import { State } from "./store/state";
+import type { State } from "./store/state";
+import type { Store } from "./store/StoreManager";
+import { StoreManager } from "./store/StoreManager";
 import { uid } from "./service/crypto";
 import { useData } from "./store/useData";
 import { useStore } from "./store/useStore";

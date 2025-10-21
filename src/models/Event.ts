@@ -21,7 +21,10 @@ export const eventSchema = z.strictObject({
   expenses: z.record(z.string().max(100), expenseSchema),
   deposits: z.record(z.string().max(100), depositSchema),
   categories: z.record(z.string().max(100), categorySchema),
-  updatedAt: z.string().transform((date) => new Date(date)),
+  updatedAt: z.union([
+    z.string().transform((date) => new Date(date)),
+    z.date(),
+  ]),
   isAutoClose: z.boolean().optional(),
   mealManager: z.record(
     z.string().max(100),

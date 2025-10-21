@@ -1,5 +1,5 @@
 import { Card } from "../../../ui/Card/Card";
-import { Event } from "../../../models/Event";
+import type { Event } from "../../../models/Event";
 import { EventParticipantItem } from "./EventParticipantItem";
 import { Stack } from "../../../ui/Stack/Stack";
 

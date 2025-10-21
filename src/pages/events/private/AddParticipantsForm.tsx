@@ -4,21 +4,44 @@ import { Avatar } from "../../../ui/Avatar/Avatar";
 import { IconButton } from "../../../ui/IconButton/IconButton";
 import { InputNumber } from "../../../ui/FormField/InputNumber/InputNumber";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
-import { Participant } from "../../../models/Participant";
-import { ParticipantShare } from "../../../models/ParticipantShare";
+import type { Participant } from "../../../models/Participant";
+import type { ParticipantShare } from "../../../models/ParticipantShare";
 import { uid } from "../../../service/crypto";
 import { useTranslation } from "react-i18next";
+import { userSchema } from "../../../models/User";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type AddParticipantsFormProps = {
   participants: Participant[];
   onAdd: (participant: Participant) => void;
 };
 
-type AddParticipantsFormData = {
-  name: string;
-  adults: number;
-  children: number;
-};
+const createAddParticipantsFormSchema = (
+  t: ReturnType<typeof useTranslation>["t"],
+  participants: Participant[]
+) =>
+  z.object({
+    name: userSchema.shape.name
+      .min(1, t("page.events.add.form.participant.name.validation.required"))
+      .refine(
+        (value) => !participants.some((p) => p.name === value),
+        t("page.events.add.form.participant.name.validation.isUnique")
+      ),
+    adults: userSchema.shape.share.shape.adults.min(
+      0,
+      t("page.events.add.form.participant.share.adults.validation.min")
+    ),
+    children: userSchema.shape.share.shape.children.min(
+      0,
+      t("page.events.add.form.participant.share.children.validation.min")
+    ),
+  });
+
+type AddParticipantsFormData = z.infer<
+  ReturnType<typeof createAddParticipantsFormSchema>
+>;
+
 export function AddParticipantsForm({
   onAdd,
   participants: participants,
@@ -31,6 +54,7 @@ export function AddParticipantsForm({
         adults: 1,
         children: 0,
       },
+      resolver: zodResolver(createAddParticipantsFormSchema(t, participants)),
     });
 
   const addParticipant = (data: AddParticipantsFormData) => {
@@ -57,22 +81,6 @@ export function AddParticipantsForm({
       </div>
       <Controller
         control={control}
-        rules={{
-          required: t(
-            "page.events.add.form.participant.name.validation.required"
-          ),
-          validate: {
-            isUnique: (value) => {
-              const isUnique = !participants.some(
-                (participant) => participant.name === value
-              );
-              return (
-                isUnique ||
-                t("page.events.add.form.participant.name.validation.isUnique")
-              );
-            },
-          },
-        }}
         name="name"
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <div>
@@ -99,14 +107,6 @@ export function AddParticipantsForm({
       <div>{t("page.events.add.form.participant.share.label")}</div>
       <Controller
         control={control}
-        rules={{
-          min: {
-            value: 0,
-            message: t(
-              "page.events.add.form.participant.share.adults.validation.min"
-            ),
-          },
-        }}
         name="adults"
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputNumber
@@ -122,14 +122,6 @@ export function AddParticipantsForm({
       />
       <Controller
         control={control}
-        rules={{
-          min: {
-            value: 0,
-            message: t(
-              "page.events.add.form.participant.share.children.validation.min"
-            ),
-          },
-        }}
         name="children"
         render={({ field: { value, onChange }, fieldState: { error } }) => (
           <InputNumber

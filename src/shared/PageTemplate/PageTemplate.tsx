@@ -5,9 +5,11 @@ import type {
   AsButton,
   IconButtonPropsWhithoutVariantAndOverlays,
 } from "../../ui/IconButton/IconButton";
-import { Menu, MenuProps } from "./Menu/Menu";
-import { Header, HeaderProps } from "./Header";
-import { RouteName } from "../../routes";
+import type { MenuProps } from "./Menu/Menu";
+import { Menu } from "./Menu/Menu";
+import type { HeaderProps } from "./Header";
+import { Header } from "./Header";
+import type { RouteName } from "../../routes";
 import { Logo } from "../../ui/Logo/Logo";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 

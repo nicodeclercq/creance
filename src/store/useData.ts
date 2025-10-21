@@ -1,14 +1,11 @@
 import * as RX from "rxjs";
 
-import { DEFAULT_STATE, State } from "./state";
-import {
-  Path,
-  ValueFromPath,
-  getValueFromPath,
-  setValueAtPath,
-} from "../utils/object";
+import type { Path, ValueFromPath } from "../utils/object";
+import { getValueFromPath, setValueAtPath } from "../utils/object";
 import { useContext, useEffect, useState } from "react";
 
+import { DEFAULT_STATE } from "./state";
+import type { State } from "./state";
 import { StoreContext } from "./StoreProvider";
 import { StoreManager } from "./StoreManager";
 

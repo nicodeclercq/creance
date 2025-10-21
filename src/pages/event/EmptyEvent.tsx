@@ -1,7 +1,6 @@
 import { EmptyState } from "../../ui/EmptyState/EmptyState";
-import { Event } from "../../models/Event";
+import type { Event } from "../../models/Event";
 import { useTranslation } from "react-i18next";
-
 type Props = {
   event: Event;
 };
