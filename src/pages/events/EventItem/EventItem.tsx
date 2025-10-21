@@ -28,7 +28,7 @@ export function EventItem({
       template={["max-content", "1fr", "max-content"]}
       styles={{
         position: "relative",
-        padding: "m",
+        padding: "s",
         radius: "m",
         overflow: "hidden",
       }}
