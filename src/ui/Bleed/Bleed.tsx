@@ -52,22 +52,33 @@ const directionsToObject = (direction: Direction) => {
 const spacingToDirections = (
   spacing: Record<string, string | undefined> = {}
 ) => {
-  return (["top", "bottom", "left", "right"] as const).reduce((acc, dir) => {
-    if ("both" in spacing) {
-      acc[dir] = spacing["both"];
-    } else if ("horizontal" in spacing && (dir === "left" || dir === "right")) {
-      acc[dir] = spacing["horizontal"];
-    } else if ("vertical" in spacing) {
-      acc[dir] = spacing["vertical"];
-    } else if (dir in spacing) {
-      acc[dir] = spacing[dir];
-    } else {
-      acc[dir] = `var(${
-        directionToMargin[dir as keyof typeof directionToMargin].variable
-      }, 0)`;
-    }
-    return acc;
-  }, {} as Record<"top" | "bottom" | "left" | "right", string | undefined>);
+  return (["top", "bottom", "left", "right"] as const).reduce(
+    (acc, dir) => {
+      if ("both" in spacing) {
+        acc[dir] = spacing["both"] ?? "0";
+      } else if (
+        "horizontal" in spacing &&
+        (dir === "left" || dir === "right")
+      ) {
+        acc[dir] = spacing["horizontal"] ?? "0";
+      } else if ("vertical" in spacing) {
+        acc[dir] = spacing["vertical"] ?? "0";
+      } else if (dir in spacing) {
+        acc[dir] = spacing[dir] ?? "0";
+      } else {
+        acc[dir] = `var(${
+          directionToMargin[dir as keyof typeof directionToMargin].variable
+        }, 0)`;
+      }
+      return acc;
+    },
+    {
+      top: "0",
+      bottom: "0",
+      left: "0",
+      right: "0",
+    } as Record<"top" | "bottom" | "left" | "right", string>
+  );
 };
 
 type ComputeStylesProps = {
@@ -104,10 +115,14 @@ const computeStyles = ({
   });
 
   if (width && width !== "inherit") {
-    styles.width = `calc(${width} + ${directionsSpacing.left} + ${directionsSpacing.right})`;
+    styles.width = `calc(${width} + ${
+      directions.left ? directionsSpacing.left : "0px"
+    } + ${directions.right ? directionsSpacing.right : "0px"})`;
   }
   if (height && height !== "inherit") {
-    styles.height = `calc(${height} + ${directionsSpacing.top} + ${directionsSpacing.bottom})`;
+    styles.height = `calc(${height} + ${
+      directions.top ? directionsSpacing.top : "0px"
+    } + ${directions.bottom ? directionsSpacing.bottom : "0px"})`;
   }
 
   return Object.entries(styles).reduce(

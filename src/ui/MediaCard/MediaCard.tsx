@@ -4,6 +4,7 @@ import { Bleed } from "../Bleed/Bleed";
 import { Card } from "../Card/Card";
 import { Container } from "../Container/Container";
 import { Grid } from "../Grid/Grid";
+import type { Media } from "../Container/styles";
 import { MediaHidden } from "../MediaHidden/MediaHidden";
 import { MediaOnly } from "../MediaOnly/MediaOnly";
 import type { ReactNode } from "react";
@@ -12,6 +13,7 @@ type MediaCardProps = {
   children: ReactNode;
   image: string;
   color?: string;
+  mediaBreakpoint?: Exclude<Media, "default">;
 };
 
 function Image({ image, color }: { image: string; color: string }) {
@@ -57,10 +59,14 @@ export function MediaCard({
   children,
   image,
   color = "transparent",
+  mediaBreakpoint = "sm",
 }: MediaCardProps) {
   return (
     <Card>
-      <Grid columns={{ default: 1, sm: ["15rem", "auto"] }} gap="m">
+      <Grid
+        columns={{ default: 1, [mediaBreakpoint]: ["15rem", "auto"] }}
+        gap="m"
+      >
         {isIllustration(image) ? (
           <Container
             styles={{
@@ -77,9 +83,10 @@ export function MediaCard({
           <Bleed
             direction={{
               default: ["top", "left", "right"],
-              md: ["top", "left", "bottom"],
+              [mediaBreakpoint]: ["top", "left", "bottom"],
             }}
-            height={{ default: "10rem", md: "100%" }}
+            width={{ default: "100%", [mediaBreakpoint]: "100%" }}
+            height={{ default: "10rem", [mediaBreakpoint]: "100%" }}
           >
             <Image image={image} color={color} />
           </Bleed>
