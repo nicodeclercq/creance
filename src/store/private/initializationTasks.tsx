@@ -5,6 +5,10 @@ import type { StoreAdapter } from "../StoreManager";
 import { flow } from "fp-ts/function";
 import { pipe } from "fp-ts/function";
 import { shouldCloseEvent } from "../../models/Event";
+import { ANONYMOUS_USER, type User } from "../../models/User";
+import { openDialog } from "../../ui/DialogProvider/DialogStackHook";
+import { SetCurrentParticipantForm } from "../../pages/auth/SetCurrentParticipantForm";
+import { uid } from "../../service/crypto";
 
 /**
  * After the end and a delay some events are automatically closed.
@@ -57,7 +61,44 @@ const fillInMissingParticipants = (state: State): State => {
   return state;
 };
 
+/**
+ * If the current user is anonymous, we open a dialog to add its informations.
+ */
+const initParticipantDetailsIfAnonymous = (
+  state: State
+): State | Promise<State> => {
+  if (state.account.currentUser._id === ANONYMOUS_USER._id) {
+    return openDialog<User>({
+      title: "page.setCurrentParticipant.title",
+      component: ({ defaultData, onSubmit, onCancel }) => (
+        <SetCurrentParticipantForm
+          defaultData={defaultData}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+        />
+      ),
+    }).then((result) => {
+      return {
+        ...state,
+        account: {
+          ...state.account,
+          currentUser:
+            result.type === "submit"
+              ? { ...result.data, _id: uid() } // we udpate the id to avoid showing the dialog twice
+              : ANONYMOUS_USER,
+        },
+      };
+    });
+  }
+
+  return state;
+};
+
 export const InitializationTasks: StoreAdapter<State> = {
-  initializer: flow(autoCloseEvents, fillInMissingParticipants),
+  initializer: flow(
+    autoCloseEvents,
+    fillInMissingParticipants,
+    initParticipantDetailsIfAnonymous
+  ),
   onStateChange: () => {},
 };

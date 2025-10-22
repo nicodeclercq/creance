@@ -1,14 +1,7 @@
 import { Container } from "./ui/Container/Container";
-import type { FormData } from "./pages/participants/ParticipantForm";
 import { LoadingIcon } from "./ui/Button/LoadingIcon";
 import type { ReactNode } from "react";
 import { Redirect } from "./Redirect";
-import { SetCurrentParticipantPage } from "./pages/auth/SetCurrentParticipantPage";
-import type { State } from "./store/state";
-import type { Store } from "./store/StoreManager";
-import { StoreManager } from "./store/StoreManager";
-import { uid } from "./service/crypto";
-import { useData } from "./store/useData";
 import { useStore } from "./store/useStore";
 
 type Props = {
@@ -16,33 +9,7 @@ type Props = {
 };
 
 export function PrivatePage({ children }: Props) {
-  const [store, setStore] = useStore();
-  const [account] = useData("account");
-
-  const submit = (data: FormData) => {
-    setStore((oldValue: Store<State>): Store<State> => {
-      if (StoreManager.hasData(oldValue)) {
-        const newCurrentParticipantId = uid();
-
-        return {
-          type: oldValue.type,
-          data: {
-            ...oldValue.data,
-            account: {
-              ...(oldValue.data.account ?? {}),
-              currentUser: {
-                _id: newCurrentParticipantId,
-                updatedAt: new Date(),
-                ...data,
-              },
-            },
-          },
-        };
-      }
-
-      return oldValue as Store<State>;
-    });
-  };
+  const [store] = useStore();
 
   switch (store.type) {
     case "loading":
@@ -65,10 +32,6 @@ export function PrivatePage({ children }: Props) {
     case "ready":
       return <Redirect to="LOGIN" />;
     case "authenticated":
-      return !account ? (
-        <SetCurrentParticipantPage onSubmit={submit} />
-      ) : (
-        <>{children}</>
-      );
+      return <>{children}</>;
   }
 }

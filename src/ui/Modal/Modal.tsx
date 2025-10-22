@@ -7,14 +7,17 @@ type ModalProps = {
   children: ReactNode;
   title: string;
   isOpen: boolean;
+  isDismissable?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
 };
 
-export function Modal({ children, title, isOpen }: ModalProps) {
+export function Modal({ children, title, isOpen, isDismissable = true, onOpenChange }: ModalProps) {
   return (
     <ModalOverlay
       data-component="Modal"
-      isDismissable
+      isDismissable={isDismissable}
       isOpen={isOpen}
+      onOpenChange={onOpenChange}
       className={styles.overlay}
     >
       <RAModal className={styles.modal}>

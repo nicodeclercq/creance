@@ -202,7 +202,16 @@ export type Styles = {
   breakInside?: WithMediaQuery<"page" | "column" | "avoid">;
 };
 
-export type LayoutStyles = "display" | "padding" | "flexGrow";
+export type LayoutStyles =
+  | "display"
+  | "padding"
+  | "flexGrow"
+  | "maxWidth"
+  | "minWidth"
+  | "maxHeight"
+  | "minHeight"
+  | "width"
+  | "height";
 export type ColorStyles = "background" | "color";
 export type TypographyStyles = "color" | "font" | "textAlign";
 export type ShadowStyles = "default" | "none";

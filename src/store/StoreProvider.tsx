@@ -1,10 +1,11 @@
+import { InitializationTasks } from "./private/initializationTasks";
+import { LocalStorageAdapter } from "./private/localStorage";
 import type { ReactNode } from "react";
+import { StoreManager } from "./StoreManager";
 import { createContext } from "react";
 
-import { LocalStorageAdapter } from "./private/localStorage";
-import { StoreManager } from "./StoreManager";
 StoreManager.launch({
-  adapters: [LocalStorageAdapter],
+  adapters: [LocalStorageAdapter, InitializationTasks],
 });
 
 export const StoreContext = createContext(StoreManager.$store);

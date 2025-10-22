@@ -101,7 +101,7 @@ export function ParticipantForm({
           gap: "m",
         }}
       >
-        <Avatar label={name} image={users[name]?.avatar} size="xl" />
+        <Avatar label={name} image={defaultValue?.avatar} size="xl" />
       </Container>
       <Controller
         name="name"
