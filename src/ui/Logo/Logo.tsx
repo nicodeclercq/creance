@@ -1,9 +1,10 @@
 import { LogoBoth } from "./private/LogoBoth";
 import { LogoPig } from "./private/LogoPig";
 import { LogoText } from "./private/LogoText";
-type Size = "s" | "m" | "l";
+type Size = "s" | "m" | "l" | "xl";
 export function computeSize(value: Size = "m") {
   const factor = {
+    xl: 8,
     l: 6,
     m: 4,
     s: 2,

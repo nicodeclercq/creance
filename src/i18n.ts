@@ -10,7 +10,6 @@ i18next
   .use(initReactI18next)
   .init({
     lng: "fr",
-    debug: true,
     fallbackLng: "fr",
     resources: {
       fr: {

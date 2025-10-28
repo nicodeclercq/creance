@@ -1,5 +1,6 @@
 cat > ./src/secrets.ts << EOF
 export const salt = "$SALT";
+export const storageFileName = "$STORAGE_FILE_NAME";
 export const firebaseConfig = {
   apiKey: "$FIREBASE_API_KEY",
   authDomain: "$FIREBASE_AUTH_DOMAIN",

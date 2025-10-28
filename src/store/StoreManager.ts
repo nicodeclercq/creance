@@ -99,7 +99,7 @@ const storeManager = <A = State>() => {
         ...StoreAdapter<A>["initializer"][]
       ];
 
-      Promise.resolve()
+      return Promise.resolve()
         .then(first)
         .then((newData) =>
           runSequentially(

@@ -1,5 +1,3 @@
-import "./index.css";
-
 import App from "./App";
 import { I18nextProvider } from "react-i18next";
 import ReactDOM from "react-dom/client";
