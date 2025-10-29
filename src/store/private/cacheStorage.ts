@@ -2,7 +2,6 @@ import * as Either from "fp-ts/Either";
 
 import { fromState, toState } from "../../adapters/json";
 
-import { DEFAULT_STATE } from "../state";
 import type { FirstStoreAdapter } from "../StoreManager";
 import { Logger } from "../../service/Logger";
 import type { State } from "../state";
@@ -10,6 +9,7 @@ import { StoreManager } from "../StoreManager";
 import { storageFileName as cacheName } from "../../secrets";
 import { createCacheWorkerClient } from "../../workers/CacheWorkerClient";
 import { pipe } from "fp-ts/function";
+import { validateOrDefaultsToState } from "../state";
 
 const workerClient = createCacheWorkerClient(cacheName);
 
@@ -43,13 +43,13 @@ export const CacheStorageAdapter: FirstStoreAdapter<State> = {
         Either.getOrElseW((error) => {
           Logger.error("Unable to get state from cache")(error);
           Logger.info("Using default state")();
-          return DEFAULT_STATE;
+          return validateOrDefaultsToState(undefined);
         })
       )
       .catch((error) => {
         Logger.error("Unable to initialize cache storage")(error);
         Logger.info("Using default state")();
-        return DEFAULT_STATE;
+        return validateOrDefaultsToState(undefined);
       }),
   onStateChange: (state) => {
     if (StoreManager.hasData(state)) {

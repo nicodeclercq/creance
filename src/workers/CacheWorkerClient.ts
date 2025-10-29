@@ -4,8 +4,8 @@ import type {
 } from "./cacheStorage.worker";
 
 import CacheStorageWorker from "./cacheStorage.worker?worker";
-import { DEFAULT_STATE } from "../store/state";
 import { Logger } from "../service/Logger";
+import { validateOrDefaultsToState } from "../store/state";
 
 const getRequestIdFromResponse = (response: CacheStorageResponse): string =>
   response.type.replace(/-success|-error/, "");
@@ -53,7 +53,7 @@ export const createCacheWorkerClient = (name: string) => {
     sendMessage({
       type: "init",
       name,
-      defaultState: JSON.stringify(DEFAULT_STATE),
+      defaultState: JSON.stringify(validateOrDefaultsToState(undefined)),
     }).then((response) => {
       if (response.type === "init-error") {
         throw new Error(response.error);
@@ -67,7 +67,7 @@ export const createCacheWorkerClient = (name: string) => {
       }
       if (response.type === "read-success") {
         if (!response.data) {
-          write(JSON.stringify(DEFAULT_STATE));
+          write(JSON.stringify(validateOrDefaultsToState(undefined)));
           return read();
         }
         return response.data;

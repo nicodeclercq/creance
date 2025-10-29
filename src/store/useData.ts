@@ -4,17 +4,19 @@ import type { Path, ValueFromPath } from "../utils/object";
 import { getValueFromPath, setValueAtPath } from "../utils/object";
 import { useContext, useEffect, useState } from "react";
 
-import { DEFAULT_STATE } from "./state";
 import type { State } from "./state";
 import { StoreContext } from "./StoreProvider";
 import { StoreManager } from "./StoreManager";
+import { validateOrDefaultsToState } from "./state";
 
 export function useData<P extends Path<State>>(path: P) {
   const store = useContext(StoreContext);
   const value = store.getValue();
   const [state, setState] = useState<ValueFromPath<P, State>>(
     getValueFromPath<P, State>(path)(
-      StoreManager.hasData(value) ? value.data : DEFAULT_STATE
+      StoreManager.hasData(value)
+        ? value.data
+        : validateOrDefaultsToState(undefined)
     )
   );
 

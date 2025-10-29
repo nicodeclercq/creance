@@ -16,8 +16,7 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { pipe } from "fp-ts/function";
-import type { State } from "../state";
-import { DEFAULT_STATE } from "../state";
+import { validateOrDefaultsToState, type State } from "../state";
 import { decrypt, generateKey } from "../../service/crypto";
 import type { Account } from "../../models/Account";
 import { accountSchema } from "../../models/Account";
@@ -338,7 +337,7 @@ export function loginUser({
                   account: data,
                   data: StoreManager.hasData(state)
                     ? state.data
-                    : DEFAULT_STATE,
+                    : validateOrDefaultsToState(undefined),
                 }));
               }
             }
