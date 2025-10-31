@@ -45,7 +45,6 @@ function init(name: string, defaultState: string): Promise<void> {
   return caches
     .open(name)
     .then((cache) => {
-      console.log("cache", cache);
       return cache.match(STORAGE_KEY).then((response) => {
         if (!response) {
           return cache.put(
@@ -64,7 +63,10 @@ function init(name: string, defaultState: string): Promise<void> {
       postMessage({ type: "init-success" } satisfies CacheStorageResponse)
     )
     .catch((error) => {
-      throw new Error(`Failed to initialize cache: ${error.message}`);
+      postMessage({
+        type: "init-error",
+        error: error.message,
+      } satisfies CacheStorageResponse);
     });
 }
 
@@ -87,6 +89,12 @@ function read(name: string): Promise<void> {
         type: "read-success",
         data: text,
       } satisfies CacheStorageResponse);
+    })
+    .catch((error) => {
+      postMessage({
+        type: "read-error",
+        error: error.message,
+      } satisfies CacheStorageResponse);
     });
 }
 
@@ -107,6 +115,12 @@ function write(name: string, data: string): Promise<void> {
     .then((cache) => cache.put(STORAGE_KEY, response))
     .then(() => {
       postMessage({ type: "write-success" } satisfies CacheStorageResponse);
+    })
+    .catch((error) => {
+      postMessage({
+        type: "write-error",
+        error: error.message,
+      } satisfies CacheStorageResponse);
     });
 }
 
@@ -115,9 +129,17 @@ function clear(name: string): Promise<void> {
     return Promise.reject(new Error("Cache not initialized. Call init first."));
   }
 
-  return caches.delete(name).then(() => {
-    postMessage({ type: "clear-success" } satisfies CacheStorageResponse);
-  });
+  return caches
+    .delete(name)
+    .then(() => {
+      postMessage({ type: "clear-success" } satisfies CacheStorageResponse);
+    })
+    .catch((error) => {
+      postMessage({
+        type: "clear-error",
+        error: error.message,
+      } satisfies CacheStorageResponse);
+    });
 }
 
 function postError(messageType: string, error: unknown): void {

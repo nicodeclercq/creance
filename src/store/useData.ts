@@ -7,17 +7,19 @@ import { useContext, useEffect, useState } from "react";
 import type { State } from "./state";
 import { StoreContext } from "./StoreProvider";
 import { StoreManager } from "./StoreManager";
-import { validateOrDefaultsToState } from "./state";
 
 export function useData<P extends Path<State>>(path: P) {
   const store = useContext(StoreContext);
   const value = store.getValue();
+
+  const defaultState = StoreManager.hasData(value) ? value.data : undefined;
+
+  if (defaultState === undefined) {
+    throw new Error("No state found");
+  }
+
   const [state, setState] = useState<ValueFromPath<P, State>>(
-    getValueFromPath<P, State>(path)(
-      StoreManager.hasData(value)
-        ? value.data
-        : validateOrDefaultsToState(undefined)
-    )
+    getValueFromPath<P, State>(path)(defaultState)
   );
 
   useEffect(() => {

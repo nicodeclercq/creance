@@ -84,7 +84,7 @@
   "component.formatter.date.noYear": "{date, date, ::EEEE dd MMMM}",
   "component.formatter.date.abbrNoYear": "{date, date, ::EEEE dd MMM}",
   
-  "page.event.empty.title": "Vous n'avez rentré encore aucune dépense sur cette liste",
+  "page.event.empty.title": "Vous n'avez encore rentré aucune dépense sur cette liste",
   "page.event.empty.description":
     "Pour commencer à ajouter des dépenses, cliquez sur le bouton ci-dessous.",
   "page.event.empty.description.closed":
@@ -365,5 +365,10 @@
   "Event.validation.activities.key.maxLength": "L'identifiant de l'activité ne peut pas dépasser 100 caractères",
   "Account.validation.events.maxLength": "L'identifiant de l'événement ne peut pas dépasser 100 caractères",
   "Account.validation.events.key.maxLength": "La clé de l'événement ne peut pas dépasser 100 caractères",
-  "Account.validation.events.uid.maxLength": "L'UID de l'événement ne peut pas dépasser 100 caractères"
+  "Account.validation.events.uid.maxLength": "L'UID de l'événement ne peut pas dépasser 100 caractères",
+  "ResetStateConfirmationDialog.title": "Réinitialiser l'application",
+  "ResetStateConfirmationDialog.description": "Les données enregistrées sur votre appareil sont invalides et ne peuvent pas être restaurées. Voulez-vous réinitialiser l'application ?",
+  "ResetStateConfirmationDialog.actions.submit": "Réinitialiser",
+  "ResetStateConfirmationDialog.actions.cancel": "Laisser les données existantes",
+  "page.event.edit.participants.actions.addParticipant": "Ajouter un participant"
 }

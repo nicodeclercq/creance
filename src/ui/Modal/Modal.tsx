@@ -2,6 +2,8 @@ import { type ReactNode } from "react";
 import { Dialog, Modal as RAModal, ModalOverlay } from "react-aria-components";
 import { Heading } from "../Heading/Heading";
 import styles from "./Modal.module.css";
+import { Heading as RAHeading } from "react-aria-components";
+import { Span } from "../Span/Span";
 
 type ModalProps = {
   children: ReactNode;
@@ -11,7 +13,13 @@ type ModalProps = {
   onOpenChange?: (isOpen: boolean) => void;
 };
 
-export function Modal({ children, title, isOpen, isDismissable = true, onOpenChange }: ModalProps) {
+export function Modal({
+  children,
+  title,
+  isOpen,
+  isDismissable = true,
+  onOpenChange,
+}: ModalProps) {
   return (
     <ModalOverlay
       data-component="Modal"
@@ -22,9 +30,9 @@ export function Modal({ children, title, isOpen, isDismissable = true, onOpenCha
     >
       <RAModal className={styles.modal}>
         <Dialog>
-          <Heading level={2} styles={{ font: "body-large" }}>
-            {title}
-          </Heading>
+          <RAHeading slot="title">
+            <Span styles={{ font: "body-large" }}>{title}</Span>
+          </RAHeading>
           {children}
         </Dialog>
       </RAModal>

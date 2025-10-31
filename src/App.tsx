@@ -9,9 +9,9 @@ import { StoreProvider } from "./store/StoreProvider";
 function App() {
   return (
     <I18nProvider locale="fr-FR">
+      <DialogStackHook />
       <StoreProvider loadingRenderer={LoadingPage}>
         <Router />
-        <DialogStackHook />
       </StoreProvider>
     </I18nProvider>
   );

@@ -13,18 +13,16 @@ export function EventParticipantsList({
   deleteShare,
 }: EventParticipantsListProps) {
   return (
-    <Card>
-      <Stack gap="m">
-        {Object.keys(currentEvent.participants).map((participantId) => (
-          <EventParticipantItem
-            key={participantId}
-            eventId={currentEvent._id}
-            participant={currentEvent.participants[participantId]}
-            share={currentEvent.participants[participantId].participantShare}
-            onDelete={() => deleteShare(participantId)}
-          />
-        ))}
-      </Stack>
-    </Card>
+    <Stack gap="m">
+      {Object.keys(currentEvent.participants).map((participantId) => (
+        <EventParticipantItem
+          key={participantId}
+          eventId={currentEvent._id}
+          participant={currentEvent.participants[participantId]}
+          share={currentEvent.participants[participantId].participantShare}
+          onDelete={() => deleteShare(participantId)}
+        />
+      ))}
+    </Stack>
   );
 }

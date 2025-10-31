@@ -73,7 +73,7 @@ export function DialogStackHook() {
  * });
  * ```
  */
-export function openDialog<T = unknown>(
+export function openDialog<T = undefined>(
   config: DialogConfig<T>,
   defaultData?: T
 ): Promise<DialogResult<T>> {

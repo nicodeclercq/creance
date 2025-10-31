@@ -5,7 +5,13 @@ import type {
 
 import CacheStorageWorker from "./cacheStorage.worker?worker";
 import { Logger } from "../service/Logger";
-import { validateOrDefaultsToState } from "../store/state";
+
+const WAITING_TIME = 1000;
+
+const wait = (ms: number): Promise<never> =>
+  new Promise((_, reject) => {
+    setTimeout(() => reject(new Error("Request timeout")), ms);
+  });
 
 const getRequestIdFromResponse = (response: CacheStorageResponse): string =>
   response.type.replace(/-success|-error/, "");
@@ -33,43 +39,38 @@ export const createCacheWorkerClient = (name: string) => {
 
   const sendMessage = (
     message: CacheStorageMessage
-  ): Promise<CacheStorageResponse> =>
-    new Promise((resolve, reject) => {
-      const requestId = message.type;
-      pendingRequests.set(requestId, { resolve, reject });
+  ): Promise<CacheStorageResponse> => {
+    const requestId = message.type;
 
-      // Set a timeout to prevent hanging requests
-      setTimeout(() => {
-        if (pendingRequests.has(requestId)) {
-          pendingRequests.delete(requestId);
-          reject(new Error(`Request timeout for ${requestId}`));
-        }
-      }, 10000); // 10 second timeout
+    const messagePromise = new Promise<CacheStorageResponse>(
+      (resolve, reject) => {
+        pendingRequests.set(requestId, { resolve, reject });
+        worker.postMessage(message);
+      }
+    );
 
-      worker.postMessage(message);
+    return Promise.race([messagePromise, wait(WAITING_TIME)]).finally(() => {
+      pendingRequests.delete(requestId);
     });
+  };
 
   const init = (): Promise<void> =>
     sendMessage({
       type: "init",
       name,
-      defaultState: JSON.stringify(validateOrDefaultsToState(undefined)),
+      defaultState: "",
     }).then((response) => {
       if (response.type === "init-error") {
         throw new Error(response.error);
       }
     });
 
-  const read = (): Promise<string> =>
+  const read = (): Promise<string | undefined> =>
     sendMessage({ type: "read", name }).then((response) => {
       if (response.type === "read-error") {
         throw new Error(response.error);
       }
       if (response.type === "read-success") {
-        if (!response.data) {
-          write(JSON.stringify(validateOrDefaultsToState(undefined)));
-          return read();
-        }
         return response.data;
       }
       throw new Error("Unexpected response type");

@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 
 export type DialogConfig<T = unknown> = {
   component: (props: {
-    onSubmit: (data: T) => void;
-    onCancel?: () => void;
+    onSubmit: T extends undefined ? () => void : (data: T) => void;
+    onCancel: T extends undefined ? () => void : () => void;
     defaultData?: T;
   }) => ReactNode;
   title: string;
