@@ -1,6 +1,5 @@
 import { type ReactNode } from "react";
 import { Dialog, Modal as RAModal, ModalOverlay } from "react-aria-components";
-import { Heading } from "../Heading/Heading";
 import styles from "./Modal.module.css";
 import { Heading as RAHeading } from "react-aria-components";
 import { Span } from "../Span/Span";
