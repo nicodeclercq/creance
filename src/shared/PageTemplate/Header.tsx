@@ -8,10 +8,9 @@ import {
   type IconButtonProps,
 } from "../../ui/IconButton/IconButton";
 import { Menu, type MenuProps } from "../../ui/Menu/Menu";
-import { useCurrentUser } from "../../store/useCurrentUser";
-import { Avatar } from "../../ui/Avatar/Avatar";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 import { Logo } from "../../ui/Logo/Logo";
+import { UserMenu } from "./UserMenu";
 
 export type HeaderProps = {
   gridArea?: string;
@@ -31,7 +30,6 @@ export function Header({
   gridArea,
 }: HeaderProps) {
   const { t } = useTranslation();
-  const { currentUser } = useCurrentUser();
 
   return (
     <Container
@@ -55,13 +53,9 @@ export function Header({
         >
           {title}
         </Heading>
-        {currentUser && (
-          <Avatar
-            label={currentUser.name}
-            image={currentUser.avatar}
-            size="m"
-          />
-        )}
+        <MediaOnly media={["default", "sm"]}>
+          <UserMenu />
+        </MediaOnly>
         {rightActions && (
           <Menu
             label={t("component.pageTemplate.actions.more")}

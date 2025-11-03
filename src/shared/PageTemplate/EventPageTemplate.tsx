@@ -12,6 +12,7 @@ import { dateToKey } from "../../utils/date";
 import { AddActivityModal } from "../../pages/calendar/private/AddActivityModal";
 import type { Activity } from "../../models/Activity";
 import { useCurrentUser } from "../../store/useCurrentUser";
+import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -163,11 +164,13 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
       >
         {children}
         {actions.length > 1 && !event.isClosed && (
-          <QuickActions
-            icon="add"
-            label={t("component.quickActions.label")}
-            actions={actions}
-          />
+          <MediaOnly media={["default", "sm"]}>
+            <QuickActions
+              icon="add"
+              label={t("component.quickActions.label")}
+              actions={actions}
+            />
+          </MediaOnly>
         )}
       </PageTemplate>
       <AddActivityModal

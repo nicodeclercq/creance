@@ -17,9 +17,7 @@ export type MenuProps = {
   gridArea?: string;
   actions: Action[];
 };
-/*
-  border-block-start: 0.1rem solid var(--ui-semantic-color-inverted);
-*/
+
 export function Menu({ actions, gridArea }: MenuProps) {
   return (
     <Container

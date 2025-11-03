@@ -12,6 +12,8 @@ import { Header } from "./Header";
 import type { RouteName } from "../../routes";
 import { Logo } from "../../ui/Logo/Logo";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
+import { UserMenu } from "./UserMenu";
+import { MediaHidden } from "../../ui/MediaHidden/MediaHidden";
 
 type PageTemplateProps<R extends RouteName> = {
   title: string;
@@ -35,17 +37,14 @@ export function PageTemplate<R extends RouteName>({
         justifyContent: "center",
         background: "inverted",
         height: "100vh",
-        gridTemplateRows: {
-          default: ["max-content", "1fr", "max-content"],
-          md: ["max-content", "1fr"],
-        },
+        gridTemplateRows: ["max-content", "1fr", "max-content"],
         gridTemplateColumns: {
           default: 1,
           md: ["max-content", "1fr"],
         },
         gridTemplateAreas: {
           default: '"header" "content" "menu"',
-          md: '"logo header" "menu content"',
+          md: '"logo header" "menu content" "user content"',
         },
       }}
     >
@@ -83,7 +82,25 @@ export function PageTemplate<R extends RouteName>({
         rightActions={rightActions}
         gridArea="header"
       />
-      {menu && <Menu actions={menu} gridArea="menu" />}
+      {menu ? (
+        <Menu actions={menu} gridArea="menu" />
+      ) : (
+        <Container styles={{ gridArea: "menu" }} />
+      )}
+      <MediaHidden media={["default", "sm"]}>
+        <Container
+          styles={{
+            gridArea: "user",
+            padding: "m",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "m",
+          }}
+        >
+          <UserMenu />
+        </Container>
+      </MediaHidden>
       <Container
         styles={{
           padding: "m",

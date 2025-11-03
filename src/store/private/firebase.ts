@@ -323,6 +323,7 @@ export function loginUser({
         localStorage.setItem(LOCAL_STORAGE_KEY, key);
       })
       .then(getAccountData)
+      .then(Either.map(validateOrDefaultsToState))
       .then((result) =>
         pipe(
           result,
@@ -332,13 +333,16 @@ export function loginUser({
             },
             (data) => {
               if (data) {
-                StoreManager.update((state) => ({
-                  type: "authenticated",
-                  account: data,
-                  data: StoreManager.hasData(state)
-                    ? state.data
-                    : validateOrDefaultsToState(undefined),
-                }));
+                StoreManager.update((state) => {
+                  if (StoreManager.hasData(state)) {
+                    return {
+                      type: "authenticated",
+                      account: data,
+                      data: state.data,
+                    };
+                  }
+                  return state;
+                });
               }
             }
           )

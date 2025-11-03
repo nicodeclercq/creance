@@ -13,6 +13,7 @@ type SetCurrentParticipantPageProps = {
   defaultData?: User;
   onSubmit: (data: User) => void;
   onCancel?: () => void;
+  cancelLabel?: string;
 };
 
 const fromUserToFormData = (user: User): FormData => {
@@ -39,6 +40,7 @@ export function SetCurrentParticipantForm({
   defaultData,
   onSubmit,
   onCancel,
+  cancelLabel,
 }: SetCurrentParticipantPageProps) {
   const { t } = useTranslation();
   const [users] = useData("users");
@@ -68,7 +70,7 @@ export function SetCurrentParticipantForm({
         cancel={
           onCancel
             ? {
-                label: t("page.setCurrentParticipant.actions.cancel"),
+                label: cancelLabel ?? t("page.setCurrentParticipant.actions.cancel"),
                 onCancel,
               }
             : undefined

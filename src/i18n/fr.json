@@ -115,6 +115,7 @@
   "component.categoryIcon.user-full": "Silouhette",
   "component.categoryIcon.wrench": "Outil",
   "component.pageTemplate.actions.more": "Paramètres",
+  "component.pageTemplate.actions.editProfile": "Modifier le profil",
   "page.information.title": "Informations",
   "settings.actions.information": "Informations",
   "settings.actions.importData": "Importer des données",

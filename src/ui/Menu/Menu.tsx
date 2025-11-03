@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { getPath } from "../../routes";
 import type { ConfirmProps } from "../ConfirmButton/ConfirmButton";
 import { ConfirmButton } from "../ConfirmButton/ConfirmButton";
+import type { ReactNode } from "react";
 
 type Action =
   | (DistributiveOmit<ButtonProps<AsLink>, "icon"> & {
@@ -26,6 +27,7 @@ type Action =
 
 export type MenuProps = {
   label: string;
+  labelRenderer?: () => ReactNode;
   variant?: "primary" | "secondary" | "tertiary";
   icon?: IconName;
   actions: Action[];
@@ -33,6 +35,7 @@ export type MenuProps = {
 
 export function Menu({
   label,
+  labelRenderer: LabelRenderer,
   icon = "menu",
   variant = "tertiary",
   actions,
@@ -43,11 +46,11 @@ export function Menu({
         className={classNames(
           buttonStyles.button,
           iconButtonStyles.button,
-          buttonStyles[`hasVariant-${variant}`],
+          buttonStyles[`hasVariant-${variant}`]
         )}
         aria-label={label}
       >
-        <Icon name={icon} />
+        {LabelRenderer ? <LabelRenderer /> : <Icon name={icon} />}
       </Button>
       <Popover>
         <Dialog className={styles.menu}>
