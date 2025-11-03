@@ -9,7 +9,7 @@ export const ANONYMOUS_USER = {
     adults: 1,
     children: 0,
   },
-  updatedAt: new Date("2025-01-01"),
+  updatedAt: new Date("2025-01-01"), // Date is in the past to be overwritten when merging state
 } satisfies User;
 
 export const userSchema = z.strictObject({

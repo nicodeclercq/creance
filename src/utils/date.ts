@@ -6,6 +6,21 @@ export function dateToKey(day: Date | undefined) {
   return `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 }
 
+export function keyToDate(key: string): Date {
+  const datePart = key.split(/[T\s]/)[0]; // Remove time and timezone if present
+  const parts = datePart.split("-");
+
+  if (parts.length !== 3) {
+    throw new Error(`Invalid date key format: ${key}`);
+  }
+
+  const year = Number.parseInt(parts[0], 10);
+  const month = Number.parseInt(parts[1], 10) - 1; // months are 0-indexed
+  const day = Number.parseInt(parts[2], 10);
+
+  return new Date(year, month, day);
+}
+
 export function addTimeToDate(date: Date, time: string) {
   if (!time) {
     return date;

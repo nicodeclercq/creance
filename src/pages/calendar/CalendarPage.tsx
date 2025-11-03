@@ -9,6 +9,7 @@ import { DaySumary } from "./private/DaySumary";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventPageTemplate } from "../../shared/PageTemplate/EventPageTemplate";
 import { Stack } from "../../ui/Stack/Stack";
+import { keyToDate } from "../../utils/date";
 import { useCurrentUser } from "../../store/useCurrentUser";
 import { useData } from "../../store/useData";
 import { useEffect } from "react";
@@ -87,7 +88,7 @@ export function CalendarPage() {
         {Object.entries(presenceByDays).map(([day, presence]) => (
           <DaySumary
             key={day}
-            day={new Date(day)}
+            day={keyToDate(day)}
             presence={presence}
             activities={activitiesByDays[day]}
             participants={currentEvent.participants}
