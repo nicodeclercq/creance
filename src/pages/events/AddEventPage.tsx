@@ -1,5 +1,4 @@
-import type { Step1Data } from "./private/AddEventStep1";
-import { AddEventStep1 } from "./private/AddEventStep1";
+import type { Step1Data } from "../../pages/events/private/EventStep1Form";
 import type { Step2Data } from "./private/AddEventStep2";
 import { AddEventStep2 } from "./private/AddEventStep2";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
@@ -16,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { generateKey, uid } from "../../service/crypto";
 import type { Participant } from "../../models/Participant";
 import type { Account } from "../../models/Account";
+import { EventStep1Form } from "./private/EventStep1Form";
 
 const now = new Date();
 
@@ -151,7 +151,16 @@ export function AddEventPage() {
           ]}
         >
           {currentStep === 0 && (
-            <AddEventStep1 onNext={goToStep2} data={step1Data} />
+            <EventStep1Form
+              defaultValues={step1Data}
+              onSubmit={goToStep2}
+              submitLabel={t("page.events.add.form.submit")}
+              cancel={{
+                as: "link",
+                label: t("page.events.add.form.cancel"),
+                to: "EVENT_LIST",
+              }}
+            />
           )}
           {currentStep === 1 && (
             <AddEventStep2

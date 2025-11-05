@@ -12,10 +12,15 @@ import { useData } from "../../../store/useData";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ButtonProps } from "../../../ui/Button/Button";
+import type { DistributiveOmit } from "../../../helpers/DistributiveOmit";
+import { useState } from "react";
+import { ConfirmDialog } from "../../../ui/ConfirmDialog/ConfirmDialog";
 
 const createStep1DataSchema = (
   t: ReturnType<typeof useTranslation>["t"],
-  events: Record<string, Event>
+  events: Record<string, Event>,
+  excludeEventId?: string
 ) =>
   z.object({
     name: eventSchema.shape.name
@@ -26,7 +31,9 @@ const createStep1DataSchema = (
       .refine(
         (value) =>
           !Object.values(events).some(
-            (event) => event.name.toLowerCase() === value.toLowerCase()
+            (event) =>
+              event._id !== excludeEventId &&
+              event.name.toLowerCase() === value.toLowerCase()
           ),
         t("page.events.add.form.field.name.validation.isUnique")
       ),
@@ -42,34 +49,60 @@ const createStep1DataSchema = (
 
 export type Step1Data = z.infer<ReturnType<typeof createStep1DataSchema>>;
 
-type AddEventStep1Props = {
-  onNext: (data: Step1Data) => void;
-  data: Step1Data;
+type EventStep1FormProps = {
+  defaultValues: Step1Data;
+  onSubmit: (data: Step1Data) => void;
+  submitLabel: string;
+  cancel: DistributiveOmit<ButtonProps, "variant">;
+  excludeEventId?: string;
 };
 
-export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
+const isPeriodReduced = (original: Step1Data, updated: Step1Data): boolean => {
+  const originalStart = original.dates.start.getTime();
+  const originalEnd = original.dates.end.getTime();
+  const updatedStart = updated.dates.start.getTime();
+  const updatedEnd = updated.dates.end.getTime();
+
+  return updatedStart > originalStart || updatedEnd < originalEnd;
+};
+
+export function EventStep1Form({
+  defaultValues,
+  onSubmit,
+  submitLabel,
+  cancel,
+  excludeEventId,
+}: EventStep1FormProps) {
   const { t } = useTranslation();
   const [events] = useData("events");
+  const [pendingData, setPendingData] = useState<Step1Data | null>(null);
   const { control, handleSubmit, formState } = useForm<Step1Data>({
-    defaultValues: data,
+    defaultValues,
     mode: "onBlur",
-    resolver: zodResolver(createStep1DataSchema(t, events)),
+    resolver: zodResolver(createStep1DataSchema(t, events, excludeEventId)),
   });
   const hasError = Object.keys(formState.errors).length > 0;
+
+  const handleFormSubmit = (data: Step1Data) => {
+    // If excludeEventId exists, we're editing, so check if period is reduced
+    if (excludeEventId && isPeriodReduced(defaultValues, data)) {
+      setPendingData(data);
+    } else {
+      onSubmit(data);
+    }
+  };
+
   return (
-    <Form
-      hasError={hasError}
-      handleSubmit={handleSubmit}
-      submit={{
-        label: t("page.events.add.form.submit"),
-        onClick: onNext,
-      }}
-      cancel={{
-        as: "link",
-        label: t("page.events.add.form.cancel"),
-        to: "EVENT_LIST",
-      }}
-    >
+    <>
+      <Form
+        hasError={hasError}
+        handleSubmit={handleSubmit}
+        submit={{
+          label: submitLabel,
+          onClick: handleFormSubmit,
+        }}
+        cancel={cancel}
+      >
       <Controller
         name="name"
         control={control}
@@ -170,5 +203,29 @@ export function AddEventStep1({ data, onNext }: AddEventStep1Props) {
         )}
       />
     </Form>
+      <ConfirmDialog
+        title={t("EventStep1Form.confirmation.title")}
+        description={t("EventStep1Form.confirmation.description")}
+        isOpen={pendingData !== null}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setPendingData(null);
+          }
+        }}
+        cancel={{
+          label: t("EventStep1Form.confirmation.cancel"),
+          onClick: () => setPendingData(null),
+        }}
+        confirm={{
+          label: t("EventStep1Form.confirmation.confirm"),
+          onClick: () => {
+            if (pendingData) {
+              onSubmit(pendingData);
+              setPendingData(null);
+            }
+          },
+        }}
+      />
+    </>
   );
 }

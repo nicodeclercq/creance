@@ -13,6 +13,8 @@ import { AddActivityModal } from "../../pages/calendar/private/AddActivityModal"
 import type { Activity } from "../../models/Activity";
 import { useCurrentUser } from "../../store/useCurrentUser";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
+import { EditEventModal } from "../../pages/events/private/EditEventModal";
+import type { Step1Data } from "../../pages/events/private/EventStep1Form";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -26,6 +28,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const [_, setEvent] = useData(`events.${event._id}`);
   const [___, setEvents] = useData(`events`);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+  const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const { currentUser } = useCurrentUser();
 
   const addActivity = (activity: Activity) => {
@@ -35,6 +38,22 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
         ...prev.activities,
         [activity._id]: activity,
       },
+    }));
+  };
+
+  const updateEvent = (data: Step1Data) => {
+    setEvent((prev) => ({
+      ...prev,
+      name: data.name,
+      description: data.description,
+      period: {
+        start: data.dates.start,
+        end: data.dates.end,
+        arrival: data.arrival,
+        departure: data.departure,
+      },
+      isAutoClose: data.isAutoClose,
+      updatedAt: new Date(),
     }));
   };
 
@@ -109,6 +128,12 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
         }}
         rightActions={[
           {
+            label: t("page.event.list.actions.editEvent"),
+            icon: "edit",
+            as: "button",
+            onClick: () => setIsEditEventModalOpen(true),
+          },
+          {
             label: t("page.event.list.actions.updateCategories"),
             icon: "folder",
             as: "link",
@@ -178,6 +203,12 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
         setIsOpen={setIsActivityModalOpen}
         onSubmit={addActivity}
         currentUser={currentUser}
+      />
+      <EditEventModal
+        event={event}
+        isOpen={isEditEventModalOpen}
+        setIsOpen={setIsEditEventModalOpen}
+        onSubmit={updateEvent}
       />
     </>
   );
