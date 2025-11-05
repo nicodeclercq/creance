@@ -5,8 +5,11 @@ import { I18nProvider } from "react-aria";
 import { LoadingPage } from "./pages/loading/LoadingPage";
 import { Router } from "./router";
 import { StoreProvider } from "./store/StoreProvider";
+import { useTheme } from "./hooks/useTheme";
 
 function App() {
+  useTheme();
+
   return (
     <I18nProvider locale="fr-FR">
       <DialogStackHook />

@@ -36,13 +36,22 @@
 }
 .isOverlay:hover::after{
   background: var(--ui-semantic-color-primary-weaker);
-  mix-blend-mode: multiply;
   opacity: 0.5;
 }
 .isOverlay:active::after{
   background: var(--ui-semantic-color-primary-weak);
-  mix-blend-mode: multiply;
   opacity: 0.5;
+}
+
+:global([data-theme="light"]) .isOverlay:hover::after, 
+:global([data-theme="light"]) .isOverlay:active::after {
+  mix-blend-mode: multiply;
+}
+
+:global([data-theme="dark"]) .isOverlay,
+:global([data-theme="dark"]) .isOverlay:hover::after, 
+:global([data-theme="dark"]) .isOverlay:active::after {
+  mix-blend-mode: lighten;
 }
 
 .hasVariant-primary {
