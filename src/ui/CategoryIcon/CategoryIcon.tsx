@@ -1,6 +1,7 @@
 import { computeRandomColor } from "../Avatar/Avatar";
 import { computeSize } from "../Icon/Icon";
 import { type CategoryIconName, CATEGORY_ICONS } from "./private";
+import styles from "./CategoryIcon.module.css";
 
 type Size = "s" | "m" | "l";
 
@@ -18,6 +19,7 @@ export function CategoryIcon({ name, size, label }: IconProps) {
   return (
     <div
       data-component="CategoryIcon"
+      className={styles.icon}
       style={{
         color: "white",
         background: color,
@@ -31,7 +33,6 @@ export function CategoryIcon({ name, size, label }: IconProps) {
         height: computedSize,
         fontSize: "1.5em",
         boxShadow: "var(--ui-shadow-inset-subtle)",
-        mixBlendMode: "multiply",
       }}
       aria-hidden={!label ? undefined : true}
       aria-label={label}

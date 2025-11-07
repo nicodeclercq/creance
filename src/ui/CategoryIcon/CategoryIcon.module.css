@@ -1,0 +1,7 @@
+:global([data-theme="light"]) .icon {
+  mix-blend-mode: multiply;
+}
+
+:global([data-theme="dark"]) .icon {
+  mix-blend-mode: lighten;
+}

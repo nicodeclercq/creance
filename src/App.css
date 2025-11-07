@@ -162,7 +162,7 @@
 
 [data-theme="dark"] {
   --ui-primitive-_grey-hue: 145;
-  --ui-primitive-_grey-saturation: 1%;
+  --ui-primitive-_grey-saturation: 5%;
   --ui-primitive-grey-000: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 95%);
   --ui-primitive-grey-100: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 90%);
   --ui-primitive-grey-200: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 80%);
@@ -176,7 +176,7 @@
   --ui-primitive-grey-1000: hsl(var(--ui-primitive-_grey-hue), var(--ui-primitive-_grey-saturation), 1%);
 
   --ui-primitive-_green-hue: 110;
-  --ui-primitive-_green-saturation: 30%;
+  --ui-primitive-_green-saturation: 45%;
   --ui-primitive-green-100: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 90%);
   --ui-primitive-green-200: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 80%);
   --ui-primitive-green-300: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 72%);
@@ -200,7 +200,7 @@
   --ui-primitive-bright-green-900: hsl(var(--ui-primitive-_bright-green-hue), var(--ui-primitive-_bright-green-saturation), 10%);
 
   --ui-primitive-_red-hue: 355;
-  --ui-primitive-_red-saturation: 75%;
+  --ui-primitive-_red-saturation: 85%;
   --ui-primitive-red-100: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 90%);
   --ui-primitive-red-200: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 80%);
   --ui-primitive-red-300: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 72%);
@@ -212,7 +212,7 @@
   --ui-primitive-red-900: hsl(var(--ui-primitive-_red-hue), var(--ui-primitive-_red-saturation), 10%);
 
   --ui-primitive-_orange-hue: 35;
-  --ui-primitive-_orange-saturation: 90%;
+  --ui-primitive-_orange-saturation: 95%;
   --ui-primitive-orange-100: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 90%);
   --ui-primitive-orange-200: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 80%);
   --ui-primitive-orange-300: hsl(var(--ui-primitive-_orange-hue), var(--ui-primitive-_orange-saturation), 72%);
@@ -256,8 +256,8 @@
   --ui-border-default: var(--ui-semantic-borderWeight) solid var(--ui-primitive-grey-800);
   --ui-border-dashed: var(--ui-semantic-borderWeight) dashed var(--ui-primitive-grey-800);
   --ui-border-inverted: var(--ui-semantic-borderWeight) solid var(--ui-semantic-color-inverted);
-  --ui-background-body: var(--ui-primitive-grey-900);
-  --ui-background-default: var(--ui-primitive-grey-1000);
+  --ui-background-body: var(--ui-primitive-grey-1000);
+  --ui-background-default: var(--ui-primitive-grey-900);
   --ui-background-inverted: var(--ui-primitive-green-500);
   --ui-semantic-color-inverted: var(--ui-primitive-grey-1000);
   --ui-shadow-default: 0 0.1rem 0 hsl(from var(--ui-primitive-grey-800) h s l / 0.1),
