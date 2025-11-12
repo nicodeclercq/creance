@@ -14,6 +14,7 @@ import { Logger } from "../../service/Logger";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
 import { ROUTES } from "../../routes";
+import { Select } from "../../ui/FormField/Select/Select";
 import { Stack } from "../../ui/Stack/Stack";
 import { fork } from "../../helpers/fp-ts";
 import { lastUpdate } from "../../service/synchronize";
@@ -21,8 +22,12 @@ import { pipe } from "fp-ts/function";
 import { resetStore } from "../../store/reset";
 import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { useTheme, type Theme } from "../../hooks/useTheme";
 import { useTranslation } from "react-i18next";
+import { LightThemeImage } from "./private/LightThemeImage";
+import { DarkThemeImage } from "./private/DarkThemeImage";
+import { SystemThemeImage } from "./private/SystemThemeImage";
 
 function Item({ label, date }: { label: string; date: Date }) {
   return (
@@ -37,10 +42,22 @@ function Item({ label, date }: { label: string; date: Date }) {
   );
 }
 
+const ThemeImage = ({ theme }: { theme: Theme | "system" }): ReactNode => {
+  switch (theme) {
+    case "light":
+      return <LightThemeImage />;
+    case "dark":
+      return <DarkThemeImage />;
+    case "system":
+      return <SystemThemeImage />;
+  }
+};
+
 export function InformationPage() {
   const { t } = useTranslation();
   const { goTo, back } = useRoute();
   const [hasImportError, setHasImportError] = useState(false);
+  const { theme, changeTheme } = useTheme();
 
   const [currentParticipantId] = useData("account.currentUser._id");
   const [events, setEvents] = useData("events");
@@ -77,6 +94,20 @@ export function InformationPage() {
       })
     );
 
+  const themeOptions = [
+    { id: "light", label: t("settings.theme.light"), value: "light" as const },
+    { id: "dark", label: t("settings.theme.dark"), value: "dark" as const },
+    {
+      id: "system",
+      label: t("settings.theme.system"),
+      value: "system" as const,
+    },
+  ];
+
+  const setThemeSetting = (theme: Theme | "system") => {
+    changeTheme(theme === "system" ? undefined : theme);
+  };
+
   return (
     <PageTemplate
       title={t("page.information.title")}
@@ -95,6 +126,20 @@ export function InformationPage() {
             <Paragraph styles={{ font: "body-smaller", color: "neutral-weak" }}>
               {currentParticipantId}
             </Paragraph>
+          </Stack>
+        </Card>
+        <Card>
+          <Stack gap="s">
+            <Paragraph styles={{ font: "body-large" }}>
+              {t("settings.theme.title")}
+            </Paragraph>
+            <Select
+              label={t("settings.theme.label")}
+              value={theme ?? "system"}
+              onChange={setThemeSetting}
+              options={themeOptions}
+              valueRenderer={({ value }) => <ThemeImage theme={value} />}
+            />
           </Stack>
         </Card>
         <Card>

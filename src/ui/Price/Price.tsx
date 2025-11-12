@@ -52,10 +52,6 @@ export function Price({
     >
       {pipe(
         calculatedAmount,
-        (a) => {
-          console.log("a", a);
-          return a;
-        },
         Either.map((a) => centToDecimal(`${a}`)),
         Either.fold(
           () => <>-</>,

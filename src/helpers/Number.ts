@@ -14,7 +14,6 @@ export function centToDecimal(
   const part1 = asString.substring(0, asString.length - 2);
   const part2 = asString.substring(asString.length - 2, asString.length);
   const result = `${part1}.${part2}`;
-  console.log("result", result, calculation);
   return result.padStart(minChars, " ");
 }
 
