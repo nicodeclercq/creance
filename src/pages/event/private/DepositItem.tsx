@@ -52,7 +52,7 @@ export function DepositItem({
         <ExchangeMoneyIcon strokeWidth={0.5} />
       </span>
       <Stack>
-        <Price styles={{ font: "body-small" }}>{deposit.amount}</Price>
+        <Price styles={{ fontSize: "small" }}>{deposit.amount}</Price>
         <Columns align="center" gap="s">
           <AvatarGroup
             avatars={[

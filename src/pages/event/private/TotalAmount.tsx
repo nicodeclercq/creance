@@ -7,12 +7,11 @@ import { Card } from "../../../ui/Card/Card";
 import type { Category } from "../../../models/Category";
 import { Either } from "../../../ui/Either";
 import type { Expense } from "../../../models/Expense";
-import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { PieChart } from "../../../ui/Pie/PieChart";
+import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
 import { centToDecimal } from "../../../helpers/Number";
 import { computeRandomColor } from "../../../ui/Avatar/Avatar";
-import { useTranslation } from "react-i18next";
 
 type TotalAmountProps = {
   expenses: Expense[];
@@ -20,23 +19,22 @@ type TotalAmountProps = {
 };
 
 export function TotalAmount({ expenses, categories }: TotalAmountProps) {
-  const { t } = useTranslation();
 
   return (
     <Card>
       <Stack alignItems="center" gap="s">
         <Either
           data={getTotalExpenseAmount(expenses)}
-          onLeft={() => <Paragraph>-</Paragraph>}
+          onLeft={() => <Price type="total">0</Price>}
           onRight={(totalAmount) => (
-            <Paragraph styles={{ font: "body-large" }}>
-              {t("page.event.total", { value: centToDecimal(totalAmount) })}
-            </Paragraph>
+            <Price type="total" styles={{ fontSize: "large" }}>
+              {totalAmount}
+            </Price>
           )}
         />
         <Either
           data={getExpenseAmountByCategory(expenses)}
-          onLeft={() => <Paragraph>-</Paragraph>}
+          onLeft={() => <></>}
           onRight={(amountByCategory) => (
             <PieChart
               data={Object.entries(amountByCategory).map(([key, value]) => ({
@@ -45,7 +43,6 @@ export function TotalAmount({ expenses, categories }: TotalAmountProps) {
                 value: centToDecimal(value),
                 color: computeRandomColor(categories[key].icon),
               }))}
-              valueFormatter={(value) => t("component.price.value", { value })}
             />
           )}
         />

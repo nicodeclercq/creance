@@ -7,7 +7,7 @@ import { Card } from "../../../ui/Card/Card";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { Icon } from "../../../ui/Icon/Icon";
 import { useTranslation, Trans } from "react-i18next";
-import { centToDecimal } from "../../../helpers/Number";
+import { Price } from "../../../ui/Price/Price";
 import * as ArrayFp from "fp-ts/Array";
 import { pipe } from "fp-ts/function";
 import styles from "./DistributionItem.module.css";
@@ -109,23 +109,30 @@ export function DistributionItem({
                             name={type === "give" ? "minus" : "plus"}
                             size="s"
                           />
-                          {type === "give"
-                            ? t("page.distribution.gives.value", {
-                                value: centToDecimal(amount),
+                          <Paragraph>
+                            <Trans
+                              i18nKey={
+                                type === "give"
+                                  ? "page.distribution.gives.value"
+                                  : "page.distribution.receives.value"
+                              }
+                              values={{
+                                value: amount,
                                 participant: isCurrentUser(
                                   participants[participantId]
                                 )
                                   ? t("currentUser.anonymous.name")
                                   : participants[participantId].name,
-                              })
-                            : t("page.distribution.receives.value", {
-                                value: centToDecimal(amount),
-                                participant: isCurrentUser(
-                                  participants[participantId]
-                                )
-                                  ? t("currentUser.anonymous.name")
-                                  : participants[participantId].name,
-                              })}
+                              }}
+                              components={{
+                                Price: (
+                                  <Price key="price" as="span">
+                                    {amount}
+                                  </Price>
+                                ),
+                              }}
+                            />
+                          </Paragraph>
                         </Columns>
                       </li>
                     )

@@ -5,13 +5,17 @@ import { pipe } from "fp-ts/function";
 
 const ALLOWER_CHARS = "0-9.,+*()-/";
 
-export function centToDecimal(calculation: string | number) {
+export function centToDecimal(
+  calculation: string | number,
+  minChars: number = 6
+) {
   const asString = `${calculation}`.split(".")[0];
 
   const part1 = asString.substring(0, asString.length - 2);
   const part2 = asString.substring(asString.length - 2, asString.length);
-
-  return `${part1}.${part2}`;
+  const result = `${part1}.${part2}`;
+  console.log("result", result, calculation);
+  return result.padStart(minChars, " ");
 }
 
 export function calculationAsNumber(

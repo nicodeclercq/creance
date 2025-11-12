@@ -1,20 +1,23 @@
 import * as Either from "fp-ts/Either";
 
-import type { ParagraphProps } from "../Paragraph/Paragraph";
-import { Paragraph } from "../Paragraph/Paragraph";
 import { calculationAsNumber, centToDecimal } from "../../helpers/Number";
+
 import { pipe } from "fp-ts/function";
 import { useTranslation } from "react-i18next";
+
 type PriceProps = {
+  as?: "p" | "span";
   children: string | number;
   type?: "default" | "sum" | "total";
-  styles?: ParagraphProps["styles"];
+  styles?: { fontSize: "large" | "default" | "small" | "smaller" };
+  props?: React.HTMLAttributes<HTMLParagraphElement | HTMLSpanElement>;
 };
 
 export function Price({
+  as: As = "p",
   children,
   type = "default",
-  styles = { font: "body-large" },
+  styles = { fontSize: "default" },
 }: PriceProps) {
   const { t } = useTranslation();
   const calculatedAmount =
@@ -37,10 +40,22 @@ export function Price({
     }
   };
 
+  const font = `var(--ui-semantic-font-price-${styles.fontSize})`;
+
   return (
-    <Paragraph data-component="Price" styles={styles}>
+    <As
+      data-component="Price"
+      style={{
+        font,
+        whiteSpace: "pre",
+      }}
+    >
       {pipe(
         calculatedAmount,
+        (a) => {
+          console.log("a", a);
+          return a;
+        },
         Either.map((a) => centToDecimal(`${a}`)),
         Either.fold(
           () => <>-</>,
@@ -50,9 +65,9 @@ export function Price({
                 value: value.startsWith("-") ? value.slice(1) : value,
               })}
             </>
-          ),
-        ),
+          )
+        )
       )}
-    </Paragraph>
+    </As>
   );
 }

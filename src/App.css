@@ -1,3 +1,9 @@
+@font-face {
+  font-family: "Anonymous Pro";
+  src: url("/AnonymousPro-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
 
 :root {
   --ui-semantic-font-body-smaller: normal 1.2rem / 1.6rem roboto, sans-serif;
@@ -7,7 +13,13 @@
   --ui-semantic-font-input: normal 1.6rem / 2rem roboto, sans-serif;
   --ui-semantic-font-body-large: normal 2rem / 2.4rem roboto, sans-serif;
   --ui-semantic-font-body-larger: normal 3.2rem / 4rem roboto, sans-serif;
-  
+
+  --ui-semantic-font-price-larger: normal 2rem / 2.4rem Anonymous Pro, sans-serif;
+  --ui-semantic-font-price-large: normal 2rem / 2.4rem Anonymous Pro, sans-serif;
+  --ui-semantic-font-price-default: normal 1.6rem / 2.4rem Anonymous Pro, sans-serif;
+  --ui-semantic-font-price-small: normal 1.4rem / 1.6rem Anonymous Pro, sans-serif;
+  --ui-semantic-font-price-smaller: normal 1.2rem / 1.6rem Anonymous Pro, sans-serif;
+
   --ui-semantic-font-action-default: bold 1.6rem / 2.4rem roboto, sans-serif;
   
   --ui-primitive-spacing-xs: 0.2rem;
@@ -186,6 +198,7 @@
   --ui-primitive-green-700: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 30%);
   --ui-primitive-green-800: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 20%);
   --ui-primitive-green-900: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 10%);
+  --ui-primitive-green-1000: hsl(var(--ui-primitive-_green-hue), var(--ui-primitive-_green-saturation), 3%);
 
   --ui-primitive-_bright-green-hue: 80;
   --ui-primitive-_bright-green-saturation: 90%;
@@ -256,10 +269,10 @@
   --ui-border-default: var(--ui-semantic-borderWeight) solid var(--ui-primitive-grey-800);
   --ui-border-dashed: var(--ui-semantic-borderWeight) dashed var(--ui-primitive-grey-800);
   --ui-border-inverted: var(--ui-semantic-borderWeight) solid var(--ui-semantic-color-inverted);
-  --ui-background-body: var(--ui-primitive-grey-1000);
+  --ui-background-body: var(--ui-primitive-green-1000);
   --ui-background-default: var(--ui-primitive-grey-900);
-  --ui-background-inverted: var(--ui-primitive-green-500);
-  --ui-semantic-color-inverted: var(--ui-primitive-grey-1000);
+  --ui-background-inverted: var(--ui-primitive-green-800);
+  --ui-semantic-color-inverted: var(--ui-primitive-green-200);
   --ui-shadow-default: 0 0.1rem 0 hsl(from var(--ui-primitive-grey-800) h s l / 0.1),
     0.2rem 0.2rem 0.4rem hsl(from var(--ui-primitive-grey-800) h s l / 0.2);
   --ui-semantic-shadow-l: 0 0.1rem 0 hsl(from var(--ui-primitive-grey-800) h s l / 0.1),

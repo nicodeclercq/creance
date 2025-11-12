@@ -1,4 +1,7 @@
 import { PieChart as Chart, pieArcLabelClasses } from "@mui/x-charts";
+
+import { Price } from "../Price/Price";
+
 type Data = {
   id: string;
   label: string;
@@ -9,10 +12,9 @@ type Data = {
 type PieProps = {
   label?: string;
   data: Data[];
-  valueFormatter: (value: string) => string;
 };
 
-export function PieChart({ data, valueFormatter, label }: PieProps) {
+export function PieChart({ data, label }: PieProps) {
   return (
     <Chart
       data-component="PieChart"
@@ -22,7 +24,14 @@ export function PieChart({ data, valueFormatter, label }: PieProps) {
         {
           data: data.map((item) => ({
             id: item.id,
-            label: `${item.label}: ${valueFormatter(item.value)}`,
+            label: (
+              <>
+                {item.label}:{" "}
+                <Price as="span" styles={{ fontSize: "smaller" }}>
+                  {item.value}
+                </Price>
+              </>
+            ) as unknown as string,
             value: parseFloat(item.value),
             color: item.color,
           })),

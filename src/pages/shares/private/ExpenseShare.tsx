@@ -58,7 +58,6 @@ export function ExpenseShare({
                 key in event.categories ? event.categories[key].icon : key
               ),
             }))}
-            valueFormatter={(value) => t("component.price.value", { value })}
           />
         </Container>
         <Divider />
