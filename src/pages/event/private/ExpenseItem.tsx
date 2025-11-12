@@ -49,7 +49,9 @@ export function ExpenseItem({
     >
       <CategoryIcon name={category.icon} label={category.name} />
       <Stack>
-        <Price>{expense.amount}</Price>
+        <Paragraph styles={{ font: "body-smaller" }}>
+          <DateFormatter>{expense.date}</DateFormatter>
+        </Paragraph>
         <Columns align="center" gap="s">
           <Avatar
             label={
@@ -67,9 +69,8 @@ export function ExpenseItem({
           </Paragraph>
         </Columns>
       </Stack>
-      <Paragraph styles={{ font: "body-smaller" }}>
-        <DateFormatter>{expense.date}</DateFormatter>
-      </Paragraph>
+      <Price>{expense.amount}</Price>
+
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}

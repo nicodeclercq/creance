@@ -9,7 +9,7 @@ type PriceProps = {
   as?: "p" | "span";
   children: string | number;
   type?: "default" | "sum" | "total";
-  styles?: { fontSize: "large" | "default" | "small" | "smaller" };
+  styles?: { fontSize: "larger" | "large" | "default" | "small" | "smaller" };
   props?: React.HTMLAttributes<HTMLParagraphElement | HTMLSpanElement>;
 };
 

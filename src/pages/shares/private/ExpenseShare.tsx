@@ -43,9 +43,18 @@ export function ExpenseShare({
           <Heading level={2} styles={{ font: "body-large", flexGrow: true }}>
             {t("page.participantshare.shares.title")}
           </Heading>
-          <Price type="total">{total}</Price>
+          <Price type="total" styles={{ fontSize: "large" }}>
+            {total}
+          </Price>
         </Columns>
-        <Container styles={{ textAlign: "center" }}>
+        <Container
+          styles={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <PieChart
             data={Object.entries(sharesByCategory).map(([key, value]) => ({
               id: key,

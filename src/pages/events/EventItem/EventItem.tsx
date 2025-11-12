@@ -5,7 +5,9 @@ import type { Event } from "../../../models/Event";
 import { IconButton } from "../../../ui/IconButton/IconButton";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import type { Participant } from "../../../models/Participant";
+import { Price } from "../../../ui/Price/Price";
 import { Stack } from "../../../ui/Stack/Stack";
+import { asNumber } from "../../../helpers/Number";
 import { useTranslation } from "react-i18next";
 
 type EventItemProps = {
@@ -14,18 +16,28 @@ type EventItemProps = {
 };
 
 export function EventItem({
-  event: { name, _id, participants: eventParticipants, isClosed = false },
+  event: {
+    name,
+    _id,
+    participants: eventParticipants,
+    isClosed = false,
+    expenses,
+  },
   participants,
 }: EventItemProps) {
   const { t } = useTranslation();
   const eventParticipantIds = Object.keys(eventParticipants);
+
+  const totalAmount = Object.values(expenses).reduce((sum, expense) => {
+    return sum + asNumber(expense.amount);
+  }, 0);
 
   return (
     <Columns
       as="li"
       align="center"
       gap="m"
-      template={["max-content", "1fr", "max-content"]}
+      template={["max-content", "1fr", "max-content", "max-content"]}
       styles={{
         position: "relative",
         padding: "s",
@@ -52,6 +64,7 @@ export function EventItem({
           />
         </Columns>
       </Stack>
+      <Price>{totalAmount}</Price>
       <IconButton
         as="link"
         overlays

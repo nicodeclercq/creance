@@ -164,7 +164,7 @@
   "component.price.sum.positive": "+ {value, number, ::currency/EUR}",
   "component.price.sum.negative": "- {value, number, ::currency/EUR}",
   "component.price.total": "= {value, number, ::currency/EUR}",
-  "page.event.total": "Total: {value, number, ::currency/EUR}",
+  "page.event.total": "Total: <Price>{{value}}</Price>",
   "page.event.expenseList.actions.more": "Afficher les actions",
   "page.event.expenseList.actions.edit": "Modifier la dépense",
   "page.event.expenseList.actions.delete": "Supprimer la dépense",

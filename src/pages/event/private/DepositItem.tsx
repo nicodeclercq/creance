@@ -52,7 +52,9 @@ export function DepositItem({
         <ExchangeMoneyIcon strokeWidth={0.5} />
       </span>
       <Stack>
-        <Price styles={{ fontSize: "small" }}>{deposit.amount}</Price>
+        <Paragraph styles={{ font: "body-smaller" }}>
+          <DateFormatter>{deposit.date}</DateFormatter>
+        </Paragraph>
         <Columns align="center" gap="s">
           <AvatarGroup
             avatars={[
@@ -71,9 +73,7 @@ export function DepositItem({
           </Paragraph>
         </Columns>
       </Stack>
-      <Paragraph styles={{ font: "body-smaller" }}>
-        <DateFormatter>{deposit.date}</DateFormatter>
-      </Paragraph>
+      <Price>{deposit.amount}</Price>
       {!isClosed && (
         <Menu
           label={t("page.event.expenseList.actions.more")}
