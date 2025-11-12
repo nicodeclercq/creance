@@ -21,9 +21,16 @@
 
   &:hover {
     background: var(--ui-semantic-color-primary-strong);
+    :global([data-theme="dark"]) & {
+      color: var(--ui-background-body);
+    }
   }
 
   &.isActive {
     background: var(--ui-semantic-color-primary-default);
+    :global([data-theme="dark"]) & {
+      color: var(--ui-background-body);
+      border-color: var(--ui-primitive-green-600);
+    }
   }
 }

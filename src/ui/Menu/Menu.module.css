@@ -7,6 +7,10 @@
     outline: none;
     box-shadow: var(--ui-shadow-focus);
   }
+
+  :global([data-theme="dark"]) & {
+    border: 0.1rem solid currentColor;
+  }
 }
 
 .action {
