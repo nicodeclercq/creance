@@ -32,14 +32,6 @@ export type MergeableCollection<T> = {
   updatedAt: Date;
 };
 
-type MergeableState<T extends Record<string, unknown>> = {
-  [k in keyof T]: T[k] extends Record<string, unknown>
-    ? MergeableState<T[k]>
-    : T[k];
-} & {
-  updatedAt: Date;
-};
-
 export const createEmptyMergeableCollection = <
   T,
 >(): MergeableCollection<T> => ({

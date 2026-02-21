@@ -2,9 +2,11 @@ import { Observable } from "rxjs";
 import { pipe } from "fp-ts/function";
 
 import { Logger } from "../../service/Logger";
-import { createRemoteAdapter, type RemoteAdapter } from "./createRemoteAdapter";
+import { createRemoteAdapter } from "./createRemoteAdapter";
 import { createUserId, type UserId } from "./shared/alias";
 import type { AuthManager } from "./AuthManager";
+import type { RemoteAdapter } from "../createStore";
+import type { State } from "../state";
 
 const DB_NAME = "creance-db";
 const DB_VERSION = 1;
@@ -36,7 +38,7 @@ const persistUserId = (userId: UserId | undefined): void =>
 
 export const createIndexedDBAdapter = (config?: {
   authManager?: AuthManager;
-}): RemoteAdapter => {
+}): RemoteAdapter<State> => {
   const state: IndexedDBState = {
     db: undefined,
     userId: readPersistedUserId(),
