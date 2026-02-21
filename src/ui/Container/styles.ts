@@ -113,7 +113,15 @@ type JustifyContent =
   | "space-around"
   | "space-evenly";
 type TextAlign = "default" | "start" | "center" | "end";
-type Radius = "none" | "s" | "m" | "l" | "round";
+type RadiusValues = "none" | "s" | "m" | "l" | "round";
+type Radius =
+  | RadiusValues
+  | Partial<{
+      topLeft: RadiusValues;
+      topRight: RadiusValues;
+      bottomLeft: RadiusValues;
+      bottomRight: RadiusValues;
+    }>;
 type Border =
   | "none"
   | "default"
@@ -141,7 +149,7 @@ export type Styles = {
   bottom?: WithMediaQuery<number | string>;
   left?: WithMediaQuery<number | string>;
   right?: WithMediaQuery<number | string>;
-  padding?: Spacing;
+  padding?: WithMediaQuery<Spacing | { x?: Spacing; y?: Spacing }>;
   gridTemplateColumns?: WithMediaQuery<GridTemplate> | undefined;
   gridTemplateRows?: WithMediaQuery<GridTemplate> | undefined;
   gridTemplateAreas?: WithMediaQuery<string> | undefined;
@@ -366,10 +374,10 @@ function computePadding(
   value: Spacing | { x?: Spacing; y?: Spacing } = "none"
 ) {
   if (typeof value === "object") {
-    const { x, y } = value;
+    const { x = "none", y = "none" } = value;
     return [
-      x === "none" ? "0" : `var(--ui-semantic-padding-${x})`,
-      y === "none" ? "0" : `var(--ui-semantic-padding-${y})`,
+      y === "none" ? "0" : `var(--ui-semantic-padding-y-${y})`,
+      x === "none" ? "0" : `var(--ui-semantic-padding-x-${x})`,
     ].join(" ");
   }
   return value === "none" ? "0" : `var(--ui-semantic-padding-${value})`;
@@ -407,12 +415,33 @@ function computeDistance(value: number | string) {
   return typeof value === "string" ? value : `${value / 10}rem`;
 }
 function computeRadius(value: Radius = "none") {
-  return value === "none"
-    ? undefined
-    : {
-        "--layout-container-radius": `var(--ui-semantic-radius-${value})`,
-        borderRadius: `var(--ui-semantic-radius-${value})`,
-      };
+  if (value === "none") {
+    return undefined;
+  }
+  if (typeof value === "string") {
+    return {
+      "--layout-container-radius": `var(--ui-semantic-radius-${value})`,
+      borderRadius: `var(--ui-semantic-radius-${value})`,
+    };
+  }
+  return {
+    borderTopLeftRadius:
+      value.topLeft === "none"
+        ? undefined
+        : `var(--ui-semantic-radius-${value.topLeft})`,
+    borderBottomLeftRadius:
+      value.bottomLeft === "none"
+        ? undefined
+        : `var(--ui-semantic-radius-${value.bottomLeft})`,
+    left:
+      value.bottomRight === "none"
+        ? undefined
+        : `var(--ui-semantic-radius-${value.bottomRight})`,
+    borderTopRightRadius:
+      value.topRight === "none"
+        ? undefined
+        : `var(--ui-semantic-radius-${value.topRight})`,
+  };
 }
 function computeShadow(value: ShadowStyles = "none") {
   return value === "none"

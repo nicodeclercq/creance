@@ -2,6 +2,8 @@ import * as z from "zod";
 
 import { asNumber, isValidCalculation } from "../helpers/Number";
 
+import { mergeableRecord } from "./mergeable";
+
 export const defaultShareSchema = z.strictObject({
   type: z.literal("default"),
 });
@@ -35,7 +37,7 @@ export const shareSchema = z.union([
 ]);
 export type Share = z.infer<typeof shareSchema>;
 
-export const expenseSchema = z.strictObject({
+export const expenseSchema = mergeableRecord({
   _id: z.string().max(100, "Expense.validation.id.maxLength"),
   reason: z.string().max(100, "Expense.validation.reason.maxLength"),
   category: z.string().max(100, "Expense.validation.category.maxLength"),
@@ -53,10 +55,6 @@ export const expenseSchema = z.strictObject({
   date: z.union([z.string().transform((date) => new Date(date)), z.date()]),
   share: shareSchema,
   lender: z.string().max(100, "Expense.validation.lender.maxLength"),
-  updatedAt: z.union([
-    z.string().transform((date) => new Date(date)),
-    z.date(),
-  ]),
 });
 
 export type Expense = z.infer<typeof expenseSchema>;

@@ -1,4 +1,5 @@
 import { AddParticipantsForm } from "../events/private/AddParticipantsForm";
+import { addMergeableCollectionItem, updateMergeableCollectionItem } from "../../models/mergeable";
 import { Button } from "../../ui/Button/Button";
 import { Card } from "../../ui/Card/Card";
 import { Columns } from "../../ui/Columns/Columns";
@@ -18,7 +19,7 @@ export function EventUsersPage() {
   const { eventId } = useParams();
   const { t } = useTranslation();
   const [showAddParticipantForm, setShowAddParticipantForm] = useState(false);
-  const [currentEvent, setEvent] = useData(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
@@ -28,23 +29,25 @@ export function EventUsersPage() {
     setShowAddParticipantForm(false);
     setEvent((event) => ({
       ...event,
-      participants: {
-        ...event.participants,
-        [participant._id]: participant,
-      },
+      participants: addMergeableCollectionItem(
+        participant._id,
+        participant,
+        event.participants
+      ),
     }));
   };
 
   const deleteShare = (participantId: string) => {
     setEvent((event) => ({
       ...event,
-      participants: {
-        ...event.participants,
-        [participantId]: {
-          ...event.participants[participantId],
+      participants: updateMergeableCollectionItem(
+        participantId,
+        {
+          ...event.participants.collection[participantId],
           participantShare: { type: "default" },
         },
-      },
+        event.participants
+      ),
     }));
   };
 
@@ -88,7 +91,7 @@ export function EventUsersPage() {
         >
           <AddParticipantsForm
             onAdd={addParticipant}
-            participants={Object.values(currentEvent.participants)}
+            participants={Object.values(currentEvent.participants.collection)}
           />
         </Modal>
       )}

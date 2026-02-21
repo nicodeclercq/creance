@@ -1,5 +1,5 @@
 export type CacheStorageMessage =
-  | { type: "init"; name: string; defaultState: string }
+  | { type: "init"; name: string }
   | { type: "read"; name: string }
   | { type: "write"; name: string; data: string }
   | { type: "clear"; name: string };
@@ -8,6 +8,7 @@ export type CacheStorageResponse =
   | { type: "init-success" }
   | { type: "init-error"; error: string }
   | { type: "read-success"; data: string }
+  | { type: "read-empty" }
   | { type: "read-error"; error: string }
   | { type: "write-success" }
   | { type: "write-error"; error: string }
@@ -22,7 +23,7 @@ self.onmessage = (event: MessageEvent<CacheStorageMessage>): void => {
   const handler = (() => {
     switch (message.type) {
       case "init":
-        return init(message.name, message.defaultState);
+        return init(message.name);
       case "read":
         return read(message.name);
       case "write":
@@ -37,28 +38,13 @@ self.onmessage = (event: MessageEvent<CacheStorageMessage>): void => {
   handler.catch((error) => postError(message.type, error));
 };
 
-function init(name: string, defaultState: string): Promise<void> {
+function init(name: string): Promise<void> {
   if (!("caches" in self)) {
     return Promise.reject(new Error("CacheStorage API is not supported"));
   }
 
   return caches
     .open(name)
-    .then((cache) => {
-      return cache.match(STORAGE_KEY).then((response) => {
-        if (!response) {
-          return cache.put(
-            STORAGE_KEY,
-            new Response(defaultState, {
-              headers: {
-                "Content-Type": "application/json",
-                "Cache-Control": "no-cache",
-              },
-            })
-          );
-        }
-      });
-    })
     .then(() =>
       postMessage({ type: "init-success" } satisfies CacheStorageResponse)
     )
@@ -78,18 +64,14 @@ function read(name: string): Promise<void> {
   return caches
     .open(name)
     .then((cache) => cache.match(STORAGE_KEY))
-    .then((response) => {
-      if (!response) {
-        throw new Error("No data found in cache");
-      }
-      return response.text();
-    })
-    .then((text) => {
-      return postMessage({
-        type: "read-success",
-        data: text,
-      } satisfies CacheStorageResponse);
-    })
+    .then((response) => (response ? response.text() : undefined))
+    .then((text) =>
+      postMessage(
+        text
+          ? ({ type: "read-success", data: text } satisfies CacheStorageResponse)
+          : ({ type: "read-empty" } satisfies CacheStorageResponse),
+      ),
+    )
     .catch((error) => {
       postMessage({
         type: "read-error",

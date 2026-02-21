@@ -1,34 +1,25 @@
-import * as RX from "rxjs";
+import { useContext, useSyncExternalStore } from "react";
 
-import { useContext, useEffect, useState } from "react";
-
-import { Logger } from "../service/Logger";
 import type { State } from "./state";
-import type { Store } from "./StoreManager";
 import { StoreContext } from "./StoreProvider";
-import { StoreManager } from "./StoreManager";
+import type { StoreState } from "./StoreProvider";
 
-export function useStore() {
-  const store = useContext(StoreContext);
-  const [state, setState] = useState<Store<State>>(store.getValue());
+export const useStoreSelector = <T>(
+  select: (state: StoreState<State>) => T,
+): T => {
+  const context = useContext(StoreContext);
+  if (context === null) {
+    throw new Error("useStore must be used within a Provider");
+  }
 
-  useEffect(() => {
-    const subscription = store
-      .pipe(RX.distinctUntilChanged(), RX.map(Logger.log("state")))
-      .subscribe({
-        next: setState,
-      });
+  return useSyncExternalStore(
+    (callback) => {
+      const subscription = context.stateSubject.subscribe(callback);
+      return () => subscription.unsubscribe();
+    },
+    () => select(context.stateSubject.getValue()),
+  );
+};
 
-    return () => subscription.unsubscribe();
-  }, [store]);
-
-  const change = (map: (oldValue: Store<State>) => Store<State>) => {
-    const currentValue = store.getValue();
-
-    if (StoreManager.hasData(currentValue)) {
-      StoreManager.update(map(currentValue));
-    }
-  };
-
-  return [state, change] as const;
-}
+export const useStore = (): StoreState<State> =>
+  useStoreSelector((state) => state);

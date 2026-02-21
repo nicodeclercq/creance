@@ -26,9 +26,9 @@ export function EventItem({
   participants,
 }: EventItemProps) {
   const { t } = useTranslation();
-  const eventParticipantIds = Object.keys(eventParticipants);
+  const eventParticipantIds = Object.keys(eventParticipants.collection);
 
-  const totalAmount = Object.values(expenses).reduce((sum, expense) => {
+  const totalAmount = Object.values(expenses.collection).reduce((sum, expense) => {
     return sum + asNumber(expense.amount);
   }, 0);
 

@@ -3,6 +3,7 @@ import { CategoryForm } from "./CategoryForm";
 import { DEFAULT_CATEGORY_ICON } from "../../../models/Category";
 import { uid } from "../../../service/crypto";
 import { useTranslation } from "react-i18next";
+import { createMergeableRecord } from "../../../models/mergeable";
 
 type AddCategoryFormProps = {
   categories: Category[];
@@ -20,11 +21,11 @@ export function AddCategoryForm({
   return (
     <CategoryForm
       categories={categories}
-      data={{
+      data={createMergeableRecord({
         _id: uid(),
         name: "",
         icon: DEFAULT_CATEGORY_ICON,
-      }}
+      })}
       submitLabel={t("page.events.add.form.category.submit")}
       cancelLabel={t("page.events.add.form.category.cancel")}
       onSubmit={onAdd}

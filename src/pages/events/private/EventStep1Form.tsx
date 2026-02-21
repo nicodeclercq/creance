@@ -79,7 +79,7 @@ export function EventStep1Form({
   const { control, handleSubmit, formState } = useForm<Step1Data>({
     defaultValues,
     mode: "onBlur",
-    resolver: zodResolver(createStep1DataSchema(t, events, excludeEventId)),
+    resolver: zodResolver(createStep1DataSchema(t, events.collection, excludeEventId)),
   });
   const hasError = Object.keys(formState.errors).length > 0;
 

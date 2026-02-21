@@ -29,8 +29,11 @@ describe("Crypto Service", () => {
 
     expect(typeof exportedKeys.publicKey).toBe("string");
     expect(typeof exportedKeys.privateKey).toBe("string");
-    expect(importedKeys.publicKey).toEqual(keys.publicKey);
-    expect(importedKeys.privateKey).toEqual(keys.privateKey);
+
+    const originalText = "round-trip test";
+    const encoded = await encode(originalText, importedKeys.publicKey);
+    const decoded = await decode(encoded, importedKeys.privateKey);
+    expect(decoded).toBe(originalText);
   });
 
   it("should encrypt and decrypt a string with imported keys", async () => {

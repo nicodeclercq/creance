@@ -4,6 +4,7 @@ import type { Category } from "../../models/Category";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Redirect } from "../../Redirect";
+import { updateMergeableCollection } from "../../models/mergeable";
 import { useData } from "../../store/useData";
 import { useParams } from "react-router-dom";
 import { useRoute } from "../../hooks/useRoute";
@@ -13,7 +14,7 @@ export function CategoriesPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const { goTo } = useRoute();
-  const [currentEvent, setEvent] = useData(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
@@ -26,11 +27,9 @@ export function CategoriesPage() {
   const updateCategories = (categories: Category[]) => {
     setEvent((event) => ({
       ...event,
-      categories: categories.reduce((acc, category) => {
-        acc[category._id] = category;
-        return acc;
-      }, {} as Record<string, Category>),
+      categories: updateMergeableCollection(categories),
     }));
+
     goTo("EVENT", { eventId: currentEvent._id });
   };
 
@@ -38,7 +37,7 @@ export function CategoriesPage() {
     <PageTemplate title={t("page.event.categories.title")}>
       <Card>
         <CategoriesForm
-          defaultCategories={Object.values(currentEvent.categories)}
+          defaultCategories={Object.values(currentEvent.categories.collection)}
           cancel={{
             label: t("page.event.categories.actions.cancel"),
             onClick: () => goTo("EVENT", { eventId: currentEvent._id }),

@@ -21,7 +21,7 @@ export type MenuProps = {
 export function Menu({ actions, gridArea }: MenuProps) {
   return (
     <Container
-      data-component="Menu"
+      data-component="TEST"
       styles={{
         zIndex: 1,
         gridArea,
@@ -63,13 +63,16 @@ export function Menu({ actions, gridArea }: MenuProps) {
             right: "inverted",
           },
         },
+        padding: {
+          y: "none",
+        },
         customCSSProperties: {
           "--ui-component-menu-margin-top": {
             default: "0",
             md: "4.8rem",
           },
           "--ui-component-menu-padding-y": {
-            default: "var(--ui-semantic-padding-y-xs)",
+            default: "var(--ui-semantic-padding-y-m)",
             md: "var(--ui-semantic-padding-y-l)",
           },
           "--ui-component-menu-border-active-bottom": {

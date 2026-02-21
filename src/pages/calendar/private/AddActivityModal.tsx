@@ -2,6 +2,7 @@ import type { Activity } from "../../../models/Activity";
 import { ActivityForm } from "./ActivityForm";
 import { Modal } from "../../../ui/Modal/Modal";
 import type { User } from "../../../models/User";
+import { createMergeableRecord } from "../../../models/mergeable";
 import { uid } from "../../../service/crypto";
 import { useTranslation } from "react-i18next";
 
@@ -21,7 +22,7 @@ const createActivity = (
   const endDate = new Date(defaultDate);
   endDate.setHours(endDate.getHours() + 1);
 
-  return {
+  return createMergeableRecord({
     _id: uid(),
     name: "",
     description: "",
@@ -30,8 +31,7 @@ const createActivity = (
     endDate,
     proposedBy: currentUser._id,
     reservationRequired: false,
-    updatedAt: new Date(),
-  };
+  });
 };
 
 export function AddActivityModal({

@@ -7,7 +7,7 @@ export function DarkThemeImage() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_3232_1444)">
+      <g clipPath="url(#clip0_3232_1444)">
         <circle cx="12" cy="12" r="12" fill="#4825C5" />
         <circle cx="18.5" cy="16.5" r="0.5" fill="#FCB723" />
         <circle cx="15.5" cy="10.5" r="0.5" fill="#FCB723" />

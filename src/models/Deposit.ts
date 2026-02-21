@@ -2,7 +2,9 @@ import * as z from "zod";
 
 import { asNumber, isValidCalculation } from "../helpers/Number";
 
-export const depositSchema = z.strictObject({
+import { mergeableRecord } from "./mergeable";
+
+export const depositSchema = mergeableRecord({
   _id: z.string().max(100, "Deposit.validation.id.maxLength"),
   amount: z
     .string()
@@ -18,10 +20,6 @@ export const depositSchema = z.strictObject({
   from: z.string().max(100, "Deposit.validation.from.maxLength"),
   to: z.string().max(100, "Deposit.validation.to.maxLength"),
   note: z.string().max(100, "Deposit.validation.note.maxLength"),
-  updatedAt: z.union([
-    z.string().transform((date) => new Date(date)),
-    z.date(),
-  ]),
   date: z.union([z.string().transform((date) => new Date(date)), z.date()]),
 });
 

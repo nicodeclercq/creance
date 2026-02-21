@@ -46,7 +46,7 @@ export function Menu({
         className={classNames(
           buttonStyles.button,
           iconButtonStyles.button,
-          buttonStyles[`hasVariant-${variant}`]
+          buttonStyles[`hasVariant-${variant}`],
         )}
         aria-label={label}
       >

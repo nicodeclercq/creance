@@ -1,16 +1,19 @@
 .pigContainer {
-  position: relative;
+  position: absolute;
   color: #fff;
-  top: 4rem;
+  top: -8rem;
+  left: 50%;
+  transform: translateX(-50%);
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
   border-radius: var(--ui-semantic-radius-round);
-  background-color: var(--ui-semantic-color-primary-stronger);
+  background-color: var(--ui-semantic-color-primary-default);
+  color: var(--ui-background-default);
   z-index: 1;
-  border: 0.5rem solid #fff;
+  border: 0.5rem solid currentColor;
   box-shadow: var(--ui-semantic-shadow-l);
   max-width: 12rem;
 }

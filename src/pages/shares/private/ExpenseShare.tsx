@@ -59,12 +59,12 @@ export function ExpenseShare({
             data={Object.entries(sharesByCategory).map(([key, value]) => ({
               id: key,
               label:
-                key in event.categories
-                  ? event.categories[key].name
+                key in event.categories.collection
+                  ? event.categories.collection[key].name
                   : t(key === "deposit" ? "deposit" : "category.unknwon"),
               value: centToDecimal(value),
               color: computeRandomColor(
-                key in event.categories ? event.categories[key].icon : key
+                key in event.categories.collection ? event.categories.collection[key].icon : key
               ),
             }))}
           />
@@ -74,8 +74,8 @@ export function ExpenseShare({
           <Stack key={expense._id}>
             <Columns gap="m" align="center">
               <CategoryIcon
-                name={event.categories[expense.category].icon}
-                label={event.categories[expense.category].name}
+                name={event.categories.collection[expense.category].icon}
+                label={event.categories.collection[expense.category].name}
                 size="m"
               />
               <Stack>

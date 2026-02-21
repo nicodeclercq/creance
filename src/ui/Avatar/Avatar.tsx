@@ -22,6 +22,7 @@ function computeSize(value: Size = "m") {
 }
 
 export function computeRandomColor(label: string) {
+  // Used to make similar values farther one form the other
   const shuffledValues = [
     14, 0, 20, 64, 30, 52, 26, 70, 34, 9, 1, 68, 4, 10, 37, 29, 55, 19, 6, 65,
     32, 43, 36, 62, 46, 71, 12, 49, 45, 66, 56, 3, 42, 38, 24, 47, 39, 50, 13,
@@ -38,8 +39,8 @@ export function computeRandomColor(label: string) {
   const hue =
     shuffledValues[value % shuffledValues.length] *
     (360 / shuffledValues.length);
-  const sat = `${50 + 10 * (value % 5)}%`;
-  const light = `${30 + 4 * (value % 5)}%`;
+  const sat = `${50 + 10 * (value % 4)}%`; // min: 50, max: 80
+  const light = `${30 + 4 * (value % 5)}%`; // min: 30, max: 46
   return `hsl(${hue}, ${sat}, ${light})`;
 }
 
@@ -49,6 +50,7 @@ function computeFirstLetters(label: string, length: number) {
 
 export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
   const computedSize = computeSize(size);
+  const backgroundColor = computeRandomColor(label);
 
   return (
     <div
@@ -58,7 +60,7 @@ export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
         position: "relative",
         aspectRatio: "1/1",
         backgroundImage: image ? `url(${image})` : undefined,
-        backgroundColor: computeRandomColor(label),
+        backgroundColor,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -66,7 +68,7 @@ export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: "white",
+        color: `oklch(from ${backgroundColor} round(1.21 - L) 0 0)`,
         width: computedSize,
         height: computedSize,
         fontSize: `calc(${computedSize} / 2)`,
@@ -76,11 +78,11 @@ export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
         boxShadow:
           "var(--ui-shadow-inset-subtle), 0 0 0 0.1rem hsl(from var(--ui-primitive-grey-200) h s l / 0.1)",
         borderRadius: "var(--ui-semantic-radius-round)",
+        transition: "background-color ease-in 0.2s, color ease-in 0.2s",
+        lineHeight: 1,
       }}
     >
-      <span aria-hidden="true">
-        {image ? undefined : computeFirstLetters(label, 2)}
-      </span>
+      <span aria-hidden="true">{computeFirstLetters(label, 2)}</span>
       {statusIcon && (
         <div className={styles.statusIcon}>
           <Icon name={statusIcon} size="s" />

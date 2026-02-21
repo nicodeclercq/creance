@@ -14,7 +14,7 @@ const wait = (ms: number): Promise<never> =>
   });
 
 const getRequestIdFromResponse = (response: CacheStorageResponse): string =>
-  response.type.replace(/-success|-error/, "");
+  response.type.replace(/-success|-error|-empty/, "");
 
 export const createCacheWorkerClient = (name: string) => {
   const worker = new CacheStorageWorker();
@@ -58,7 +58,6 @@ export const createCacheWorkerClient = (name: string) => {
     sendMessage({
       type: "init",
       name,
-      defaultState: "",
     }).then((response) => {
       if (response.type === "init-error") {
         throw new Error(response.error);
@@ -69,6 +68,9 @@ export const createCacheWorkerClient = (name: string) => {
     sendMessage({ type: "read", name }).then((response) => {
       if (response.type === "read-error") {
         throw new Error(response.error);
+      }
+      if (response.type === "read-empty") {
+        return undefined;
       }
       if (response.type === "read-success") {
         return response.data;

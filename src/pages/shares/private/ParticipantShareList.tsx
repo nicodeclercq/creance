@@ -72,7 +72,7 @@ export function ParticipantShareList({
   );
 
   const depositShares = pipe(
-    getDepositShares({ event, participants: event.participants }),
+    getDepositShares({ event, participants: event.participants.collection }),
     Either.map((deposits) =>
       deposits[participantId]
         ? deposits[participantId].sort((a, b) => -1 * sort(a.date, b.date))

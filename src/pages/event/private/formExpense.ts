@@ -11,6 +11,7 @@ import { Logger } from "../../../service/Logger";
 import type { Participant } from "../../../models/Participant";
 import type { UseFormSetError } from "react-hook-form";
 import { calculationAsNumber } from "../../../helpers/Number";
+import { createMergeableRecord } from "../../../models/mergeable";
 import type { i18n } from "i18next";
 import { pipe } from "fp-ts/function";
 
@@ -74,13 +75,14 @@ export const toExpense = (
 
   switch (data.share.type) {
     case "default":
-      return Either.right({
-        ...data,
-        amount: data.amount,
-        date: data.date,
-        share: { type: "default" } as DefaultShare,
-        updatedAt: new Date(),
-      });
+      return Either.right(
+        createMergeableRecord({
+          ...data,
+          amount: data.amount,
+          date: data.date,
+          share: { type: "default" } as DefaultShare,
+        })
+      );
     case "fixed":
       const fixedDistribution = Object.entries(
         data.share.fixedParticipant
@@ -107,14 +109,15 @@ export const toExpense = (
 
       return pipe(
         fixedDistribution,
-        Either.map((distribution) => ({
-          ...data,
-          share: {
-            type: "fixed",
-            distribution,
-          } as FixedShare,
-          updatedAt: new Date(),
-        }))
+        Either.map((distribution) =>
+          createMergeableRecord({
+            ...data,
+            share: {
+              type: "fixed",
+              distribution,
+            } as FixedShare,
+          })
+        )
       );
     case "percentage":
       const percentageDistribution = Object.entries(
@@ -143,14 +146,15 @@ export const toExpense = (
 
       return pipe(
         percentageDistribution,
-        Either.map((distribution) => ({
-          ...data,
-          share: {
-            type: "percentage",
-            distribution,
-          } as PercentageShare,
-          updatedAt: new Date(),
-        }))
+        Either.map((distribution) =>
+          createMergeableRecord({
+            ...data,
+            share: {
+              type: "percentage",
+              distribution,
+            } as PercentageShare,
+          })
+        )
       );
   }
 };

@@ -119,7 +119,7 @@ function getDefaultExpenseShares({
   event: Event;
 }): Either.Either<Error, Record<string, number>> {
   return pipe(
-    Object.values(event.participants),
+    Object.values(event.participants.collection),
     (participants) =>
       participants.reduce(
         (counts, participant) => ({
@@ -247,13 +247,13 @@ export function getExpenseShares({
       case "fixed":
         return getFixedExpenseShares({
           distribution: share.distribution,
-          participants: event.participants,
+          participants: event.participants.collection,
         });
       case "percentage":
         return getPercentageExpenseShares({
           expense,
           distribution: share.distribution,
-          participants: event.participants,
+          participants: event.participants.collection,
         });
     }
   });
@@ -272,7 +272,7 @@ function getEventShares({
   event: Event;
 }): Either.Either<Error, Readonly<ExpenseShare[]>> {
   return pipe(
-    Object.values(event.expenses),
+    Object.values(event.expenses.collection),
     (expenses) =>
       expenses.map((expense) =>
         pipe(
@@ -352,7 +352,7 @@ export function getDepositShares({
   );
 
   return pipe(
-    Object.values(event.deposits),
+    Object.values(event.deposits.collection),
     ArrayFP.map((deposit) =>
       pipe(
         calculationAsNumber(deposit.amount),
@@ -390,15 +390,13 @@ export function getDepositShares({
 
 export function getDepositSharesByParticipants({
   event,
-  participants,
   currentParticipantId,
 }: {
   event: Event;
-  participants: Record<string, Participant>;
   currentParticipantId: string;
 }): Either.Either<Error, number> {
   return pipe(
-    getDepositShares({ event, participants }),
+    getDepositShares({ event, participants: event.participants.collection }),
     Either.map((shares) => getTotalDepositAmount(shares[currentParticipantId]))
   );
 }
@@ -415,7 +413,7 @@ export function getParticipantTotalExpenseAmount({
   participantId: string;
 }): Either.Either<Error, number> {
   return pipe(
-    Object.values(event.expenses),
+    Object.values(event.expenses.collection),
     ArrayFP.map((expense) =>
       expense.lender === participantId
         ? calculationAsNumber(expense.amount)
@@ -442,7 +440,7 @@ export function getParticipantTotalExpensesAmount({
   participantId: string;
 }): Either.Either<Error, number> {
   return pipe(
-    Object.values(event.expenses),
+    Object.values(event.expenses.collection),
     ArrayFP.map((expense) =>
       expense.lender === participantId
         ? calculationAsNumber(expense.amount)
@@ -464,7 +462,7 @@ export function getEventDistribution({
 }: {
   event: Event;
 }): Either.Either<Error, Record<string, Distribution[]>> {
-  const participantsTotalDueAmount = Object.keys(event.participants).reduce(
+  const participantsTotalDueAmount = Object.keys(event.participants.collection).reduce(
     (acc, participantId) =>
       pipe(
         getEventSharesByParticipant({ event, participantId }),
@@ -487,12 +485,11 @@ export function getEventDistribution({
     Error,
     Record<string, number>
   > = pipe(
-    Object.keys(event.participants),
+    Object.keys(event.participants.collection),
     ArrayFP.map((participantId) =>
       pipe(
         getDepositSharesByParticipants({
           event,
-          participants: event.participants,
           currentParticipantId: participantId,
         }),
         Either.map((amount) => [participantId, amount] as const)
@@ -502,7 +499,7 @@ export function getEventDistribution({
     Either.map(Object.fromEntries)
   );
 
-  const participantsTotalPayedAmount = Object.keys(event.participants).reduce(
+  const participantsTotalPayedAmount = Object.keys(event.participants.collection).reduce(
     (acc, participantId) =>
       pipe(
         getParticipantTotalExpenseAmount({ event, participantId }),
@@ -532,7 +529,7 @@ export function getEventDistribution({
         participantsTotalDepositAmount,
       }) => {
         const mergedPayedAndDepositAmounts = Object.keys(
-          event.participants
+          event.participants.collection
         ).reduce(
           (acc, participantId) => ({
             ...acc,
@@ -543,7 +540,7 @@ export function getEventDistribution({
           {} as Record<string, number>
         );
 
-        const remainingDue = Object.keys(event.participants).reduce(
+        const remainingDue = Object.keys(event.participants.collection).reduce(
           (acc, participantId) => ({
             ...acc,
             [participantId]:

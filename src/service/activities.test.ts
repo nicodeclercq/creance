@@ -1,6 +1,7 @@
 import { createEvent, createParticipant } from "./test-helpers";
 import { describe, expect, it } from "vitest";
 
+import { PAST_DATE } from "../models/mergeable";
 import { getPresenceByDays } from "./activities";
 
 describe("getPresenceByDays", () => {
@@ -17,7 +18,8 @@ describe("getPresenceByDays", () => {
         departure: "AM",
       },
       participants: {
-        [user1._id]: user1,
+        collection: { [user1._id]: user1 },
+        updatedAt: PAST_DATE,
       },
     });
 
@@ -80,7 +82,8 @@ describe("getPresenceByDays", () => {
         departure: "AM",
       },
       participants: {
-        [user1._id]: user1,
+        collection: { [user1._id]: user1 },
+        updatedAt: PAST_DATE,
       },
     });
 
@@ -140,8 +143,11 @@ describe("getPresenceByDays", () => {
         departure: "AM",
       },
       participants: {
-        [user1._id]: user1,
-        [user2._id]: user2,
+        collection: {
+          [user1._id]: user1,
+          [user2._id]: user2,
+        },
+        updatedAt: PAST_DATE,
       },
     });
 

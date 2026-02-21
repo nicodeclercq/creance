@@ -1,28 +1,42 @@
 import * as z from "zod";
 
-import { accountSchema } from "../../models/Account";
-import { eventSchema } from "../../models/Event";
 import { ANONYMOUS_USER, userSchema } from "../../models/User";
+import {
+  PAST_DATE,
+  createEmptyMergeableCollection,
+  mergeableCollection,
+  updatedAtSchema,
+} from "../../models/mergeable";
+import { accountSchema, createEmptyAccount } from "../../models/Account";
+
 import { Logger } from "../../service/Logger";
-import { openDialog } from "../../ui/DialogProvider/DialogStackHook";
-import { ResetStateConfirmationDialog } from "./ResetStateConfirmationDialog";
+import { eventSchema } from "../../models/Event";
 
 export const stateSchemaV0 = z.strictObject({
-  users: z.record(z.string().max(100), userSchema),
-  events: z.record(z.string().max(100), eventSchema),
+  users: mergeableCollection(userSchema),
+  events: mergeableCollection(eventSchema),
   account: accountSchema,
+  updatedAt: updatedAtSchema,
 });
 
 export type StateV0 = z.infer<typeof stateSchemaV0>;
 
-const DEFAULT_STATE_V0 = {
-  account: {
-    currentUser: ANONYMOUS_USER,
-    events: {},
-  },
-  events: {},
-  users: {},
-} satisfies StateV0;
+export const DEFAULT_STATE_V0: StateV0 = {
+  account: createEmptyAccount(ANONYMOUS_USER),
+  events: createEmptyMergeableCollection(),
+  users: createEmptyMergeableCollection(),
+  updatedAt: PAST_DATE,
+};
+
+export const validateStateV0 = (state: unknown): StateV0 => {
+  const parsed = stateSchemaV0.safeParse(state);
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  Logger.error("State validation failed")(parsed.error);
+  throw new Error("State is invalid");
+};
 
 export const validateOrDefaultsToStateV0 = (
   state: unknown
@@ -32,18 +46,24 @@ export const validateOrDefaultsToStateV0 = (
     return parsed.data;
   }
 
-  if (state !== undefined) {
-    Logger.error("Invalid state")(state, parsed.error);
-    return openDialog({
-      component: ResetStateConfirmationDialog,
-      title: "ResetStateConfirmationDialog.title",
-    }).then((result) => {
-      if (result.type === "submit") {
-        return DEFAULT_STATE_V0;
-      } else {
-        throw new Error("State is invalid");
-      }
-    });
+  if (state === undefined) {
+    return DEFAULT_STATE_V0;
   }
-  return DEFAULT_STATE_V0;
+
+  Logger.error("Invalid state")(state);
+  return Promise.all([
+    import("../../ui/DialogProvider/DialogStackHook"),
+    import("./ResetStateConfirmationDialog"),
+  ])
+    .then(([{ openDialog }, { ResetStateConfirmationDialog }]) =>
+      openDialog({
+        component: ResetStateConfirmationDialog,
+        title: "ResetStateConfirmationDialog.title",
+      })
+    )
+    .then((result) =>
+      result.type === "submit"
+        ? DEFAULT_STATE_V0
+        : Promise.reject(new Error("State is invalid"))
+    );
 };

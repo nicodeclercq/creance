@@ -16,6 +16,10 @@ import { uid } from "../../../service/crypto";
 import { useData } from "../../../store/useData";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  addMergeableCollectionItem,
+  createMergeableRecord,
+} from "../../../models/mergeable";
 
 export type Step3Data = {
   participants: Participant[];
@@ -52,6 +56,8 @@ const UserRenderer = ({
               top: "75%",
               left: "0",
               display: "inline-block",
+              height: "1.6rem",
+              width: "1.6rem",
             }}
           >
             <Icon name="check" size="s" />
@@ -90,7 +96,7 @@ export function AddEventStep3({
   };
 
   const addParticipant = (data: FormData) => {
-    const user: User = {
+    const user: User = createMergeableRecord({
       _id: uid(),
       name: data.name,
       avatar: data.avatar,
@@ -98,17 +104,13 @@ export function AddEventStep3({
         adults: data.share.adults,
         children: data.share.children,
       },
-      updatedAt: new Date(),
-    };
+    });
     const newParticipant: Participant = {
       ...user,
       participantShare: { type: "default" },
     };
 
-    setUsers((users) => ({
-      ...users,
-      [user._id]: user,
-    }));
+    setUsers((users) => addMergeableCollectionItem(user._id, user, users));
     setSelection((s) => [...s, newParticipant]);
     setIsFormOpen(false);
   };
@@ -154,7 +156,7 @@ export function AddEventStep3({
       )}
       <CheckboxList
         onChange={onSelectionChange}
-        items={Object.values(users)
+        items={Object.values(users.collection)
           .filter((user) => user._id !== account?.currentUser._id)
           .map((user) => ({
             label: user.name,
@@ -195,7 +197,7 @@ export function AddEventStep3({
             onCancel: () => setIsFormOpen(false),
           }}
           submitLabel={t("AddEventStep3.modal.addParticipant.submit")}
-          users={users}
+          users={users.collection}
         />
       </Modal>
     </Form>

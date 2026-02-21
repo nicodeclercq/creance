@@ -8,15 +8,15 @@ import { useParams } from "react-router-dom";
 
 export function EventParticipantSharePage() {
   const { eventId } = useParams();
-  const [currentEvent] = useData(`events.${eventId}`);
-  const [currentParticipantId] = useData(`account.events.${eventId}.uid`);
+  const [currentEvent] = useData(`events.collection.${eventId}`);
+  const [currentParticipantId] = useData(`account.events.collection.${eventId}.uid`);
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
 
-  if (Object.keys(currentEvent.expenses).length === 0) {
+  if (Object.keys(currentEvent.expenses.collection).length === 0) {
     return (
       <EventPageTemplate event={currentEvent}>
         <EmptyEvent event={currentEvent} />

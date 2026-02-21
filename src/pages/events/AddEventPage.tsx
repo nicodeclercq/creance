@@ -4,7 +4,6 @@ import { AddEventStep2 } from "./private/AddEventStep2";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Stepper } from "../../ui/Stepper/Stepper";
 import { useState } from "react";
-import type { Category } from "../../models/Category";
 import { DEFAULT_CATEGORIES } from "../../models/Category";
 import type { Step3Data } from "./private/AddEventStep3";
 import { AddEventStep3 } from "./private/AddEventStep3";
@@ -13,9 +12,15 @@ import { Card } from "../../ui/Card/Card";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
 import { generateKey, uid } from "../../service/crypto";
-import type { Participant } from "../../models/Participant";
 import type { Account } from "../../models/Account";
 import { EventStep1Form } from "./private/EventStep1Form";
+import {
+  addMergeableCollectionItem,
+  createEmptyMergeableCollection,
+  createMergeableRecord,
+  updateMergeableCollection,
+  updateMergeableRecord,
+} from "../../models/mergeable";
 
 const now = new Date();
 
@@ -46,14 +51,13 @@ export function AddEventPage() {
   });
   const [step3Data, setStep3Data] = useState<Step3Data>({
     participants: [
-      {
+      createMergeableRecord({
         _id: account.currentUser._id,
         name: account.currentUser.name,
-        updatedAt: new Date(),
         avatar: account.currentUser.avatar,
         share: account.currentUser.share,
         participantShare: { type: "default" },
-      },
+      }),
     ],
   });
 
@@ -80,51 +84,43 @@ export function AddEventPage() {
       .then(() => generateKey(uid()))
       .then((eventKey) => {
         setStep3Data(data);
-        setEvents((events) => ({
-          ...events,
-          [eventId]: {
-            _id: eventId,
-            name: step1Data.name,
-            participants: data.participants.reduce(
-              (acc, participant) => ({
-                ...acc,
-                [participant._id]: {
-                  ...participant,
-                  updatedAt: new Date(),
-                  participantShare: { type: "default" },
-                },
-              }),
-              {} as Record<string, Participant>
-            ),
-            period: {
-              start: dates.start,
-              end: dates.end,
-              arrival: step1Data.arrival,
-              departure: step1Data.departure,
+        setEvents((events) =>
+          addMergeableCollectionItem(
+            eventId,
+            {
+              _id: eventId,
+              name: step1Data.name,
+              participants: updateMergeableCollection(data.participants),
+              period: {
+                start: dates.start,
+                end: dates.end,
+                arrival: step1Data.arrival,
+                departure: step1Data.departure,
+              },
+              description: step1Data.description,
+              expenses: createEmptyMergeableCollection(),
+              deposits: createEmptyMergeableCollection(),
+              categories: updateMergeableCollection(step2Data.categories),
+              activities: createEmptyMergeableCollection(),
+              mealManager: {},
             },
-            description: step1Data.description,
-            expenses: {},
-            deposits: {},
-            categories: step2Data.categories.reduce(
-              (acc, category) => ({ ...acc, [category._id]: category }),
-              {} as Record<string, Category>
-            ),
-            activities: {},
-            updatedAt: new Date(),
-            mealManager: {},
-          },
-        }));
+            events
+          )
+        );
 
-        setAccount((account) => ({
-          ...(account as Account),
-          events: {
-            ...account?.events,
-            [eventId]: {
-              key: eventKey,
-              uid: account.currentUser._id,
-            },
-          },
-        }));
+        setAccount((account) =>
+          updateMergeableRecord({
+            ...(account as Account),
+            events: addMergeableCollectionItem(
+              eventId,
+              {
+                key: eventKey,
+                uid: account.currentUser._id,
+              },
+              account.events
+            ),
+          })
+        );
 
         goTo("EVENT_LIST");
       });

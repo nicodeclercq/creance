@@ -1,3 +1,4 @@
+import { addMergeableCollectionItem } from "../../models/mergeable";
 import { Card } from "../../ui/Card/Card";
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
@@ -17,9 +18,9 @@ export function AddTransactionPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const { goTo } = useRoute();
-  const [currentEvent, setEvent] = useData(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
   const participants = useEventParticipants(eventId);
-  const [currentParticipantId] = useData(`account.events.${eventId}.uid`);
+  const [currentParticipantId] = useData(`account.events.collection.${eventId}.uid`);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
@@ -30,25 +31,27 @@ export function AddTransactionPage() {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
   }
 
-  const defaultCategory = Object.values(currentEvent.categories)[0];
+  const defaultCategory = Object.values(currentEvent.categories.collection)[0];
   const firstParticipant = Object.values(participants)[0];
 
   const handleSubmit = (transaction: Transaction) => {
     if (transaction.type === "expense") {
       setEvent((event) => ({
         ...event,
-        expenses: {
-          ...event.expenses,
-          [transaction.data._id]: transaction.data,
-        },
+        expenses: addMergeableCollectionItem(
+          transaction.data._id,
+          transaction.data,
+          event.expenses
+        ),
       }));
     } else {
       setEvent((event) => ({
         ...event,
-        deposits: {
-          ...event.deposits,
-          [transaction.data._id]: transaction.data,
-        },
+        deposits: addMergeableCollectionItem(
+          transaction.data._id,
+          transaction.data,
+          event.deposits
+        ),
       }));
     }
     goTo(ROUTES.EVENT, { eventId: currentEvent._id });

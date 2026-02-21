@@ -9,6 +9,7 @@ export type DialogConfig<T = unknown> = {
     defaultData?: T;
   }) => ReactNode;
   title: string;
+  isDismissable?: boolean;
 };
 
 export type DialogResult<T> = { type: "submit"; data: T } | { type: "cancel" };
@@ -44,7 +45,7 @@ export function Dialog({ instance, onClose }: DialogProps) {
     <Modal
       title={t(instance.config.title)}
       isOpen={true}
-      isDismissable={true}
+      isDismissable={instance.config.isDismissable ?? true}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           handleCancel();

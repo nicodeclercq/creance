@@ -23,7 +23,7 @@ export function getActivitiesByDays(event: Event): Record<string, Activity[]> {
       activitiesByDays[dayString] = [];
     }
 
-    Object.values(event.activities).forEach((activity) => {
+    Object.values(event.activities.collection).forEach((activity) => {
       if (
         dateToKey(activity.startDate) === dayString ||
         dateToKey(activity.endDate) === dayString
@@ -78,7 +78,7 @@ export function getPresenceByDays(event: Event): Record<string, Presence> {
 
   return period.reduce(
     (presenceByDays, day) =>
-      Object.values(event.participants).reduce(
+      Object.values(event.participants.collection).reduce(
         (presenceByDays, participant) => {
           const dayString = dateToKey(day);
           if (!(dayString in presenceByDays)) {

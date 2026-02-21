@@ -4,6 +4,7 @@ import { EventParticipantShareForm } from "../participants/private/EventParticip
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import type { ParticipantShare } from "../../models/ParticipantShare";
 import { Redirect } from "../../Redirect";
+import { updateMergeableCollectionItem } from "../../models/mergeable";
 import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
@@ -14,7 +15,7 @@ export function ParticipantSharePage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
   const { eventId, participantId } = useParams();
-  const [currentEvent, setEvent] = useData(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
@@ -31,18 +32,19 @@ export function ParticipantSharePage() {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
   }
 
-  const share = currentEvent.participants[participantId].participantShare;
+  const share = currentEvent.participants.collection[participantId].participantShare;
 
   const saveShare = (data: ParticipantShare) => {
     setEvent((event) => ({
       ...event,
-      participants: {
-        ...event.participants,
-        [participantId]: {
-          ...event.participants[participantId],
+      participants: updateMergeableCollectionItem(
+        participantId,
+        {
+          ...event.participants.collection[participantId],
           participantShare: data,
         },
-      },
+        event.participants
+      ),
     }));
     goTo("EVENT_USERS", { eventId: currentEvent._id });
   };

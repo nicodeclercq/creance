@@ -55,14 +55,22 @@ export const uid = () => crypto.randomUUID();
 
 export const generateKey = (secret: string): Promise<string> => {
   const encoder = new TextEncoder();
-  const saltedSecret = `${salt}${secret}${salt}`;
-  const data = encoder.encode(saltedSecret);
 
   return crypto.subtle
-    .digest("SHA-256", data)
-    .then((hashBuffer) =>
-      btoa(String.fromCharCode(...new Uint8Array(hashBuffer)))
-    );
+    .importKey("raw", encoder.encode(secret), "PBKDF2", false, ["deriveBits"])
+    .then((baseKey) =>
+      crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          salt: encoder.encode(salt),
+          iterations: 600_000,
+          hash: "SHA-256",
+        },
+        baseKey,
+        256,
+      ),
+    )
+    .then((bits) => btoa(String.fromCharCode(...new Uint8Array(bits))));
 };
 
 export const generateKeyPair = () =>

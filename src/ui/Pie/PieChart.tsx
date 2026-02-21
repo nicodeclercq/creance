@@ -48,6 +48,9 @@ export function PieChart({ data, label }: PieProps) {
           font: "var(--ui-semantic-font-body-smaller)",
           fill: "var(--ui-semantic-color-neutral-default)",
         },
+        "& .MuiPieArc-root": {
+          strokeWidth: 0,
+        },
       }}
       slotProps={{
         legend: {

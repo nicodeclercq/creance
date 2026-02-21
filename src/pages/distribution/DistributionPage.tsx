@@ -17,15 +17,15 @@ import { useTranslation } from "react-i18next";
 export function DistributionPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
-  const [currentEvent] = useData(`events.${eventId}`);
-  const [currentParticipantId] = useData(`account.events.${eventId}.uid`);
+  const [currentEvent] = useData(`events.collection.${eventId}`);
+  const [currentParticipantId] = useData(`account.events.collection.${eventId}.uid`);
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
   }
   const participants = useEventParticipants(eventId);
 
-  if (Object.keys(currentEvent.expenses).length === 0) {
+  if (Object.keys(currentEvent.expenses.collection).length === 0) {
     return (
       <EventPageTemplate event={currentEvent}>
         <EmptyEvent event={currentEvent} />

@@ -34,9 +34,9 @@ export function ExpenseList({
   onDeleteDeposit,
 }: Props) {
   const { t } = useTranslation();
-  const expenses = Object.values(event.expenses);
+  const expenses = Object.values(event.expenses.collection);
 
-  const deposits = Object.values(event.deposits);
+  const deposits = Object.values(event.deposits.collection);
 
   const deleteExpense = (expenseId: string) => () => {
     onDeleteExpense(expenseId);
@@ -59,7 +59,7 @@ export function ExpenseList({
         <EmptyEvent event={event} />
       ) : (
         <Stack gap="m">
-          <TotalAmount expenses={expenses} categories={event.categories} />
+          <TotalAmount expenses={expenses} categories={event.categories.collection} />
           <Card>
             <Stack gap="s" alignItems="stretch">
               <Stack as="ol" gap="none">
@@ -70,7 +70,7 @@ export function ExpenseList({
                       isClosed={event.isClosed}
                       eventId={event._id}
                       expense={element.data}
-                      category={event.categories[element.data.category]}
+                      category={event.categories.collection[element.data.category]}
                       participants={participants}
                       onDelete={deleteExpense(element.data._id)}
                     />

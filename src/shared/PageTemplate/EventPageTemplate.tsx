@@ -15,6 +15,11 @@ import { useCurrentUser } from "../../store/useCurrentUser";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 import { EditEventModal } from "../../pages/events/private/EditEventModal";
 import type { Step1Data } from "../../pages/events/private/EventStep1Form";
+import {
+  addMergeableCollectionItem,
+  deleteMergeableCollectionItem,
+  updateMergeableRecord,
+} from "../../models/mergeable";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -25,7 +30,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const currentDay = useRef(dateToKey(new Date()));
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const [_, setEvent] = useData(`events.${event._id}`);
+  const [_, setEvent] = useData(`events.collection.${event._id}`);
   const [___, setEvents] = useData(`events`);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
@@ -34,27 +39,29 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const addActivity = (activity: Activity) => {
     setEvent((prev) => ({
       ...prev,
-      activities: {
-        ...prev.activities,
-        [activity._id]: activity,
-      },
+      activities: addMergeableCollectionItem(
+        activity._id,
+        activity,
+        prev.activities
+      ),
     }));
   };
 
   const updateEvent = (data: Step1Data) => {
-    setEvent((prev) => ({
-      ...prev,
-      name: data.name,
-      description: data.description,
-      period: {
-        start: data.dates.start,
-        end: data.dates.end,
-        arrival: data.arrival,
-        departure: data.departure,
-      },
-      isAutoClose: data.isAutoClose,
-      updatedAt: new Date(),
-    }));
+    setEvent((prev) =>
+      updateMergeableRecord({
+        ...prev,
+        name: data.name,
+        description: data.description,
+        period: {
+          start: data.dates.start,
+          end: data.dates.end,
+          arrival: data.arrival,
+          departure: data.departure,
+        },
+        isAutoClose: data.isAutoClose,
+      })
+    );
   };
 
   const actions = [
@@ -93,11 +100,9 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           icon: "trash",
           onClick: () => {
             // No need to clean up global expenses since they're embedded in events
-            setEvents((currentEvents) => {
-              const updatedEvents = { ...currentEvents };
-              delete updatedEvents[event._id];
-              return updatedEvents;
-            });
+            setEvents((currentEvents) =>
+              deleteMergeableCollectionItem(event._id, currentEvents)
+            );
             goTo("EVENT_LIST");
           },
         },

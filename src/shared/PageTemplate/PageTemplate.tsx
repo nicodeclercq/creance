@@ -106,6 +106,10 @@ export function PageTemplate<R extends RouteName>({
           padding: "m",
           gridArea: "content",
           background: "body",
+          radius: {
+            default: "none",
+            md: { topLeft: "l" },
+          },
           height: "100%",
           overflow: "auto",
           display: "flex",

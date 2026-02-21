@@ -7,7 +7,6 @@ import { fromExpense, toExpense } from "./formExpense";
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import type { ButtonProps } from "../../../ui/Button/Button";
 import { CategoryIcon } from "../../../ui/CategoryIcon/CategoryIcon";
-import type { CategoryIconName } from "../../../ui/CategoryIcon/private";
 import { Columns } from "../../../ui/Columns/Columns";
 import type { DistributiveOmit } from "../../../helpers/DistributiveOmit";
 import { ErrorMessage } from "../../../ui/FormField/ErrorMessage/ErrorMessage";
@@ -24,6 +23,7 @@ import { RadioGroup } from "../../../ui/Form/RadioGroup/RadioGroup";
 import { Select } from "../../../ui/FormField/Select/Select";
 import type { Transaction } from "../../../models/Transaction";
 import { asNumber } from "../../../helpers/Number";
+import { createMergeableRecord } from "../../../models/mergeable";
 import { depositSchema } from "../../../models/Deposit";
 import type { i18n } from "i18next";
 import { pipe } from "fp-ts/function";
@@ -64,7 +64,7 @@ const formSchema = z
       if (data.share.type === "percentage") {
         const sum = Object.values(data.share.percentageParticipant).reduce(
           (acc: number, val) => acc + asNumber(val),
-          0
+          0,
         );
 
         if (sum === 0) {
@@ -85,12 +85,12 @@ const formSchema = z
                 path: ["share"],
               });
             }
-          }
+          },
         );
       } else if (data.share.type === "fixed") {
         const sum = Object.values(data.share.fixedParticipant).reduce(
           (acc: number, val) => acc + asNumber(val),
-          0
+          0,
         );
 
         if (sum !== asNumber(data.amount)) {
@@ -111,7 +111,7 @@ const formSchema = z
                 path: ["share"],
               });
             }
-          }
+          },
         );
       }
     }
@@ -122,13 +122,14 @@ type FormData = z.infer<typeof formSchema>;
 const toFormData = (
   transaction: Transaction,
   participants: Record<string, Participant>,
-  event: Event
+  event: Event,
 ): FormData => {
   const isExpense = transaction.type === "expense";
   const formExpense = isExpense
     ? fromExpense(transaction.data, participants)
     : undefined;
-  const defaultCategory = Object.values(event.categories)[0]?._id || "";
+  const defaultCategory =
+    Object.values(event.categories.collection)[0]?._id || "";
   const firstParticipant = Object.values(participants)[0]?._id || "";
 
   return {
@@ -146,11 +147,11 @@ const toFormData = (
           type: "default",
           percentageParticipant: Object.keys(participants).reduce(
             (acc, participant) => ({ ...acc, [participant]: "0" }),
-            {} as Record<string, string>
+            {} as Record<string, string>,
           ),
           fixedParticipant: Object.keys(participants).reduce(
             (acc, participant) => ({ ...acc, [participant]: "0" }),
-            {} as Record<string, string>
+            {} as Record<string, string>,
           ),
         },
     updatedAt: transaction.data.updatedAt,
@@ -160,7 +161,7 @@ const toFormData = (
 const fromFormData = (
   data: FormData,
   setError: UseFormSetError<FormData>,
-  t: i18n["t"]
+  t: i18n["t"],
 ): Either.Either<Error, Transaction> => {
   return data.mode === "expense"
     ? pipe(
@@ -176,26 +177,25 @@ const fromFormData = (
             updatedAt: data.updatedAt,
           },
           setError as any,
-          t
+          t,
         ),
         Either.map(
           (expense: Expense): Transaction => ({
             type: "expense",
             data: expense,
-          })
-        )
+          }),
+        ),
       )
     : Either.right({
         type: "deposit",
-        data: {
+        data: createMergeableRecord({
           _id: data._id,
           amount: data.amount,
           from: data.from,
           to: data.to,
           note: data.note,
           date: data.date,
-          updatedAt: new Date(),
-        },
+        }),
       });
 };
 
@@ -303,15 +303,16 @@ export function TransactionForm({
                 size="m"
               />
             )}
-            options={Object.keys(event.participants).map(
+            options={Object.keys(event.participants.collection).map(
               (participant, index) => ({
                 id: participant ?? index,
                 label: isCurrentUser(participants[participant])
                   ? t("currentUser.anonymous.name")
-                  : participants[participant].name ?? t("participant.unknown"),
+                  : (participants[participant].name ??
+                    t("participant.unknown")),
                 value:
                   participants[participant]?._id ?? t("participant.unknown"),
-              })
+              }),
             )}
           />
         )}
@@ -328,16 +329,18 @@ export function TransactionForm({
               onChange={onChange}
               valueRenderer={({ value }) => (
                 <CategoryIcon
-                  name={event.categories[value].icon as CategoryIconName}
+                  name={event.categories.collection[value].icon}
                   size="m"
-                  label={event.categories[value].name}
+                  label={event.categories.collection[value].name}
                 />
               )}
-              options={Object.values(event.categories).map((category) => ({
-                id: category._id,
-                label: category.name,
-                value: category._id,
-              }))}
+              options={Object.values(event.categories.collection).map(
+                (category) => ({
+                  id: category._id,
+                  label: category.name,
+                  value: category._id,
+                }),
+              )}
             />
           )}
         />
@@ -362,16 +365,16 @@ export function TransactionForm({
                   size="m"
                 />
               )}
-              options={Object.keys(event.participants).map(
+              options={Object.keys(event.participants.collection).map(
                 (participant, index) => ({
                   id: participant ?? index,
                   label: isCurrentUser(participants[participant])
                     ? t("currentUser.anonymous.name")
-                    : participants[participant].name ??
-                      t("participant.unknown"),
+                    : (participants[participant].name ??
+                      t("participant.unknown")),
                   value:
                     participants[participant]?._id ?? t("participant.unknown"),
-                })
+                }),
               )}
             />
           )}
@@ -441,21 +444,21 @@ export function TransactionForm({
                   {
                     id: "default",
                     label: t(
-                      "page.event.add.form.field.share.type.option.default.label"
+                      "page.event.add.form.field.share.type.option.default.label",
                     ),
                     value: "default",
                   },
                   {
                     id: "percentage",
                     label: t(
-                      "page.event.add.form.field.share.type.option.percentage.label"
+                      "page.event.add.form.field.share.type.option.percentage.label",
                     ),
                     value: "percentage",
                   },
                   {
                     id: "fixed",
                     label: t(
-                      "page.event.add.form.field.share.type.option.fixed.label"
+                      "page.event.add.form.field.share.type.option.fixed.label",
                     ),
                     value: "fixed",
                   },
@@ -466,7 +469,7 @@ export function TransactionForm({
 
           <Paragraph styles={{ font: "body-small" }}>
             {t(
-              `page.event.add.form.field.share.type.${currentShareType}.description`
+              `page.event.add.form.field.share.type.${currentShareType}.description`,
             )}
           </Paragraph>
 
@@ -496,7 +499,7 @@ export function TransactionForm({
                       as="number"
                       type="number"
                       label={t(
-                        "page.event.add.form.field.share.percentage.amount.label"
+                        "page.event.add.form.field.share.percentage.amount.label",
                       )}
                       value={isNaN(Number(value)) ? 0 : Number(value)}
                       isRequired
@@ -538,7 +541,7 @@ export function TransactionForm({
                       type="number"
                       unit="€"
                       label={t(
-                        "page.event.add.form.field.share.fixed.amount.label"
+                        "page.event.add.form.field.share.fixed.amount.label",
                       )}
                       value={value}
                       isRequired

@@ -12,7 +12,6 @@ import { ParticipantSharePage } from "./pages/shares/ParticipantSharePage";
 import { EventParticipantSharePage } from "./pages/participants/EventParticipantSharePage";
 import { DistributionPage } from "./pages/distribution/DistributionPage";
 import type { ValueOf } from "./utils/object";
-import { LoginPage } from "./pages/auth/LoginPage";
 import { InformationPage } from "./pages/settings/InformationPage";
 import { CalendarPage } from "./pages/calendar/CalendarPage";
 
@@ -20,10 +19,6 @@ export const ROUTES_DEFINITION = {
   ROOT: {
     path: "/",
     component: () => <Redirect to="EVENT_LIST" />,
-  },
-  LOGIN: {
-    path: "/login",
-    component: LoginPage,
   },
   INFORMATION: {
     path: "/information",
@@ -76,6 +71,7 @@ export const ROUTES_DEFINITION = {
   JOIN: {
     path: "/join/:eventId/:shareId",
     component: () => <h1>Join event</h1>,
+    isPublic: true,
   },
 } as const satisfies Record<
   string,
@@ -88,7 +84,7 @@ export const ROUTES_DEFINITION = {
 
 export const ROUTES = Object.keys(ROUTES_DEFINITION).reduce(
   (acc, cur) => ({ ...acc, [cur]: cur }),
-  {}
+  {},
 ) as { [k in RouteName]: k };
 
 export const DEFAULT_ROUTE: RouteName = ROUTES.ROOT;
@@ -96,7 +92,7 @@ export const DEFAULT_ROUTE: RouteName = ROUTES.ROOT;
 export type LeafRoute = {
   path: ValueOf<typeof ROUTES_DEFINITION>["path"];
   component: () => ReactNode;
-  isPrivate?: boolean;
+  isPublic?: boolean;
 };
 
 export const routes = Object.values(ROUTES_DEFINITION) as LeafRoute[];
@@ -112,16 +108,15 @@ type ParamsFromString<R extends string> =
         [K in Param]: string;
       } & ParamsFromString<`/${Rest}`>
     : R extends `${infer _Start}:${infer Param}`
-    ? {
-        [K in Param]: string;
-      }
-    : {};
+      ? {
+          [K in Param]: string;
+        }
+      : {};
 
-export type Params<R extends RouteName> = {} extends ParamsFromString<
-  RoutePath<R>
->
-  ? undefined
-  : ParamsFromString<RoutePath<R>>;
+export type Params<R extends RouteName> =
+  {} extends ParamsFromString<RoutePath<R>>
+    ? undefined
+    : ParamsFromString<RoutePath<R>>;
 
 export const isLeafRoute = (route: Route): route is LeafRoute =>
   "component" in route;
@@ -132,7 +127,7 @@ export const getRouteDefinition = (route: RouteName) =>
 export const getPath = (
   route: RouteName,
   parameters?: { [key: string]: string | number },
-  hash?: string
+  hash?: string,
 ) => {
   if (!(route in ROUTES_DEFINITION)) {
     throw new Error(`Route ${route} not found`);
@@ -141,13 +136,13 @@ export const getPath = (
   return (parameters ? Object.entries(parameters) : []).reduce(
     (acc: string, [key, value]) =>
       acc.replace(new RegExp(`:${key}`, "g"), `${value}`),
-    `${ROUTES_DEFINITION[route].path}${hash ? `#${hash}` : ""}`
+    `${ROUTES_DEFINITION[route].path}${hash ? `#${hash}` : ""}`,
   ) as RouteName;
 };
 
 export const navigate = (
   route: RouteName,
-  parameters?: { [key: string]: string }
+  parameters?: { [key: string]: string },
 ) => {
   const path = getPath(route, parameters);
   redirect(path);

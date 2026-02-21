@@ -4,7 +4,7 @@ import { useData } from "../store/useData";
 export function useEventParticipants(
   eventId: string | undefined
 ): Record<string, Participant> {
-  const [event] = useData(`events.${eventId}`);
+  const [event] = useData(`events.collection.${eventId}`);
 
   if (!eventId) {
     return {};
@@ -14,5 +14,5 @@ export function useEventParticipants(
     return {};
   }
 
-  return event.participants || {};
+  return event.participants?.collection || {};
 }

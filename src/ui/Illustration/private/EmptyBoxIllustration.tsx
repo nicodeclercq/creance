@@ -1,7 +1,6 @@
 export function EmptyBoxIllustration() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={122} height={83} fill="none">
-      <path fill="#fff" d="M0 0h122v83H0z" />
       <path
         fill="#A1C09B"
         d="m3.227 35.172 33.791-2.446L79.29 58.367 66.58 72.065l-19.374-5.183L28.321 79.29l4.62-11.233z"

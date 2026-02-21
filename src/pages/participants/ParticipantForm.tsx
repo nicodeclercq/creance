@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 const createParticipantFormSchema = (
   t: ReturnType<typeof useTranslation>["t"],
-  users: Record<string, User>
+  users: Record<string, User>,
 ) =>
   z
     .object({
@@ -21,7 +21,7 @@ const createParticipantFormSchema = (
         .min(1)
         .refine(
           (value) => !Object.values(users).some((user) => user.name === value),
-          t("participantForm.name.validation.unique")
+          t("participantForm.name.validation.unique"),
         ),
       avatar: userSchema.shape.avatar,
       share: userSchema.shape.share,

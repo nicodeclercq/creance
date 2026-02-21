@@ -1,9 +1,7 @@
-import { clearCache } from "./private/cacheStorage";
-import { logoutUser } from "./private/firebase";
+import { storageFileName } from "../secrets";
 
 export function resetStore() {
-  logoutUser();
   localStorage.removeItem("state");
-  clearCache();
+  caches.delete(storageFileName).catch(console.error);
   location.reload();
 }

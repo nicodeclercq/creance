@@ -38,7 +38,7 @@ export function EventList({ events }: Props) {
                 <EventItem
                   key={event._id}
                   event={event}
-                  participants={event.participants}
+                  participants={event.participants.collection}
                 />
               ))}
             </Stack>

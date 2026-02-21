@@ -10,6 +10,7 @@ import { categorySchema } from "../../../models/Category";
 import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import { updateMergeableRecord } from "../../../models/mergeable";
 
 type CategoryFormProps = {
   data: Category;
@@ -24,6 +25,7 @@ const categoryFormSchema = z.object({
   _id: categorySchema.shape._id,
   name: categorySchema.shape.name,
   icon: categorySchema.shape.icon,
+  updatedAt: categorySchema.shape.updatedAt,
 });
 
 export function CategoryForm({
@@ -61,7 +63,7 @@ export function CategoryForm({
       handleSubmit={handleSubmit}
       submit={{
         label: submitLabel,
-        onClick: (data) => onSubmit(data),
+        onClick: (data) => onSubmit(updateMergeableRecord(data)),
       }}
       cancel={{
         label: cancelLabel,

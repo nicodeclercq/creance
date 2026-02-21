@@ -1,4 +1,7 @@
 const isDebugActive = (): boolean => {
+  if (typeof window === "undefined") {
+    return false;
+  }
   return (
     window.location.search.includes("debug") ||
     localStorage.getItem("debug") === "true"

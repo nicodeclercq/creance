@@ -15,6 +15,7 @@ import { depositSchema } from "../models/Deposit";
 import { expenseSchema } from "../models/Expense";
 import { participantSchema } from "../models/Participant";
 import { withoutKey } from "../helpers/object";
+import { PAST_DATE } from "../models/mergeable";
 
 const eventSchema = defaultEventSchema
   .omit({
@@ -33,9 +34,9 @@ type ExportedData = z.infer<typeof eventSchema>;
 export function toExportedData({ event }: { event: Event }): ExportedData {
   return {
     ...withoutKey(event, "updatedAt"),
-    participants: Object.values(event.participants),
-    expenses: Object.values(event.expenses),
-    deposits: Object.values(event.deposits),
+    participants: Object.values(event.participants.collection),
+    expenses: Object.values(event.expenses.collection),
+    deposits: Object.values(event.deposits.collection),
   };
 }
 
@@ -89,9 +90,18 @@ export function fromExportedData(data: ExportedData): Either.Either<
   const event: Event = {
     ...eventData,
     updatedAt: now,
-    participants: participantsMap,
-    expenses: expensesMap,
-    deposits: depositsMap,
+    participants: {
+      collection: participantsMap,
+      updatedAt: PAST_DATE,
+    },
+    expenses: {
+      collection: expensesMap,
+      updatedAt: PAST_DATE,
+    },
+    deposits: {
+      collection: depositsMap,
+      updatedAt: PAST_DATE,
+    },
   };
 
   return Either.right({

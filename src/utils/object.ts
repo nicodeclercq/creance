@@ -8,12 +8,11 @@ export const entries = <T extends Record<string | number | symbol, unknown>>(
 export const mapObject =
   <T, U>(fn: Func<[T, string, { [key: string]: T }], U>) =>
   (o: { [key: string]: T }): { [key in keyof typeof o]: U } =>
-    Object.entries(o)
-      .map(([key, value]) => [key, fn(value, key, o)] as [string, U])
-      .reduce(
-        (acc, [key, value]: [string, U]) => ({ ...acc, [key]: value }),
-        {} as { [key in keyof typeof o]: U }
-      );
+    Object.fromEntries(
+      Object.entries(o).map(
+        ([key, value]) => [key, fn(value, key, o)] as [string, U]
+      )
+    );
 
 export const filterObject = <T extends Record<string, unknown>>(
   obj: T,

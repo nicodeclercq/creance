@@ -11,6 +11,7 @@ import {
   createParticipant,
 } from "./test-helpers";
 import { describe, expect, it } from "vitest";
+import { PAST_DATE } from "../models/mergeable";
 import {
   getCustomParticipantShareCount,
   getDailyParticipantShareCount,
@@ -238,18 +239,24 @@ describe("calcultation", () => {
       });
       const event = createEvent({
         participants: {
-          participant1: createParticipant({
-            _id: "participant1",
-            share: { adults: 2, children: 0 },
-            participantShare: { type: "default" },
-          }),
-          participant2: createParticipant({
-            _id: "participant2",
-            share: { adults: 0, children: 1 },
-            participantShare: { type: "default" },
-          }),
+          collection: {
+            participant1: createParticipant({
+              _id: "participant1",
+              share: { adults: 2, children: 0 },
+              participantShare: { type: "default" },
+            }),
+            participant2: createParticipant({
+              _id: "participant2",
+              share: { adults: 0, children: 1 },
+              participantShare: { type: "default" },
+            }),
+          },
+          updatedAt: PAST_DATE,
         },
-        expenses: { [expense._id]: expense },
+        expenses: {
+          collection: { [expense._id]: expense },
+          updatedAt: PAST_DATE,
+        },
         period: {
           start: new Date("2025-01-01"), // x2
           arrival: "AM",
@@ -280,16 +287,22 @@ describe("calcultation", () => {
       });
       const event = createEvent({
         participants: {
-          participant1: createParticipant({
-            _id: "participant1",
-            participantShare: { type: "default" },
-          }),
-          participant2: createParticipant({
-            _id: "participant2",
-            participantShare: { type: "default" },
-          }),
+          collection: {
+            participant1: createParticipant({
+              _id: "participant1",
+              participantShare: { type: "default" },
+            }),
+            participant2: createParticipant({
+              _id: "participant2",
+              participantShare: { type: "default" },
+            }),
+          },
+          updatedAt: PAST_DATE,
         },
-        expenses: { [expense._id]: expense },
+        expenses: {
+          collection: { [expense._id]: expense },
+          updatedAt: PAST_DATE,
+        },
         period: {
           start: new Date("2025-01-01"), // x2
           arrival: "AM",
@@ -320,16 +333,22 @@ describe("calcultation", () => {
       });
       const event = createEvent({
         participants: {
-          participant1: createParticipant({
-            _id: "participant1",
-            participantShare: { type: "default" },
-          }),
-          participant2: createParticipant({
-            _id: "participant2",
-            participantShare: { type: "default" },
-          }),
+          collection: {
+            participant1: createParticipant({
+              _id: "participant1",
+              participantShare: { type: "default" },
+            }),
+            participant2: createParticipant({
+              _id: "participant2",
+              participantShare: { type: "default" },
+            }),
+          },
+          updatedAt: PAST_DATE,
         },
-        expenses: { [expense._id]: expense },
+        expenses: {
+          collection: { [expense._id]: expense },
+          updatedAt: PAST_DATE,
+        },
         period: {
           start: new Date("2025-01-01"), // x2
           arrival: "AM",
@@ -408,16 +427,25 @@ describe("calcultation", () => {
       };
 
       const event = createEvent({
-        participants,
+        participants: {
+          collection: participants,
+          updatedAt: PAST_DATE,
+        },
         deposits: {
-          [deposits.deposit1._id]: deposits.deposit1,
-          [deposits.deposit2._id]: deposits.deposit2,
-          [deposits.deposit3._id]: deposits.deposit3,
+          collection: {
+            [deposits.deposit1._id]: deposits.deposit1,
+            [deposits.deposit2._id]: deposits.deposit2,
+            [deposits.deposit3._id]: deposits.deposit3,
+          },
+          updatedAt: PAST_DATE,
         },
         expenses: {
-          expense1: expenses.expense1,
-          expense2: expenses.expense2,
-          expense3: expenses.expense3,
+          collection: {
+            expense1: expenses.expense1,
+            expense2: expenses.expense2,
+            expense3: expenses.expense3,
+          },
+          updatedAt: PAST_DATE,
         },
       });
 
@@ -519,11 +547,17 @@ describe("calcultation", () => {
       };
 
       const event = createEvent({
-        participants,
+        participants: {
+          collection: participants,
+          updatedAt: PAST_DATE,
+        },
         expenses: {
-          expense1: expenses.expense1,
-          expense2: expenses.expense2,
-          expense3: expenses.expense3,
+          collection: {
+            expense1: expenses.expense1,
+            expense2: expenses.expense2,
+            expense3: expenses.expense3,
+          },
+          updatedAt: PAST_DATE,
         },
       });
 
@@ -629,11 +663,17 @@ describe("calcultation", () => {
       };
 
       const event = createEvent({
-        participants,
+        participants: {
+          collection: participants,
+          updatedAt: PAST_DATE,
+        },
         expenses: {
-          expense1: expenses.expense1,
-          expense2: expenses.expense2,
-          expense3: expenses.expense3,
+          collection: {
+            expense1: expenses.expense1,
+            expense2: expenses.expense2,
+            expense3: expenses.expense3,
+          },
+          updatedAt: PAST_DATE,
         },
       });
 
@@ -758,11 +798,17 @@ describe("calcultation", () => {
       };
 
       const event = createEvent({
-        participants,
+        participants: {
+          collection: participants,
+          updatedAt: PAST_DATE,
+        },
         expenses: {
-          expense1: expenses.expense1,
-          expense2: expenses.expense2,
-          expense3: expenses.expense3,
+          collection: {
+            expense1: expenses.expense1,
+            expense2: expenses.expense2,
+            expense3: expenses.expense3,
+          },
+          updatedAt: PAST_DATE,
         },
         period: {
           start: new Date("2025-01-01"),
@@ -969,11 +1015,17 @@ describe("calcultation", () => {
       };
 
       const event = createEvent({
-        participants,
+        participants: {
+          collection: participants,
+          updatedAt: PAST_DATE,
+        },
         expenses: {
-          expense1: expenses.expense1,
-          expense2: expenses.expense2,
-          expense3: expenses.expense3,
+          collection: {
+            expense1: expenses.expense1,
+            expense2: expenses.expense2,
+            expense3: expenses.expense3,
+          },
+          updatedAt: PAST_DATE,
         },
         period: {
           start: new Date("2025-01-01"),

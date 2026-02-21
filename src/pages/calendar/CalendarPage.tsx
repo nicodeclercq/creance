@@ -1,4 +1,10 @@
 import {
+  addMergeableCollectionItem,
+  createMergeableRecord,
+  deleteMergeableCollectionItem,
+  updateMergeableCollectionItem,
+} from "../../models/mergeable";
+import {
   getActivitiesByDays,
   getPresenceByDays,
 } from "../../service/activities";
@@ -18,50 +24,51 @@ export function CalendarPage() {
   const { eventId } = useParams();
   const { hash } = useLocation();
   const { currentUser } = useCurrentUser();
-  const [currentEvent, setCurrentEvent] = useData(`events.${eventId}`);
+  const [currentEvent, setCurrentEvent] = useData(
+    `events.collection.${eventId}`
+  );
   const [mealManagers, setMealManagers] = useData(
-    `events.${eventId}.mealManager`
+    `events.collection.${eventId}.mealManager`
   );
 
   const setLunchManager = (day: string) => (lunchManager: string) => {
     setMealManagers((prev) => ({
       ...prev,
-      [day]: { ...prev[day], lunch: lunchManager },
+      [day]: createMergeableRecord({ ...prev[day], lunch: lunchManager }),
     }));
   };
   const setDinnerManager = (day: string) => (dinnerManager: string) => {
     setMealManagers((prev) => ({
       ...prev,
-      [day]: { ...prev[day], dinner: dinnerManager },
+      [day]: createMergeableRecord({ ...prev[day], dinner: dinnerManager }),
     }));
   };
 
   const addActivity = (activity: Activity) => {
     setCurrentEvent((prev) => ({
       ...prev,
-      activities: {
-        ...prev.activities,
-        [activity._id]: activity,
-      },
+      activities: addMergeableCollectionItem(
+        activity._id,
+        activity,
+        prev.activities
+      ),
     }));
   };
   const updateActivity = (activity: Activity) => {
     setCurrentEvent((prev) => ({
       ...prev,
-      activities: {
-        ...prev.activities,
-        [activity._id]: activity,
-      },
+      activities: updateMergeableCollectionItem(
+        activity._id,
+        activity,
+        prev.activities
+      ),
     }));
   };
   const deleteActivity = (activity: Activity) => {
-    setCurrentEvent((prev) => {
-      const { [activity._id]: _, ...activities } = prev.activities;
-      return {
-        ...prev,
-        activities,
-      };
-    });
+    setCurrentEvent((prev) => ({
+      ...prev,
+      activities: deleteMergeableCollectionItem(activity._id, prev.activities),
+    }));
   };
 
   useEffect(() => {
@@ -91,7 +98,7 @@ export function CalendarPage() {
             day={keyToDate(day)}
             presence={presence}
             activities={activitiesByDays[day]}
-            participants={currentEvent.participants}
+            participants={currentEvent.participants.collection}
             lunchManager={mealManagers[day]?.lunch ?? "none"}
             dinnerManager={mealManagers[day]?.dinner ?? "none"}
             setLunchManager={setLunchManager(day)}

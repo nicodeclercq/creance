@@ -1,16 +1,28 @@
-import { CacheStorageAdapter } from "./private/cacheStorage";
-import { InitializationTasks } from "./private/initializationTasks";
-// import { LocalStorageAdapter } from "./private/localStorage";
-import type { ReactNode } from "react";
-import { StoreManager, type Store } from "./StoreManager";
 import { createContext, useEffect, useState } from "react";
+
+import type { ReactNode } from "react";
 import type { State } from "./state";
+import { type StoreState } from "./createStore";
+import type { BehaviorSubject } from "rxjs";
+import { store } from "./store";
+import type { Credentials } from "./adapters/AuthManager";
 
-StoreManager.launch({
-  adapters: [/*LocalStorageAdapter,*/ CacheStorageAdapter, InitializationTasks],
-});
+export type { StoreState } from "./createStore";
 
-export const StoreContext = createContext(StoreManager.$store);
+const isLoading = <T extends unknown>(
+  state: StoreState<T>,
+): state is { status: "loading" } => state.status === "loading";
+
+type StoreContextValue<T> = {
+  login: (credentials?: Credentials) => Promise<void>;
+  signup: (credentials: Credentials) => Promise<void>;
+  logout: () => Promise<void>;
+  stateSubject: BehaviorSubject<StoreState<State>>;
+  updateState: (update: T | ((current: T) => T)) => void;
+};
+export const StoreContext = createContext<StoreContextValue<State> | null>(
+  null,
+);
 
 export function StoreProvider({
   children,
@@ -19,21 +31,24 @@ export function StoreProvider({
   children: ReactNode;
   loadingRenderer: () => ReactNode;
 }) {
-  const [storeState, setStoreState] = useState<Store<State>>(
-    StoreManager.$store.getValue()
+  const [storeState, setStoreState] = useState<StoreState<State>>(
+    store.getState(),
   );
 
-  useEffect(() => {
-    const subscription = StoreManager.$store.subscribe(setStoreState);
-    return () => subscription.unsubscribe();
-  }, []);
+  useEffect(() => store.subscribe(setStoreState), []);
 
-  if (StoreManager.isLoading(storeState)) {
-    return <LoadingRenderer />;
-  }
+  const contextValue: StoreContextValue<State> = {
+    login: store.login,
+    logout: store.logout,
+    signup: store.signup,
+    stateSubject: store.stateSubject,
+    updateState: store.updateState,
+  };
 
-  return (
-    <StoreContext.Provider value={StoreManager.$store}>
+  return isLoading(storeState) ? (
+    <LoadingRenderer />
+  ) : (
+    <StoreContext.Provider value={contextValue}>
       {children}
     </StoreContext.Provider>
   );

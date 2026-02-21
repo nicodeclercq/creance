@@ -2,6 +2,7 @@ import * as RX from "rxjs";
 import { type Observable } from "rxjs";
 import * as z from "zod";
 import { Logger } from "./Logger";
+import { PAST_DATE } from "../models/mergeable";
 
 type Diff<Data> = {
   created: Record<string, Data>;
@@ -20,9 +21,7 @@ export const lastUpdate = {
     const model = z
       .string()
       .nullable()
-      .transform((val) =>
-        val == null ? new Date("2025-01-01") : new Date(val)
-      );
+      .transform((val) => (val == null ? PAST_DATE : new Date(val)));
     const lastUpdate = localStorage.getItem(`lastUpdate_${collectionName}`);
     const parsed = model.safeParse(lastUpdate);
     if (!parsed.success) {

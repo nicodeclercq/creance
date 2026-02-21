@@ -12,22 +12,22 @@ export function Router() {
           ({
             path,
             component: Component,
-            isPrivate = false,
+            isPublic = false,
           }: RouteDefinition) => (
             <Route
               key={path}
               path={path}
               element={
-                isPrivate ? (
+                isPublic ? (
+                  <Component />
+                ) : (
                   <PrivatePage>
                     <Component />
                   </PrivatePage>
-                ) : (
-                  <Component />
                 )
               }
             />
-          )
+          ),
         )}
       </Routes>
     </BrowserRouter>

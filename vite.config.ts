@@ -5,7 +5,10 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   test: {
     environment: "jsdom",
-    environmentMatchGlobs: [["src/service/crypto.test.ts", "node"]],
+    environmentMatchGlobs: [
+      ["src/service/crypto.test.ts", "node"],
+      ["src/store/**/*.test.ts", "node"],
+    ],
   },
   plugins: [
     react(),

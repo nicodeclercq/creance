@@ -20,6 +20,7 @@ import { uid } from "../../../service/crypto";
 import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import { createMergeableRecord } from "../../../models/mergeable";
 
 type ActivityFormProps = {
   defaultValue: Activity;
@@ -104,7 +105,7 @@ const formActivityToActivity = (
   const endDate = formActivity.endTime
     ? addTimeToDate(formActivity.date, formActivity.endTime)
     : undefined;
-  return {
+  return createMergeableRecord({
     _id: id ?? uid(),
     description: formActivity.description,
     name: formActivity.name,
@@ -115,8 +116,7 @@ const formActivityToActivity = (
     url: formActivity.url,
     image: formActivity.image,
     proposedBy: proposedBy,
-    updatedAt: new Date(),
-  };
+  });
 };
 
 const activityToFormActivity = (activity: Activity): FormActivity => {

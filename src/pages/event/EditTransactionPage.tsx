@@ -7,6 +7,7 @@ import { ROUTES } from "../../routes";
 import { Redirect } from "../../Redirect";
 import type { Transaction } from "../../models/Transaction";
 import { TransactionForm } from "./private/TransactionForm";
+import { updateMergeableCollectionItem } from "../../models/mergeable";
 import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router-dom";
@@ -17,7 +18,7 @@ export function EditTransactionPage() {
   const { t } = useTranslation();
   const { eventId, transactionId } = useParams();
   const { goTo } = useRoute();
-  const [currentEvent, setEvent] = useData(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
@@ -34,9 +35,9 @@ export function EditTransactionPage() {
 
   // Try to find in expenses first, then deposits
   const currentExpense: Expense | undefined =
-    currentEvent.expenses[transactionId];
+    currentEvent.expenses.collection[transactionId];
   const currentDeposit: Deposit | undefined =
-    currentEvent.deposits[transactionId];
+    currentEvent.deposits.collection[transactionId];
 
   const isExpense = !!currentExpense;
   const isDeposit = !!currentDeposit;
@@ -56,7 +57,7 @@ export function EditTransactionPage() {
           data: {
             _id: "",
             reason: "",
-            category: Object.values(currentEvent.categories)[0]?._id || "",
+            category: Object.values(currentEvent.categories.collection)[0]?._id || "",
             lender: Object.values(participants)[0]?._id || "",
             amount: "0",
             date: new Date(),
@@ -69,18 +70,20 @@ export function EditTransactionPage() {
     if (transaction.type === "expense") {
       setEvent((event) => ({
         ...event,
-        expenses: {
-          ...event.expenses,
-          [transaction.data._id]: transaction.data,
-        },
+        expenses: updateMergeableCollectionItem(
+          transaction.data._id,
+          transaction.data,
+          event.expenses
+        ),
       }));
     } else {
       setEvent((event) => ({
         ...event,
-        deposits: {
-          ...event.deposits,
-          [transaction.data._id]: transaction.data,
-        },
+        deposits: updateMergeableCollectionItem(
+          transaction.data._id,
+          transaction.data,
+          event.deposits
+        ),
       }));
     }
     goTo(ROUTES.EVENT, { eventId: currentEvent._id });

@@ -17,6 +17,7 @@ const DialogStackManager = (function createDialogStackManager() {
   };
 
   const add = (instance: DialogInstance) => {
+    console.log("add dialog", instance.config.title);
     instances.add(instance);
     notifyListeners();
   };
@@ -74,13 +75,13 @@ export function DialogStackHook() {
  * ```
  */
 export function openDialog<T = undefined>(
-  config: DialogConfig<T>,
-  defaultData?: T
+  config: Omit<DialogConfig<T>, "isDismissable">,
+  defaultData?: T,
 ): Promise<DialogResult<T>> {
   return new Promise((resolve) => {
     const instance: DialogInstance<T> = {
       id: Symbol(),
-      config,
+      config: { ...config, isDismissable: false },
       resolve,
       defaultData,
     };

@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { userSchema } from "../../../models/User";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createMergeableRecord } from "../../../models/mergeable";
 
 type AddParticipantsFormProps = {
   participants: Participant[];
@@ -58,7 +59,7 @@ export function AddParticipantsForm({
     });
 
   const addParticipant = (data: AddParticipantsFormData) => {
-    const newParticipant: Participant = {
+    const newParticipant: Participant = createMergeableRecord({
       _id: uid(),
       name: data.name,
       avatar: "",
@@ -67,8 +68,7 @@ export function AddParticipantsForm({
         children: data.children,
       },
       participantShare: { type: "default" } as ParticipantShare,
-      updatedAt: new Date(),
-    };
+    });
     onAdd(newParticipant);
     reset();
   };

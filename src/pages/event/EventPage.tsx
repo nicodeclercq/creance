@@ -1,13 +1,13 @@
+import { deleteMergeableCollectionItem } from "../../models/mergeable";
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
 import { ExpenseList } from "./private/ExpenseList";
-import { removeFromObject } from "../../helpers/object";
 import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router";
 
 export function EventPage() {
   const { eventId } = useParams();
-  const [currentEvent, setEvent] = useData(`events.${eventId}`);
+  const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
 
   if (!eventId) {
     return <EventNotFoundPage />;
@@ -21,14 +21,14 @@ export function EventPage() {
   const deleteExpense = (expenseId: string) => {
     setEvent((event) => ({
       ...event,
-      expenses: removeFromObject(event.expenses, expenseId),
+      expenses: deleteMergeableCollectionItem(expenseId, event.expenses),
     }));
   };
 
   const deleteDeposit = (depositId: string) => {
     setEvent((event) => ({
       ...event,
-      deposits: removeFromObject(event.deposits, depositId),
+      deposits: deleteMergeableCollectionItem(depositId, event.deposits),
     }));
   };
 

@@ -6,12 +6,12 @@ export function EventsPage() {
   const [events] = useData("events");
   const [currentParticipantId] = useData("account.currentUser._id");
 
-  const eventsArray = Object.values(events).sort(
+  const eventsArray = Object.values(events.collection).sort(
     sortByDate("updatedAt", "desc")
   );
 
   const filteredEvents = eventsArray.filter((event) => {
-    const eventParticipants = Object.keys(event.participants);
+    const eventParticipants = Object.keys(event.participants.collection);
     return eventParticipants.includes(currentParticipantId);
   });
 

@@ -1,18 +1,20 @@
 import * as z from "zod";
+
+import { createMergeableRecord, mergeableRecord } from "./mergeable";
+
 import { uid } from "../service/crypto";
 
-export const ANONYMOUS_USER = {
+export const ANONYMOUS_USER = createMergeableRecord({
   _id: uid(),
   name: "Anonymous",
-  avatar: "/anonymous.svg",
+  avatar: "",
   share: {
     adults: 1,
     children: 0,
   },
-  updatedAt: new Date("2025-01-01"), // Date is in the past to be overwritten when merging state
-} satisfies User;
+});
 
-export const userSchema = z.strictObject({
+export const userSchema = mergeableRecord({
   _id: z.string().max(100, "User.validation.id.maxLength"),
   name: z.string().max(100, "User.validation.name.maxLength"),
   avatar: z.string().max(100, "User.validation.avatar.maxLength"),
@@ -20,10 +22,6 @@ export const userSchema = z.strictObject({
     adults: z.number("User.validation.share.adults.invalid"),
     children: z.number("User.validation.share.children.invalid"),
   }),
-  updatedAt: z.union(
-    [z.string().transform((date) => new Date(date)), z.date()],
-    "User.validation.updatedAt.invalid"
-  ),
 });
 
 export type User = z.infer<typeof userSchema>;
