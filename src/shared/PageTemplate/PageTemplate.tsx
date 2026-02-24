@@ -14,6 +14,7 @@ import { Logo } from "../../ui/Logo/Logo";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 import { UserMenu } from "./UserMenu";
 import { MediaHidden } from "../../ui/MediaHidden/MediaHidden";
+import { ShareButton } from "./ShareButton";
 
 type PageTemplateProps<R extends RouteName> = {
   title: string;
@@ -88,6 +89,18 @@ export function PageTemplate<R extends RouteName>({
         <Container styles={{ gridArea: "menu" }} />
       )}
       <MediaHidden media={["default", "sm"]}>
+        <Container
+          styles={{
+            gridArea: "user",
+            padding: "m",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "m",
+          }}
+        >
+          <ShareButton />
+        </Container>
         <Container
           styles={{
             gridArea: "user",

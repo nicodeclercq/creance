@@ -21,6 +21,7 @@ type Spacing = "none" | "s" | "m" | "l";
 type Position = "default" | "absolute" | "relative" | "fixed" | "sticky";
 type Background =
   | "default"
+  | "white"
   | "body"
   | "transparent"
   | "inverted"
@@ -244,7 +245,7 @@ function isMediaQuery<S>(value: WithMediaQuery<S>): value is MediaQuery<S> {
 
 function getMediaValue<S>(
   media: keyof MediaQuery<S>,
-  value: WithMediaQuery<S>
+  value: WithMediaQuery<S>,
 ): S | undefined {
   if (!isMediaQuery(value)) {
     return media === "default" ? value : undefined;
@@ -254,34 +255,40 @@ function getMediaValue<S>(
 }
 
 export function getPropertiesValueByMedia<
-  S extends Record<string, WithMediaQuery<unknown>>
+  S extends Record<string, WithMediaQuery<unknown>>,
 >(values: S) {
   type Values = {
     [key in keyof S]: S[key] extends WithMediaQuery<infer T> ? T : undefined;
   };
 
-  return entries(MEDIA_QUERY_BREAKPOINTS).reduce((acc, [breakpoint]) => {
-    const valuesAtBreakpoint = entries(values)
-      .map(([key, value]) => [key, getMediaValue(breakpoint, value)])
-      .filter(([_, value]) => value != null)
-      .reduce((acc, [key, value]) => {
-        const newAcc = (acc ?? {}) as Record<keyof S, S[keyof S]>;
-        newAcc[key as keyof S] = value as S[keyof S];
+  return entries(MEDIA_QUERY_BREAKPOINTS).reduce(
+    (acc, [breakpoint]) => {
+      const valuesAtBreakpoint = entries(values)
+        .map(([key, value]) => [key, getMediaValue(breakpoint, value)])
+        .filter(([_, value]) => value != null)
+        .reduce(
+          (acc, [key, value]) => {
+            const newAcc = (acc ?? {}) as Record<keyof S, S[keyof S]>;
+            newAcc[key as keyof S] = value as S[keyof S];
 
-        return newAcc;
-      }, undefined as Record<keyof S, S[keyof S]> | undefined);
+            return newAcc;
+          },
+          undefined as Record<keyof S, S[keyof S]> | undefined,
+        );
 
-    if (valuesAtBreakpoint != null) {
-      acc[breakpoint] = valuesAtBreakpoint as Values;
-    }
+      if (valuesAtBreakpoint != null) {
+        acc[breakpoint] = valuesAtBreakpoint as Values;
+      }
 
-    return acc;
-  }, {} as Record<Partial<MediaSize>, Values>);
+      return acc;
+    },
+    {} as Record<Partial<MediaSize>, Values>,
+  );
 }
 
 function buildMediaQueryStyles(
   media: MediaSize,
-  styles: string | number | undefined
+  styles: string | number | undefined,
 ) {
   if (styles == null) {
     return "";
@@ -294,7 +301,7 @@ function buildMediaQueryStyles(
 
 function buildStylesForAllMedia<S extends Record<string, unknown>>(
   values: Record<MediaSize, S>,
-  transform: (value: S, currentMedia: MediaSize) => string | number | undefined
+  transform: (value: S, currentMedia: MediaSize) => string | number | undefined,
 ): string {
   return entries(MEDIA_QUERY_BREAKPOINTS).reduce((acc, [breakpoint]) => {
     const value = values[breakpoint];
@@ -305,13 +312,13 @@ function buildStylesForAllMedia<S extends Record<string, unknown>>(
 
     return `${acc ? `${acc} ` : ""}${buildMediaQueryStyles(
       breakpoint,
-      transform(value, breakpoint)
+      transform(value, breakpoint),
     )}`;
   }, "");
 }
 
 type FromPropertiesRecord<
-  S extends Record<string, WithMediaQuery<unknown> | undefined>
+  S extends Record<string, WithMediaQuery<unknown> | undefined>,
 > = {
   [key in keyof S]: S[key] extends WithMediaQuery<infer T>
     ? T | undefined
@@ -319,21 +326,21 @@ type FromPropertiesRecord<
 };
 
 export function buildStylesForMedia<
-  S extends Record<string, WithMediaQuery<unknown> | undefined>
+  S extends Record<string, WithMediaQuery<unknown> | undefined>,
 >(
   values: S,
-  transform: (value: FromPropertiesRecord<S>) => string | number | undefined
+  transform: (value: FromPropertiesRecord<S>) => string | number | undefined,
 ): string {
   const propertiesByMedia = getPropertiesValueByMedia(values);
   const stylesByMedia = buildStylesForAllMedia(propertiesByMedia, (value) =>
-    transform(value as FromPropertiesRecord<S>)
+    transform(value as FromPropertiesRecord<S>),
   );
 
   return css(stylesByMedia);
 }
 
 function buildCustomPropertiesStyles(
-  customCSSProperties: CustomCSSProperties | undefined
+  customCSSProperties: CustomCSSProperties | undefined,
 ) {
   return Object.keys(MEDIA_QUERY_BREAKPOINTS)
     .map((breakpoint) => {
@@ -371,7 +378,7 @@ function computeDisplay(value: Display = "default") {
   return value === "default" ? "block" : value;
 }
 function computePadding(
-  value: Spacing | { x?: Spacing; y?: Spacing } = "none"
+  value: Spacing | { x?: Spacing; y?: Spacing } = "none",
 ) {
   if (typeof value === "object") {
     const { x = "none", y = "none" } = value;
@@ -384,6 +391,10 @@ function computePadding(
 }
 function computeBackground(value: Background = "transparent") {
   const bg = ["default", "body", "transparent", "inverted"];
+
+  if (value === "white") {
+    return "white";
+  }
 
   if (bg.includes(value)) {
     return value === "transparent" ? value : `var(--ui-background-${value})`;
@@ -457,10 +468,13 @@ function computeBorder(value: Border = "none") {
   };
 
   return typeof value === "object"
-    ? entries(value).reduce((acc, [key, value]) => {
-        acc[key] = `var(--ui-border-${value})`;
-        return acc;
-      }, {} as Record<keyof typeof properties, string>)
+    ? entries(value).reduce(
+        (acc, [key, value]) => {
+          acc[key] = `var(--ui-border-${value})`;
+          return acc;
+        },
+        {} as Record<keyof typeof properties, string>,
+      )
     : { border: `var(--ui-border-${value})` };
 }
 function computeFlexGrow(value: boolean) {
@@ -524,7 +538,7 @@ const transformers = {
     transformer: (
       value: Defined<WithoutMediaQuery<Styles[K]>>,
       styles: Styles,
-      currentMedia: MediaSize
+      currentMedia: MediaSize,
     ) =>
       | string
       | number
@@ -566,7 +580,7 @@ export function computeStyles(styles: Styles) {
         }
         if (typeof result === "object") {
           return Object.entries(
-            result as Record<string, string | number | undefined>
+            result as Record<string, string | number | undefined>,
           )
             .map(([key, value]) => {
               return `${camelCaseToKebab(key)}: ${value};`;
@@ -578,7 +592,7 @@ export function computeStyles(styles: Styles) {
           return "";
         }
       })
-      .join(" ")
+      .join(" "),
   );
 
   return [customCSSPropertiesStyles, propertiesStyles]

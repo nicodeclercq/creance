@@ -400,5 +400,11 @@
   "LoginForm.errors.invalidCredentials": "Identifiant ou mot de passe incorrect",
   "LoginForm.errors.unknown": "Une erreur est survenue. Veuillez réessayer.",
   "LoginForm.actions.continueAnonymously": "Continuer hors connexion",
-  "LoginForm.actions.submit": "Se connecter"
+  "LoginForm.actions.submit": "Se connecter",
+  "ShareButton.action.label": "Partager",
+  "ShareButton.modal.title": "Partager la liste de créances",
+  "ShareButton.modal.qrcode.title": "Lien de partage de liste de créances",
+  "ShareButton.modal.description": "Une fois le lien copié collez-le dans un sms, un message whatsapp ou encore signal pour permettre à vos destinataires de rejoindre la liste de créances.",
+  "ShareButton.modal.action.copyLink": "Copier le lien de partage",
+  "ShareButton.modal.action.linkCopied": "Lien copier dans le presse-papier!"
 }

@@ -11,6 +11,7 @@ import { Menu, type MenuProps } from "../../ui/Menu/Menu";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 import { Logo } from "../../ui/Logo/Logo";
 import { UserMenu } from "./UserMenu";
+import { ShareButton } from "./ShareButton";
 
 export type HeaderProps = {
   gridArea?: string;
@@ -54,7 +55,10 @@ export function Header({
           {title}
         </Heading>
         <MediaOnly media={["default", "sm"]}>
-          <UserMenu />
+          <Columns gap="m">
+            <ShareButton />
+            <UserMenu />
+          </Columns>
         </MediaOnly>
         {rightActions && (
           <Menu
