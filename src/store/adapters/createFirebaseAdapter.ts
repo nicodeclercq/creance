@@ -19,10 +19,10 @@ import {
 import { Logger } from "../../service/Logger";
 import { firebaseConfig } from "../../secrets";
 import { createRemoteAdapter } from "./createRemoteAdapter";
-import { createUserId, type UserId } from "./shared/alias";
 import type { AuthManager } from "./AuthManager";
 import type { RemoteAdapter } from "../createStore";
 import type { State } from "../state";
+import type { Event } from "../../models/Event";
 
 const COLLECTIONS = {
   USERS: firebaseConfig.collections.USERS,
@@ -31,12 +31,12 @@ const COLLECTIONS = {
 
 const USER_ID_STORAGE_KEY = "creance-fb-uid";
 
-const readPersistedUserId = (): UserId | undefined => {
+const readPersistedUserId = (): string | undefined => {
   const stored = localStorage.getItem(USER_ID_STORAGE_KEY);
-  return stored ? createUserId(stored) : undefined;
+  return stored ? stored : undefined;
 };
 
-const persistUserId = (userId: UserId | undefined): void =>
+const persistUserId = (userId: string | undefined): void =>
   userId
     ? localStorage.setItem(USER_ID_STORAGE_KEY, userId as string)
     : localStorage.removeItem(USER_ID_STORAGE_KEY);
@@ -65,12 +65,12 @@ const getFirebase = (() => {
 })();
 
 type FirebaseState = {
-  userId: UserId | undefined;
+  userId: string | undefined;
 };
 
 export const createFirebaseAdapter = (config?: {
   authManager?: AuthManager;
-}): RemoteAdapter<State> => {
+}): RemoteAdapter<State, Event> => {
   const state: FirebaseState = {
     userId: readPersistedUserId(),
   };
@@ -81,11 +81,11 @@ export const createFirebaseAdapter = (config?: {
   }: {
     login: string;
     password: string;
-  }): Promise<UserId | Error> => {
+  }): Promise<string | Error> => {
     const { auth } = getFirebase();
     return signInWithEmailAndPassword(auth, email, password)
       .then((credential) => {
-        const userId = createUserId(credential.user.uid);
+        const userId = credential.user.uid;
         state.userId = userId;
         persistUserId(userId);
         return userId;
@@ -102,11 +102,11 @@ export const createFirebaseAdapter = (config?: {
   }: {
     login: string;
     password: string;
-  }): Promise<UserId | Error> => {
+  }): Promise<string | Error> => {
     const { auth } = getFirebase();
     return createUserWithEmailAndPassword(auth, email, password)
       .then((credential) => {
-        const userId = createUserId(credential.user.uid);
+        const userId = credential.user.uid;
         state.userId = userId;
         persistUserId(userId);
         return userId;
@@ -141,6 +141,7 @@ export const createFirebaseAdapter = (config?: {
       const unsubscribe = onValue(
         userRef,
         (snapshot) => {
+          console.log("TMP firebase user data changed");
           subscriber.next(
             snapshot.exists() ? (snapshot.val() as string) : undefined,
           );
@@ -175,6 +176,7 @@ export const createFirebaseAdapter = (config?: {
       const unsubscribe = onValue(
         eventRef,
         (snapshot) => {
+          console.log("TMP firebase event data changed");
           subscriber.next(
             snapshot.exists() ? (snapshot.val() as string) : undefined,
           );

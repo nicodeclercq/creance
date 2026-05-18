@@ -1,5 +1,9 @@
+import {
+  addMergeableCollectionItem,
+  updateMergeableCollectionItem,
+} from "../../models/mergeable";
+
 import { AddParticipantsForm } from "../events/private/AddParticipantsForm";
-import { addMergeableCollectionItem, updateMergeableCollectionItem } from "../../models/mergeable";
 import { Button } from "../../ui/Button/Button";
 import { Card } from "../../ui/Card/Card";
 import { Columns } from "../../ui/Columns/Columns";
@@ -32,7 +36,7 @@ export function EventUsersPage() {
       participants: addMergeableCollectionItem(
         participant._id,
         participant,
-        event.participants
+        event.participants,
       ),
     }));
   };
@@ -46,7 +50,7 @@ export function EventUsersPage() {
           ...event.participants.collection[participantId],
           participantShare: { type: "default" },
         },
-        event.participants
+        event.participants,
       ),
     }));
   };
@@ -91,6 +95,7 @@ export function EventUsersPage() {
         >
           <AddParticipantsForm
             onAdd={addParticipant}
+            onClose={() => setShowAddParticipantForm(false)}
             participants={Object.values(currentEvent.participants.collection)}
           />
         </Modal>

@@ -8,15 +8,15 @@ import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
 
-const loginFormSchema = z.object({
+const signupFormSchema = z.object({
   login: z.string().min(1).max(100),
   password: z.string().min(1).max(100),
 });
 
-export type LoginFormData = z.infer<typeof loginFormSchema>;
+export type SignupFormData = z.infer<typeof signupFormSchema>;
 
-type LoginFormProps = {
-  onSubmit: (data: LoginFormData) => Promise<void>;
+type SignupFormProps = {
+  onSubmit: (data: SignupFormData) => Promise<void>;
   cancel: {
     onClick: () => void;
     label: string;
@@ -25,18 +25,18 @@ type LoginFormProps = {
   errorMessage?: string;
 };
 
-export function LoginForm({
+export function SignupForm({
   onSubmit,
   cancel,
   errorMessage,
   isLoading,
-}: LoginFormProps) {
+}: SignupFormProps) {
   const { t } = useTranslation();
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm(loginFormSchema, {
+  } = useForm(signupFormSchema, {
     defaultValues: {
       login: "",
       password: "",
@@ -51,7 +51,7 @@ export function LoginForm({
       handleSubmit={handleSubmit}
       isLoading={isLoading}
       submit={{
-        label: t("LoginForm.actions.submit"),
+        label: t("SignupForm.actions.submit"),
         onClick: onSubmit,
       }}
       cancel={cancel}
@@ -64,7 +64,7 @@ export function LoginForm({
           padding: "m",
         }}
       >
-        {t("LoginForm.description")}
+        {t("SignupForm.description")}
       </Paragraph>
       {errorMessage && (
         <Paragraph
@@ -85,7 +85,7 @@ export function LoginForm({
             type="text"
             value={value}
             onChange={onChange}
-            label={t("LoginForm.login.label")}
+            label={t("SignupForm.login.label")}
             isRequired
             error={error?.message}
           />
@@ -99,7 +99,7 @@ export function LoginForm({
             type="password"
             value={value}
             onChange={onChange}
-            label={t("LoginForm.password.label")}
+            label={t("SignupForm.password.label")}
             isRequired
             error={error?.message}
           />

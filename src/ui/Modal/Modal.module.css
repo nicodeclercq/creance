@@ -18,7 +18,7 @@
   z-index: 100001;
   min-width: min-content;
   width: max-content;
-  max-width: 90vw;
+  max-width: min(90vw, 70ch);
   --component-layout-padding-x: var(--ui-semantic-padding-x-l);
   --component-layout-padding-y: var(--ui-semantic-padding-y-l);
   padding-inline: var(--component-layout-padding-x, 0);

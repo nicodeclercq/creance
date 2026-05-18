@@ -9,4 +9,6 @@ export const decryptState = (
   ciphertext: string,
   key: string,
 ): Promise<unknown> =>
-  decrypt(ciphertext, key).then((plaintext) => JSON.parse(plaintext));
+  Promise.resolve()
+    .then(() => decrypt(ciphertext, key))
+    .then((plaintext) => JSON.parse(plaintext));

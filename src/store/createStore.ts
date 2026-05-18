@@ -12,8 +12,8 @@ export type StoreState<T> =
   | { status: "ready"; data: T }
   | { status: "error"; error: Error };
 
-type StoreManager<T> = {
-  register: (adapter: Adapter<T> | RemoteAdapter<T>) => () => void;
+type StoreManager<T, Item> = {
+  register: (adapter: Adapter<T> | RemoteAdapter<T, Item>) => () => void;
   init: () => Promise<void>;
   getState: () => StoreState<T>;
   stateSubject: BehaviorSubject<StoreState<T>>;
@@ -22,6 +22,7 @@ type StoreManager<T> = {
   login: (credentials?: Credentials) => Promise<void>;
   signup: (credentials: Credentials) => Promise<void>;
   logout: () => Promise<void>;
+  fetchRemoteItem: (id: string, passKey: string) => Promise<Item>;
 };
 
 type StateUpdate<T> = T | ((current: T) => T);
@@ -33,15 +34,16 @@ export type Adapter<T> = {
   onLogout?: () => void;
 };
 
-export type RemoteAdapter<T> = Adapter<T> & {
+export type RemoteAdapter<T, Item> = Adapter<T> & {
   login: (credentials: Credentials) => Promise<UserId | Error>;
   signup: (credentials: Credentials) => Promise<UserId | Error>;
   logout: () => Promise<void>;
+  fetchItem: (id: string, passKey: string) => Promise<Item>;
 };
 
-const isRemoteAdapter = <T>(
-  adapter: Adapter<T> | RemoteAdapter<T>,
-): adapter is RemoteAdapter<T> =>
+const isRemoteAdapter = <T, Item>(
+  adapter: Adapter<T> | RemoteAdapter<T, Item>,
+): adapter is RemoteAdapter<T, Item> =>
   "login" in adapter && "signup" in adapter && "logout" in adapter;
 
 const applyStateUpdate = <T extends unknown>(
@@ -113,17 +115,20 @@ export const runAdaptersCascade = async <T>(
     });
 };
 
-export const createStore = <T>(config?: {
+export const createStore = <T, Item>(config?: {
   authManager?: AuthManager;
   defaultState?: T;
-}): StoreManager<T> => {
+}): StoreManager<T, Item> => {
   const authManager = config?.authManager ?? getDefaultAuthManager();
   const stateSubject = new BehaviorSubject<StoreState<T>>(createLoadingState());
   const adapters: Adapter<T>[] = [];
-  const remoteAdapters: RemoteAdapter<T>[] = [];
+  const remoteAdapters: RemoteAdapter<T, Item>[] = [];
   let isInitialized = false;
   let currentChangeId = uid();
   let isNotifying = false;
+  const remoteItemFetchers: Array<
+    (id: string, passKey: string) => Promise<Item>
+  > = [];
 
   const notifyAdapters = ({
     data,
@@ -197,8 +202,10 @@ export const createStore = <T>(config?: {
         };
   };
 
-  const registerRemote = (adapter: RemoteAdapter<T>): (() => void) => {
+  const registerRemote = (adapter: RemoteAdapter<T, Item>): (() => void) => {
     remoteAdapters.push(adapter);
+    remoteItemFetchers.push(adapter.fetchItem);
+
     const unregisterAdapter = registerLocal(adapter);
 
     if (isInitialized) {
@@ -213,16 +220,22 @@ export const createStore = <T>(config?: {
     }
 
     return () => {
-      const index = remoteAdapters.indexOf(adapter);
-      if (index !== -1) {
-        remoteAdapters.splice(index, 1);
+      const adapterIndex = remoteAdapters.indexOf(adapter);
+      const fetcherIndex = remoteItemFetchers.indexOf(adapter.fetchItem);
+      if (adapterIndex !== -1) {
+        remoteAdapters.splice(adapterIndex, 1);
+      }
+      if (fetcherIndex !== -1) {
+        remoteItemFetchers.splice(fetcherIndex, 1);
       }
 
       unregisterAdapter();
     };
   };
 
-  const register = (adapter: Adapter<T> | RemoteAdapter<T>): (() => void) => {
+  const register = (
+    adapter: Adapter<T> | RemoteAdapter<T, Item>,
+  ): (() => void) => {
     const change = (update: StateUpdate<T>) => {
       const currentState = stateSubject.getValue();
 
@@ -369,6 +382,16 @@ export const createStore = <T>(config?: {
     return teardownAdapters().then(reinitialize);
   };
 
+  const fetchRemoteItem = (id: string, passKey: string) => {
+    if (remoteItemFetchers.length === 0) {
+      return Promise.reject("No remote adapter setup");
+    }
+
+    return Promise.race(
+      remoteItemFetchers.map((fetcher) => fetcher(id, passKey)),
+    );
+  };
+
   return {
     register,
     init,
@@ -379,5 +402,6 @@ export const createStore = <T>(config?: {
     login,
     signup,
     logout,
+    fetchRemoteItem,
   };
 };

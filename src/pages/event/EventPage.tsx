@@ -1,6 +1,6 @@
-import { deleteMergeableCollectionItem } from "../../models/mergeable";
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
 import { ExpenseList } from "./private/ExpenseList";
+import { deleteMergeableCollectionItem } from "../../models/mergeable";
 import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
 import { useParams } from "react-router";

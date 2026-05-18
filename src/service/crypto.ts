@@ -1,3 +1,4 @@
+import { Logger } from "./Logger";
 import { salt } from "../secrets";
 
 const split = (str: string, index: number): [string, string] => {
@@ -26,7 +27,7 @@ const toStr = (cipher: ArrayBuffer, iv: Uint8Array<ArrayBuffer>): string => {
 };
 
 const fromStr = (
-  str: string
+  str: string,
 ): { cipher: ArrayBuffer; iv: Uint8Array<ArrayBuffer> } => {
   const [A, rest] = split(str, 2);
   const [index, rest2] = split(rest, 1);
@@ -37,12 +38,12 @@ const fromStr = (
   const ivArray = new Uint8Array(
     atob(iv)
       .split("")
-      .map((c) => c.charCodeAt(0))
+      .map((c) => c.charCodeAt(0)),
   );
   const cipherArray = new Uint8Array(
     atob(cipher)
       .split("")
-      .map((c) => c.charCodeAt(0))
+      .map((c) => c.charCodeAt(0)),
   );
 
   return {
@@ -82,7 +83,7 @@ export const generateKeyPair = () =>
       hash: "SHA-256",
     },
     true,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
 export function exportKeyPair(keyPair: CryptoKeyPair) {
@@ -91,7 +92,7 @@ export function exportKeyPair(keyPair: CryptoKeyPair) {
     crypto.subtle.exportKey("pkcs8", keyPair.privateKey),
   ])
     .then((keys) =>
-      keys.map((key) => btoa(String.fromCharCode(...new Uint8Array(key))))
+      keys.map((key) => btoa(String.fromCharCode(...new Uint8Array(key)))),
     )
     .then(([publicKey, privateKey]) => ({ publicKey, privateKey }));
 }
@@ -111,7 +112,7 @@ export function importPublicKey(publicKey: string): Promise<CryptoKey> {
       hash: "SHA-256",
     },
     true,
-    ["encrypt"]
+    ["encrypt"],
   );
 }
 
@@ -130,7 +131,7 @@ export function importPrivateKey(privateKey: string): Promise<CryptoKey> {
       hash: "SHA-256",
     },
     true,
-    ["decrypt"]
+    ["decrypt"],
   );
 }
 
@@ -157,7 +158,7 @@ export function encode(str: string, publicKey: CryptoKey): Promise<string> {
         name: "RSA-OAEP",
       },
       publicKey,
-      new TextEncoder().encode(str)
+      new TextEncoder().encode(str),
     )
     .then((buffer) => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 }
@@ -175,7 +176,7 @@ export function decode(str: string, privateKey: CryptoKey): Promise<string> {
         name: "RSA-OAEP",
       },
       privateKey,
-      bytes.buffer
+      bytes.buffer,
     )
     .then((buffer) => new TextDecoder().decode(buffer));
 }
@@ -199,7 +200,7 @@ export const encrypt = async (plaintext: string, key: string) => {
         length: 256,
       },
       true,
-      ["encrypt", "decrypt"]
+      ["encrypt", "decrypt"],
     );
     const ciphertext = await crypto.subtle.encrypt(
       {
@@ -207,7 +208,7 @@ export const encrypt = async (plaintext: string, key: string) => {
         iv,
       },
       secretKey,
-      encodedPlaintext
+      encodedPlaintext,
     );
     return toStr(ciphertext, iv);
   } catch (error) {
@@ -215,36 +216,46 @@ export const encrypt = async (plaintext: string, key: string) => {
   }
 };
 
-export const decrypt = async (str: string, key: string) => {
-  try {
-    const { cipher, iv } = fromStr(str);
-
-    const binaryString = atob(key);
-    const keyBytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      keyBytes[i] = binaryString.charCodeAt(i);
-    }
-
-    const secretKey = await crypto.subtle.importKey(
-      "raw",
-      keyBytes.buffer,
-      {
-        name: "AES-GCM",
-        length: 256,
-      },
-      true,
-      ["encrypt", "decrypt"]
-    );
-    const decrypted = await crypto.subtle.decrypt(
-      {
-        name: "AES-GCM",
-        iv,
-      },
-      secretKey,
-      cipher
-    );
-    return new TextDecoder().decode(decrypted);
-  } catch (error) {
-    throw new Error("Decryption failed");
+const toBufferArray = (binaryString: string) => {
+  const keyBytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    keyBytes[i] = binaryString.charCodeAt(i);
   }
+  return keyBytes;
 };
+
+export const decrypt = (str: string, key: string) =>
+  Promise.resolve(key)
+    .then(atob)
+    .then(toBufferArray)
+    .then((keyBytes) =>
+      crypto.subtle.importKey(
+        "raw",
+        keyBytes.buffer,
+        {
+          name: "AES-GCM",
+          length: 256,
+        },
+        true,
+        ["encrypt", "decrypt"],
+      ),
+    )
+    .then((secretKey) =>
+      Promise.resolve(str)
+        .then(fromStr)
+        .then(({ cipher, iv }) =>
+          crypto.subtle.decrypt(
+            {
+              name: "AES-GCM",
+              iv,
+            },
+            secretKey,
+            cipher,
+          ),
+        )
+        .then((value) => new TextDecoder().decode(value))
+        .catch((error) => {
+          Logger.log("Decryption failed")(error);
+          throw new Error("Decryption failed");
+        }),
+    );

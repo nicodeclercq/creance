@@ -2,8 +2,11 @@ import * as z from "zod";
 import {
   type Observable,
   type Subscription,
+  catchError,
   distinctUntilChanged,
   firstValueFrom,
+  of,
+  timeout,
 } from "rxjs";
 import { pipe } from "fp-ts/function";
 
@@ -12,23 +15,9 @@ import type { State } from "../state";
 import { stateSchema } from "../state";
 import type { Event } from "../../models/Event";
 import { eventSchema } from "../../models/Event";
-import type { User } from "../../models/User";
 import { Logger } from "../../service/Logger";
 import { merge } from "./shared/merge";
-import {
-  type AliasRegistry,
-  type AliasMappingRegistry,
-  createUserId,
-  createAliasId,
-  setAlias,
-  createEmptyAliasRegistry,
-  createEmptyMappingRegistry,
-  getOrCreateAlias,
-  getAliasForUser,
-  replaceUserIdsWithAliases,
-} from "./shared/alias";
 import { encryptState, decryptState } from "./shared/e2ee";
-import { mapObject } from "../../utils/object";
 import { type AuthManager, getDefaultAuthManager } from "./AuthManager";
 
 const dateSchema = z.union([
@@ -36,51 +25,18 @@ const dateSchema = z.union([
   z.date(),
 ]);
 
-const knownEventSchema = z.strictObject({
-  eventKey: z.string(),
-  lastSyncAt: dateSchema,
-});
-
-const aliasIdSchema = z.string().transform((id) => createAliasId(id));
-const userIdSchema = z.string().transform((id) => createUserId(id));
-
-const userInfoSchema = z.strictObject({
-  name: z.string(),
-  avatar: z.string().optional(),
-});
-
-const aliasRegistrySchema = z.record(aliasIdSchema, userInfoSchema);
-const aliasMappingRegistrySchema = z.record(userIdSchema, aliasIdSchema);
-
 const userDataSchema = z.strictObject({
-  knownEvents: z.record(z.string(), knownEventSchema),
-  knownAliases: aliasRegistrySchema,
-  aliasMappings: aliasMappingRegistrySchema,
   state: stateSchema,
   updatedAt: dateSchema,
 });
 
 export type UserData = z.infer<typeof userDataSchema>;
 
-const remoteEventDataSchema = z.strictObject({
-  event: eventSchema,
-  participants: z.record(
-    z.string(),
-    z.strictObject({
-      aliasId: aliasIdSchema,
-      userInfo: userInfoSchema,
-    }),
-  ),
-  updatedAt: dateSchema,
-});
-
-type RemoteEventData = z.infer<typeof remoteEventDataSchema>;
-
 export type RemoteOperations = {
   name: string;
-  login: RemoteAdapter<unknown>["login"];
-  signup: RemoteAdapter<unknown>["signup"];
-  logout: RemoteAdapter<unknown>["logout"];
+  login: RemoteAdapter<unknown, unknown>["login"];
+  signup: RemoteAdapter<unknown, unknown>["signup"];
+  logout: RemoteAdapter<unknown, unknown>["logout"];
   getUserData: () => Observable<string | undefined>;
   setUserData: (encryptedData: string) => Promise<void>;
   getEventData?: (eventId: string) => Observable<string | undefined>;
@@ -93,159 +49,36 @@ export type RemoteAdapterConfig = {
   authManager?: AuthManager;
 };
 
+const FIRST_REMOTE_EMISSION_TIMEOUT_MS = 3000;
+
 const createEmptyUserData = (state: State): UserData => ({
-  knownEvents: {},
-  knownAliases: createEmptyAliasRegistry(),
-  aliasMappings: createEmptyMappingRegistry(),
   state,
   updatedAt: new Date(),
 });
-
-type AliasAccumulator = {
-  mappings: AliasMappingRegistry;
-  aliases: AliasRegistry;
-  participants: RemoteEventData["participants"];
-};
-
-const collectUserIds = (event: Event): string[] =>
-  Object.keys(event.participants.collection);
-
-const buildAliasAccumulator = (
-  userIds: string[],
-  users: Record<string, User>,
-  existingMappings: AliasMappingRegistry,
-): AliasAccumulator =>
-  userIds.reduce<AliasAccumulator>(
-    (acc, userId) => {
-      const { aliasId, mappings } = pipe(userId, createUserId, (typedUserId) =>
-        getOrCreateAlias(typedUserId, acc.mappings),
-      );
-      const user = users[userId];
-      const userInfo = user
-        ? { name: user.name, avatar: user.avatar }
-        : { name: "Unknown" };
-
-      return {
-        mappings,
-        aliases: setAlias(acc.aliases, aliasId, userInfo),
-        participants: {
-          ...acc.participants,
-          [userId]: { aliasId, userInfo },
-        },
-      };
-    },
-    {
-      mappings: existingMappings,
-      aliases: createEmptyAliasRegistry(),
-      participants: {},
-    },
-  );
-
-const prepareEventForSharing = (
-  event: Event,
-  users: Record<string, User>,
-  existingMappings: AliasMappingRegistry,
-): {
-  eventData: RemoteEventData;
-  mappings: AliasMappingRegistry;
-  aliases: AliasRegistry;
-} => {
-  const userIds = collectUserIds(event);
-  const { mappings, aliases, participants } = buildAliasAccumulator(
-    userIds,
-    users,
-    existingMappings,
-  );
-
-  const aliasedExpenses = pipe(
-    event.expenses.collection,
-    mapObject((expense) =>
-      replaceUserIdsWithAliases(expense, "lender", mappings),
-    ),
-  );
-
-  const aliasedDeposits = pipe(
-    event.deposits.collection,
-    mapObject((deposit) =>
-      replaceUserIdsWithAliases(
-        replaceUserIdsWithAliases(deposit, "from", mappings),
-        "to",
-        mappings,
-      ),
-    ),
-  );
-
-  const aliasedParticipants = Object.fromEntries(
-    Object.entries(event.participants.collection).map(
-      ([userId, participant]) => [
-        getAliasForUser(mappings, createUserId(userId)) ?? userId,
-        participant,
-      ],
-    ),
-  );
-
-  const aliasedMealManager = pipe(
-    event.mealManager,
-    mapObject((meals) =>
-      replaceUserIdsWithAliases(
-        replaceUserIdsWithAliases(meals, "lunch", mappings),
-        "dinner",
-        mappings,
-      ),
-    ),
-  );
-
-  const aliasedEvent: Event = {
-    ...event,
-    expenses: {
-      collection: aliasedExpenses,
-      updatedAt: event.expenses.updatedAt,
-    },
-    deposits: {
-      collection: aliasedDeposits,
-      updatedAt: event.deposits.updatedAt,
-    },
-    participants: {
-      collection: aliasedParticipants,
-      updatedAt: event.participants.updatedAt,
-    },
-    mealManager: aliasedMealManager,
-  };
-
-  return {
-    eventData: {
-      event: aliasedEvent,
-      participants,
-      updatedAt: event.updatedAt,
-    },
-    mappings,
-    aliases,
-  };
-};
 
 const decryptAndValidate = <T extends z.ZodType>(
   encryptedData: string,
   passKey: string,
   schema: T,
 ): Promise<z.infer<T>> =>
-  decryptState(encryptedData, passKey).then((decrypted) => {
-    const validated = schema.safeParse(decrypted);
-    if (!validated.success) {
-      Logger.error("RemoteAdapter: decrypted data validation failed")(
-        validated.error,
-      );
-      throw new Error("Decrypted data validation failed");
-    }
-    return validated.data as z.infer<T>;
-  });
+  Promise.resolve()
+    .then(() => decryptState(encryptedData, passKey))
+    .then((decrypted) => {
+      const validated = schema.safeParse(decrypted);
 
-const generateRandomKey = (): string =>
-  btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
+      if (!validated.success) {
+        Logger.error("RemoteAdapter: decrypted data validation failed")(
+          validated.error,
+        );
+        throw new Error("Decrypted data validation failed");
+      }
+      return validated.data as z.infer<T>;
+    });
 
 export const createRemoteAdapter = ({
   operations,
   authManager = getDefaultAuthManager(),
-}: RemoteAdapterConfig): RemoteAdapter<State> => {
+}: RemoteAdapterConfig): RemoteAdapter<State, Event> => {
   Logger.log(`RemoteAdapter[${operations.name}]: creating`)({});
 
   const state: {
@@ -339,16 +172,27 @@ export const createRemoteAdapter = ({
     userKey: string,
     prev: State | undefined,
   ): Promise<State | undefined> =>
-    firstValueFrom(operations.getUserData().pipe(distinctUntilChanged()))
-      .then((encryptedData: string | undefined) => {
-        if (encryptedData === undefined) {
-          return handleRemoteData(undefined, prev);
-        }
-
-        return decryptAndValidate(encryptedData, userKey, userDataSchema).then(
-          (remoteUserData) => handleRemoteData(remoteUserData, prev),
-        );
-      })
+    firstValueFrom(
+      operations.getUserData().pipe(
+        distinctUntilChanged(),
+        timeout({ first: FIRST_REMOTE_EMISSION_TIMEOUT_MS }),
+        catchError((error) => {
+          Logger.error(
+            `RemoteAdapter[${operations.name}]: getUserData first emission timeout or error`,
+          )(error);
+          return of(undefined);
+        }),
+      ),
+    )
+      .then((encryptedData: string | undefined) =>
+        Promise.resolve().then(() =>
+          encryptedData === undefined
+            ? handleRemoteData(undefined, prev)
+            : decryptAndValidate(encryptedData, userKey, userDataSchema).then(
+                (remoteUserData) => handleRemoteData(remoteUserData, prev),
+              ),
+        ),
+      )
       .catch((error) => {
         Logger.error(`RemoteAdapter[${operations.name}]: fetchAndMerge failed`)(
           error,
@@ -387,44 +231,23 @@ export const createRemoteAdapter = ({
       });
   };
 
-  const ensureEventKey = (eventId: string): string => {
-    if (!state.userData) {
-      return generateRandomKey();
-    }
-
-    const existing = state.userData.knownEvents[eventId];
-    if (existing) {
-      return existing.eventKey;
-    }
-
-    const newKey = generateRandomKey();
-    state.userData = {
-      ...state.userData,
-      knownEvents: {
-        ...state.userData.knownEvents,
-        [eventId]: { eventKey: newKey, lastSyncAt: new Date() },
-      },
-    };
-    return newKey;
-  };
-
   const saveEventData = (eventId: string, event: Event): Promise<void> => {
     if (!operations.setEventData || !authManager.getUserKey()) {
       return Promise.resolve();
     }
 
-    const eventKey = ensureEventKey(eventId);
-    const users = state.userData?.state.users.collection ?? {};
-    const { eventData } = prepareEventForSharing(
-      event,
-      users,
-      state.userData?.aliasMappings ?? createEmptyMappingRegistry(),
-    );
+    const knownEvent = state.userData?.state.account.events.collection[eventId];
+    const eventKey = knownEvent?.key;
 
-    return encryptState(eventData, eventKey)
+    if (!eventKey) {
+      return Promise.reject("No event key found");
+    }
+
+    return encryptState(event, eventKey as string)
       .then((encrypted) => {
         // Skip save if event was deleted during encryption
-        if (!state.userData?.knownEvents[eventId]) {
+        if (!state.userData?.state.account.events.collection[eventId]) {
+          Logger.log("Skip event saving, it was deelted during encryption");
           return;
         }
 
@@ -437,40 +260,9 @@ export const createRemoteAdapter = ({
       });
   };
 
+  // TODO: change deletion workflow
   const cleanupDeletedEvents = (currentEvents: Record<string, Event>): void => {
-    if (!state.userData) {
-      return;
-    }
-
-    const currentEventIds = new Set(Object.keys(currentEvents));
-    const deletedEventIds = Object.keys(state.userData.knownEvents).filter(
-      (id) => !currentEventIds.has(id),
-    );
-
-    if (deletedEventIds.length === 0) {
-      return;
-    }
-
-    Logger.log(
-      `RemoteAdapter[${operations.name}]: cleaning up ${deletedEventIds.length} deleted events`,
-    )({ deletedEventIds });
-
-    state.userData = {
-      ...state.userData,
-      knownEvents: Object.fromEntries(
-        Object.entries(state.userData.knownEvents).filter(([id]) =>
-          currentEventIds.has(id),
-        ),
-      ),
-    };
-
-    deletedEventIds.forEach((id) => {
-      operations.deleteEventData?.(id).catch((error) => {
-        Logger.error(
-          `RemoteAdapter[${operations.name}]: deleteEventData failed`,
-        )(error);
-      });
-    });
+    // TODO
   };
 
   const onChange = (newState: State): void => {
@@ -483,15 +275,6 @@ export const createRemoteAdapter = ({
       : createEmptyUserData(newState);
 
     cleanupDeletedEvents(newState.events.collection);
-
-    // Ensure all event keys exist before saving userData,
-    // so knownEvents is complete when the encrypted userData reaches remote
-    if (operations.setEventData) {
-      Object.keys(newState.events.collection).forEach((eventId) => {
-        ensureEventKey(eventId);
-      });
-    }
-
     saveUserData(state.userData);
 
     if (operations.setEventData) {
@@ -512,13 +295,39 @@ export const createRemoteAdapter = ({
     state.userData = undefined;
   };
 
-  const adapter: RemoteAdapter<State> = {
+  const fetchItem = (id: string, passKey: string) => {
+    const fetcher = operations.getEventData;
+
+    if (!fetcher) {
+      return Promise.reject("Operation missing on adapter");
+    }
+
+    return pipe(id, fetcher, firstValueFrom, (result) =>
+      result
+        .then((value) => {
+          if (!value) {
+            return Promise.reject("Unknown event");
+          }
+
+          return decryptAndValidate(value as string, passKey, eventSchema).then(
+            (data) => data,
+          );
+        })
+        .catch((e) => {
+          Logger.error("ERROR")(z.prettifyError(e));
+          throw new Error(z.prettifyError(e.message));
+        }),
+    );
+  };
+
+  const adapter: RemoteAdapter<State, Event> = {
     load,
     onChange,
     onLogout,
     login: (credentials) => operations.login(credentials),
     signup: (credentials) => operations.signup(credentials),
     logout: () => operations.logout().then(() => onLogout()),
+    fetchItem,
   };
 
   return adapter;

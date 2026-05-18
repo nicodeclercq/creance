@@ -6,19 +6,20 @@ import {
 } from "../../pages/auth/private/LoginForm";
 import styles from "../../pages/auth/private/LoginPage.module.css";
 import { PigImage } from "../../ui/Pig";
-import type { UserId } from "./shared/alias";
+import { useTranslation } from "react-i18next";
 
 const isError = (data: unknown): data is Error => data instanceof Error;
 
 export const createLoginDialog = (
-  signIn: (data: LoginFormData) => Promise<UserId | Error>,
+  signIn: (data: LoginFormData) => Promise<string | Error>,
 ) =>
-  openDialog<LoginFormData & { userId: UserId }>({
+  openDialog<LoginFormData & { userId: string }>({
     title: "LoginForm.title",
     component: ({ onSubmit, onCancel }) => {
       const isMount = useRef(false);
       const [error, setError] = useState<string>();
       const [isSubmiting, setIsSubmiting] = useState(false);
+      const { t } = useTranslation();
 
       useEffect(() => {
         isMount.current = true;
@@ -29,7 +30,6 @@ export const createLoginDialog = (
       }, []);
 
       const submit = (data: LoginFormData) => {
-        console.log("submit");
         setIsSubmiting(true);
 
         return signIn(data)
@@ -49,10 +49,6 @@ export const createLoginDialog = (
             }
           });
       };
-      const cancel = () => {
-        console.log("cancel");
-        return onCancel();
-      };
 
       return (
         <div>
@@ -61,7 +57,10 @@ export const createLoginDialog = (
           </div>
           <LoginForm
             onSubmit={submit}
-            onCancel={cancel}
+            cancel={{
+              onClick: onCancel,
+              label: t("LoginForm.actions.continueAnonymously"),
+            }}
             errorMessage={error}
             isLoading={isSubmiting}
           />

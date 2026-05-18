@@ -9,6 +9,7 @@ import { useAuth } from "./store/useAuth";
 import { useData } from "./store/useData";
 import { useStore } from "./store/useStore";
 import { useTranslation } from "react-i18next";
+import { useCurrentUser } from "./store/useCurrentUser";
 
 type Props = {
   children: ReactNode;
@@ -29,10 +30,10 @@ export function PrivatePage({ children }: Props) {
   const { t } = useTranslation();
   const store = useStore();
   const { state } = useAuth();
-  const [currentUser, setCurrentUser] = useData("account.currentUser");
+  const { setCurrentUser, userId } = useCurrentUser();
   const [users] = useData("users.collection");
 
-  const isAnonymous = currentUser._id === ANONYMOUS_USER._id;
+  const isAnonymous = userId === ANONYMOUS_USER._id;
 
   const handleSetParticipant = (user: User) => {
     setCurrentUser(() => user);

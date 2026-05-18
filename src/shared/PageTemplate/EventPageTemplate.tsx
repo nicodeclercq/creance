@@ -1,4 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
+import { pipe } from "fp-ts/function";
+import * as ArrayFP from "fp-ts/Array";
 import { PageTemplate } from "./PageTemplate";
 import type { Event } from "../../models/Event";
 import { useTranslation } from "react-i18next";
@@ -11,7 +13,6 @@ import { ROUTES } from "../../routes";
 import { dateToKey } from "../../utils/date";
 import { AddActivityModal } from "../../pages/calendar/private/AddActivityModal";
 import type { Activity } from "../../models/Activity";
-import { useCurrentUser } from "../../store/useCurrentUser";
 import { MediaOnly } from "../../ui/MediaOnly/MediaOnly";
 import { EditEventModal } from "../../pages/events/private/EditEventModal";
 import type { Step1Data } from "../../pages/events/private/EventStep1Form";
@@ -20,6 +21,7 @@ import {
   deleteMergeableCollectionItem,
   updateMergeableRecord,
 } from "../../models/mergeable";
+import type { MenuProps } from "./Menu/Menu";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -34,7 +36,6 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
   const [___, setEvents] = useData(`events`);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
-  const { currentUser } = useCurrentUser();
 
   const addActivity = (activity: Activity) => {
     setEvent((prev) => ({
@@ -42,7 +43,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
       activities: addMergeableCollectionItem(
         activity._id,
         activity,
-        prev.activities
+        prev.activities,
       ),
     }));
   };
@@ -60,27 +61,69 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           departure: data.departure,
         },
         isAutoClose: data.isAutoClose,
-      })
+      }),
     );
   };
 
-  const actions = [
-    {
-      label: t("page.event.list.actions.addActivity"),
-      icon: "calendar-day",
-      as: "button",
-      onClick: () => {
-        setIsActivityModalOpen(true);
+  const actions = pipe(
+    [
+      event.hasProgram
+        ? {
+            label: t("page.event.list.actions.addActivity"),
+            icon: "calendar-day",
+            as: "button",
+            onClick: () => {
+              setIsActivityModalOpen(true);
+            },
+          }
+        : undefined,
+      {
+        label: t("page.event.list.actions.addExpense"),
+        icon: "shopping-cart",
+        as: "link",
+        to: "TRANSACTION_ADD",
+        params: { eventId: event._id },
+      } as Action<"TRANSACTION_ADD">,
+    ] satisfies Array<Action<RouteName> | undefined>,
+    ArrayFP.filter((a) => a != null),
+  );
+
+  const menu = pipe(
+    [
+      event.hasProgram
+        ? {
+            label: t("page.menu.calendar"),
+            icon: "calendar-day",
+            as: "link",
+            to: "EVENT_CALENDAR",
+            params: { eventId: event._id },
+            hash: currentDay.current,
+          }
+        : undefined,
+      {
+        label: t("page.menu.expenses"),
+        icon: "shopping-cart",
+        as: "link",
+        to: "EVENT",
+        params: { eventId: event._id },
       },
-    },
-    {
-      label: t("page.event.list.actions.addExpense"),
-      icon: "shopping-cart",
-      as: "link",
-      to: "TRANSACTION_ADD",
-      params: { eventId: event._id },
-    } as Action<"TRANSACTION_ADD">,
-  ] satisfies Action<RouteName>[];
+      {
+        label: t("page.menu.shares"),
+        icon: "user-share",
+        as: "link",
+        to: "EVENT_PARTICIPANT_SHARE",
+        params: { eventId: event._id },
+      },
+      {
+        label: t("page.menu.distribution"),
+        icon: "give-money",
+        as: "link",
+        to: "EVENT_DISTRIBUTION",
+        params: { eventId: event._id },
+      },
+    ] as const,
+    ArrayFP.filter((a) => a != null),
+  ) as MenuProps["actions"];
 
   const eventActions = event.isClosed
     ? ([
@@ -101,7 +144,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           onClick: () => {
             // No need to clean up global expenses since they're embedded in events
             setEvents((currentEvents) =>
-              deleteMergeableCollectionItem(event._id, currentEvents)
+              deleteMergeableCollectionItem(event._id, currentEvents),
             );
             goTo("EVENT_LIST");
           },
@@ -160,40 +203,10 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           },
           ...eventActions,
         ]}
-        menu={[
-          {
-            label: t("page.menu.calendar"),
-            icon: "calendar-day",
-            as: "link",
-            to: "EVENT_CALENDAR",
-            params: { eventId: event._id },
-            hash: currentDay.current,
-          },
-          {
-            label: t("page.menu.expenses"),
-            icon: "shopping-cart",
-            as: "link",
-            to: "EVENT",
-            params: { eventId: event._id },
-          },
-          {
-            label: t("page.menu.shares"),
-            icon: "user-share",
-            as: "link",
-            to: "EVENT_PARTICIPANT_SHARE",
-            params: { eventId: event._id },
-          },
-          {
-            label: t("page.menu.distribution"),
-            icon: "give-money",
-            as: "link",
-            to: "EVENT_DISTRIBUTION",
-            params: { eventId: event._id },
-          },
-        ]}
+        menu={menu}
       >
         {children}
-        {actions.length > 1 && !event.isClosed && (
+        {!event.isClosed && (
           <MediaOnly media={["default", "sm"]}>
             <QuickActions
               icon="add"
@@ -207,7 +220,6 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
         isOpen={isActivityModalOpen}
         setIsOpen={setIsActivityModalOpen}
         onSubmit={addActivity}
-        currentUser={currentUser}
       />
       <EditEventModal
         event={event}

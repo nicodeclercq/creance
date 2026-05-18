@@ -1,10 +1,6 @@
 import { createStore } from "../createStore";
 import type { UserData } from "../adapters/createRemoteAdapter";
 import type { State } from "../state";
-import {
-  createEmptyAliasRegistry,
-  createEmptyMappingRegistry,
-} from "../adapters/shared/alias";
 import { generateKey } from "../../service/crypto";
 import type { SecureKeyStore } from "../../service/secureKeyStore";
 import type { Event } from "../../models/Event";
@@ -32,19 +28,13 @@ export const preAuthenticate = (
   secureKeyStore?: SecureKeyStore,
 ): Promise<string> =>
   generateKey(TEST_CREDENTIALS.password).then((userKey) => {
-    storage.setItem(
-      "creance-auth",
-      JSON.stringify({ type: "authenticated" }),
-    );
+    storage.setItem("creance-auth", JSON.stringify({ type: "authenticated" }));
     return (secureKeyStore?.store(userKey) ?? Promise.resolve()).then(
       () => userKey,
     );
   });
 
 export const createTestUserData = (state: State): UserData => ({
-  knownEvents: {},
-  knownAliases: createEmptyAliasRegistry(),
-  aliasMappings: createEmptyMappingRegistry(),
   state,
   updatedAt: state.updatedAt,
 });

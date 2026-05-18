@@ -1,0 +1,132 @@
+{
+  "users": {
+    "collection": {
+      "d3f3aaae-4082-4b0d-9f33-163ca8bcf10d": {
+        "_id": "d3f3aaae-4082-4b0d-9f33-163ca8bcf10d",
+        "name": "Nobody",
+        "avatar": "",
+        "share": {
+          "adults": 1,
+          "children": 0
+        },
+        "updatedAt": "2025-01-01T00:00:00.000Z"
+      }
+    },
+    "updatedAt": "2026-05-08T07:22:25.343Z"
+  },
+  "events": {
+    "collection": {
+      "ba5dc739-3597-4e0c-a59c-44504a8ac0ff": {
+        "_id": "ba5dc739-3597-4e0c-a59c-44504a8ac0ff",
+        "name": "coucou",
+        "participants": {
+          "collection": {
+            "c5085327-0325-4007-b7ae-ce102b5916fb": {
+              "_id": "c5085327-0325-4007-b7ae-ce102b5916fb",
+              "name": "Plop",
+              "avatar": "",
+              "share": {
+                "adults": 1,
+                "children": 0
+              },
+              "updatedAt": "2026-05-08T07:22:26.593Z",
+              "participantShare": {
+                "type": "default"
+              }
+            },
+            "d3f3aaae-4082-4b0d-9f33-163ca8bcf10d": {
+              "_id": "d3f3aaae-4082-4b0d-9f33-163ca8bcf10d",
+              "name": "Nobody",
+              "avatar": "",
+              "share": {
+                "adults": 1,
+                "children": 0
+              },
+              "updatedAt": "2026-05-08T07:22:26.593Z",
+              "participantShare": {
+                "type": "default"
+              }
+            }
+          },
+          "updatedAt": "2026-05-08T07:22:26.593Z"
+        },
+        "period": {
+          "start": "2026-05-08T07:21:31.901Z",
+          "end": "2026-05-08T07:21:31.901Z",
+          "arrival": "PM",
+          "departure": "AM"
+        },
+        "description": "",
+        "expenses": {
+          "collection": {},
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        },
+        "deposits": {
+          "collection": {},
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        },
+        "categories": {
+          "collection": {
+            "8af91bd6-c503-4375-9841-0e833bf50f7e": {
+              "_id": "8af91bd6-c503-4375-9841-0e833bf50f7e",
+              "name": "Divers",
+              "icon": "coin",
+              "updatedAt": "2026-05-08T07:22:26.593Z"
+            },
+            "eff91e62-3787-4846-a8a6-105cc626a2f4": {
+              "_id": "eff91e62-3787-4846-a8a6-105cc626a2f4",
+              "name": "Courses",
+              "icon": "cart",
+              "updatedAt": "2026-05-08T07:22:26.593Z"
+            },
+            "ae605b8d-0d3d-4368-aaaf-04f432d7c57b": {
+              "_id": "ae605b8d-0d3d-4368-aaaf-04f432d7c57b",
+              "name": "Logement",
+              "icon": "house",
+              "updatedAt": "2026-05-08T07:22:26.593Z"
+            },
+            "298fc309-8775-466e-90d3-dd0c3f1065a1": {
+              "_id": "298fc309-8775-466e-90d3-dd0c3f1065a1",
+              "name": "Visites",
+              "icon": "camera",
+              "updatedAt": "2026-05-08T07:22:26.593Z"
+            }
+          },
+          "updatedAt": "2026-05-08T07:22:26.593Z"
+        },
+        "mealManager": {},
+        "activities": {
+          "collection": {},
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        },
+        "updatedAt": "2025-01-01T00:00:00.000Z"
+      }
+    },
+    "updatedAt": "2026-05-08T07:22:26.593Z"
+  },
+  "account": {
+    "currentUser": {
+      "_id": "c5085327-0325-4007-b7ae-ce102b5916fb",
+      "name": "Plop",
+      "avatar": "",
+      "share": {
+        "adults": 1,
+        "children": 0
+      },
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    "events": {
+      "collection": {
+        "ba5dc739-3597-4e0c-a59c-44504a8ac0ff": {
+          "key": "Tt6mdEdvn3ot9XdB0HotxxwnSWvhD07neLhBBZEIfuw=",
+          "uid": "c5085327-0325-4007-b7ae-ce102b5916fb",
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        }
+      },
+      "updatedAt": "2026-05-08T07:22:26.593Z"
+    },
+    "updatedAt": "2026-05-08T07:22:26.593Z"
+  },
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "version": 1
+}

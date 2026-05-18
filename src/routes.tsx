@@ -14,6 +14,7 @@ import { DistributionPage } from "./pages/distribution/DistributionPage";
 import type { ValueOf } from "./utils/object";
 import { InformationPage } from "./pages/settings/InformationPage";
 import { CalendarPage } from "./pages/calendar/CalendarPage";
+import { JoinPage } from "./pages/join/JoinPage";
 
 export const ROUTES_DEFINITION = {
   ROOT: {
@@ -70,7 +71,7 @@ export const ROUTES_DEFINITION = {
   },
   JOIN: {
     path: "/join/:eventId/:shareId",
-    component: () => <h1>Join event</h1>,
+    component: JoinPage,
     isPublic: true,
   },
 } as const satisfies Record<

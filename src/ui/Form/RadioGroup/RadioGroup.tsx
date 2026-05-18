@@ -1,8 +1,12 @@
 import { RadioGroup as Group, Radio } from "react-aria-components";
+
 import { FormField } from "../../FormField/FormField";
+import { InputText } from "../../FormField/InputText/InputText";
 import classNames from "classnames";
 import styles from "./RadioGroup.module.css";
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
+
 type Option<T> = { id: string; label: string; value: T };
 
 type RadioGroupProps<T> = {
@@ -14,6 +18,8 @@ type RadioGroupProps<T> = {
   error?: string | undefined;
   options: Option<T>[];
   wrap?: boolean;
+  direction?: "horizontal" | "vertical";
+  onCustomOption?: (value: string) => void;
 };
 
 export function RadioGroup<T>({
@@ -25,8 +31,11 @@ export function RadioGroup<T>({
   isDisabled = false,
   isRequired = false,
   wrap = false,
+  direction = "horizontal",
+  onCustomOption,
 }: RadioGroupProps<T>) {
   const id = useId();
+  const { t } = useTranslation();
   const selectedOption = options.find((option) => option.id === value);
   const change = (newValue: string) => {
     const newOption = options.find((option) => option.id === newValue);
@@ -47,7 +56,9 @@ export function RadioGroup<T>({
       <Group
         value={selectedOption?.id}
         onChange={change}
-        className={classNames(styles.group, { [styles.wrap]: wrap })}
+        className={classNames(styles.group, styles[direction], {
+          [styles.wrap]: wrap,
+        })}
         aria-labelledby={id}
       >
         {options.map(({ label, id }) => (
@@ -55,6 +66,15 @@ export function RadioGroup<T>({
             {label}
           </Radio>
         ))}
+        {onCustomOption != null && (
+          <Radio
+            key={`${id}-custom`}
+            value={`${id}-custom`}
+            className={styles.radio}
+          >
+            {t("component.RadioGroup.options.custom")}
+          </Radio>
+        )}
       </Group>
     </FormField>
   );

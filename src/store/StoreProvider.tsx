@@ -6,6 +6,7 @@ import { type StoreState } from "./createStore";
 import type { BehaviorSubject } from "rxjs";
 import { store } from "./store";
 import type { Credentials } from "./adapters/AuthManager";
+import type { Event } from "../models/Event";
 
 export type { StoreState } from "./createStore";
 
@@ -19,6 +20,7 @@ type StoreContextValue<T> = {
   logout: () => Promise<void>;
   stateSubject: BehaviorSubject<StoreState<State>>;
   updateState: (update: T | ((current: T) => T)) => void;
+  fetchEvent: (id: string, passKey: string) => Promise<Event>;
 };
 export const StoreContext = createContext<StoreContextValue<State> | null>(
   null,
@@ -43,6 +45,7 @@ export function StoreProvider({
     signup: store.signup,
     stateSubject: store.stateSubject,
     updateState: store.updateState,
+    fetchEvent: store.fetchRemoteItem,
   };
 
   return isLoading(storeState) ? (

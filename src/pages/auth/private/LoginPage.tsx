@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { Alert } from "../../../ui/Alert/Alert";
 import { Container } from "../../../ui/Container/Container";
 import type { Credentials } from "../../../store/adapters/AuthManager";
 import { LoadingIcon } from "../../../ui/Button/LoadingIcon";
@@ -57,8 +58,12 @@ export function LoginPage() {
     >
       <LoadingIcon size="l" />
       <Modal isOpen title={t("LoginForm.title")}>
+        <Alert type="subtle">{t("LoginForm.alert")}</Alert>
         <LoginForm
-          onCancel={cancel}
+          cancel={{
+            onClick: cancel,
+            label: t("LoginForm.actions.continueAnonymously"),
+          }}
           onSubmit={submit}
           errorMessage={error}
           isLoading={isLoading}

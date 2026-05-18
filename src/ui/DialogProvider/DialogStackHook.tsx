@@ -17,7 +17,6 @@ const DialogStackManager = (function createDialogStackManager() {
   };
 
   const add = (instance: DialogInstance) => {
-    console.log("add dialog", instance.config.title);
     instances.add(instance);
     notifyListeners();
   };

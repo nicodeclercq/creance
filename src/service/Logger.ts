@@ -4,7 +4,7 @@ const isDebugActive = (): boolean => {
   }
   return (
     window.location.search.includes("debug") ||
-    localStorage.getItem("debug") === "true"
+    localStorage?.getItem?.("debug") === "true"
   );
 };
 

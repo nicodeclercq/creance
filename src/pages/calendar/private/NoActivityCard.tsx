@@ -36,7 +36,6 @@ export function NoActivityCard({
       <AddActivityModal
         defaultDate={defaultDate}
         isOpen={isOpen}
-        currentUser={currentUser}
         setIsOpen={setIsOpen}
         onSubmit={addActivity}
       />

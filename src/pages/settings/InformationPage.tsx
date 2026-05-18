@@ -25,6 +25,7 @@ import { LightThemeImage } from "./private/LightThemeImage";
 import { DarkThemeImage } from "./private/DarkThemeImage";
 import { SystemThemeImage } from "./private/SystemThemeImage";
 import { updateMergeableRecord } from "../../models/mergeable";
+import { useCurrentUser } from "../../store/useCurrentUser";
 
 const ThemeImage = ({ theme }: { theme: Theme | "system" }): ReactNode => {
   switch (theme) {
@@ -43,7 +44,7 @@ export function InformationPage() {
   const [hasImportError, setHasImportError] = useState(false);
   const { theme, changeTheme } = useTheme();
 
-  const [currentParticipantId] = useData("account.currentUser._id");
+  const { userId } = useCurrentUser();
   const [events, setEvents] = useData("events");
 
   const reset = () => {
@@ -57,8 +58,8 @@ export function InformationPage() {
       Object.values(events.collection).map((event) =>
         toExportedData({
           event,
-        })
-      )
+        }),
+      ),
     );
 
   const doImportData = () =>
@@ -76,11 +77,11 @@ export function InformationPage() {
             updateMergeableRecord({
               ...events,
               collection: { ...events.collection, ...data.events },
-            })
+            }),
           );
           goTo(ROUTES.ROOT);
         },
-      })
+      }),
     );
 
   const themeOptions = [
@@ -109,11 +110,11 @@ export function InformationPage() {
       <Stack gap="m" alignItems="center">
         <Card>
           <Stack gap="s" alignItems="center">
-            {!currentParticipantId && (
+            {!userId && (
               <Paragraph>{t("page.information.disconnected")}</Paragraph>
             )}
             <Paragraph styles={{ font: "body-smaller", color: "neutral-weak" }}>
-              {currentParticipantId}
+              {userId}
             </Paragraph>
           </Stack>
         </Card>

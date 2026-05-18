@@ -139,6 +139,12 @@ type CustomCSSProperties = Record<
   WithMediaQuery<string | number>
 >;
 
+type Dimension =
+  `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem" | "ch"}`;
+type CalcDimension =
+  | Dimension
+  | `${"min" | "max" | "clamp"}(${Dimension}, ${Dimension})`;
+
 export type Styles = {
   cursor?: WithMediaQuery<"pointer" | "default">;
   display?: WithMediaQuery<Display>;
@@ -169,43 +175,18 @@ export type Styles = {
   overflow?: WithMediaQuery<"hidden" | "auto" | "scroll" | "visible">;
   zIndex?: WithMediaQuery<number>;
   width?: WithMediaQuery<
-    | `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`
-    | "auto"
-    | "max-content"
-    | "min-content"
-    | "fit-content"
+    Dimension | "auto" | "max-content" | "min-content" | "fit-content"
   >;
-  maxWidth?: WithMediaQuery<`${number}${
-    | "vw"
-    | "%"
-    | "vh"
-    | "vmin"
-    | "vmax"
-    | "rem"}`>;
-  minWidth?: WithMediaQuery<`${number}${
-    | "vw"
-    | "%"
-    | "vh"
-    | "vmin"
-    | "vmax"
-    | "rem"}`>;
+  maxWidth?: WithMediaQuery<CalcDimension>;
+  minWidth?: WithMediaQuery<CalcDimension>;
   height?: WithMediaQuery<
-    | `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`
-    | "max-content"
-    | "min-content"
-    | "fit-content"
+    CalcDimension | "max-content" | "min-content" | "fit-content"
   >;
   minHeight?: WithMediaQuery<
-    | `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`
-    | "max-content"
-    | "min-content"
-    | "fit-content"
+    CalcDimension | "max-content" | "min-content" | "fit-content"
   >;
   maxHeight?: WithMediaQuery<
-    | `${number}${"vw" | "%" | "vh" | "vmin" | "vmax" | "rem"}`
-    | "max-content"
-    | "min-content"
-    | "fit-content"
+    CalcDimension | "max-content" | "min-content" | "fit-content"
   >;
   customCSSProperties?: CustomCSSProperties;
   breakInside?: WithMediaQuery<"page" | "column" | "avoid">;

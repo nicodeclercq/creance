@@ -1,12 +1,12 @@
 import * as z from "zod";
 
 import { addDays, isBefore } from "../utils/date";
+import { mergeableCollection, mergeableRecord } from "./mergeable";
 
 import { activitySchema } from "./Activity";
 import { categorySchema } from "./Category";
 import { depositSchema } from "./Deposit";
 import { expenseSchema } from "./Expense";
-import { mergeableCollection, mergeableRecord } from "./mergeable";
 import { participantSchema } from "./Participant";
 import { periodSchema } from "./Period";
 
@@ -30,6 +30,7 @@ export const eventSchema = mergeableRecord({
   isAutoClose: z.boolean().optional(),
   mealManager: z.record(z.string(), mealManagerEntrySchema),
   activities: mergeableCollection(activitySchema),
+  hasProgram: z.boolean().optional(),
 });
 
 export type Event = z.infer<typeof eventSchema>;

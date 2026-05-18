@@ -60,7 +60,7 @@ export function DaySumary({
     sortByPriority([
       sortByKey("startDate", "asc", sortDates),
       sortByKey("isAllDay", "desc", sortBooleans),
-    ])
+    ]),
   );
 
   return (
@@ -163,7 +163,6 @@ export function DaySumary({
         isOpen={isAddActivityModalOpen}
         setIsOpen={setIsAddActivityModalOpen}
         onSubmit={addActivity}
-        currentUser={currentUser}
       />
     </Card>
   );

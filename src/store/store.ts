@@ -1,4 +1,5 @@
 import { DEFAULT_STATE } from "./state";
+import type { Event } from "../models/Event";
 import { InitTasksAdapter } from "./adapters/createInitTasksAdapter";
 import type { State } from "./state";
 import { createCacheAdapter } from "./adapters/createCacheAdapter";
@@ -13,7 +14,7 @@ const CacheStorageAdapter = createCacheAdapter({
 });
 const FirebaseAdapter = createFirebaseAdapter();
 
-export const store = createStore<State>({ defaultState: DEFAULT_STATE });
+export const store = createStore<State, Event>({ defaultState: DEFAULT_STATE });
 store.register(CacheStorageAdapter);
 store.register(FirebaseAdapter);
 store.register(InitTasksAdapter);

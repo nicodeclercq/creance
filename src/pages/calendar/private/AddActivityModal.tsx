@@ -1,22 +1,21 @@
 import type { Activity } from "../../../models/Activity";
 import { ActivityForm } from "./ActivityForm";
 import { Modal } from "../../../ui/Modal/Modal";
-import type { User } from "../../../models/User";
 import { createMergeableRecord } from "../../../models/mergeable";
 import { uid } from "../../../service/crypto";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useTranslation } from "react-i18next";
 
 type AddActivityModalProps = {
   defaultDate?: Date;
   isOpen: boolean;
-  currentUser: User;
   setIsOpen: (isOpen: boolean) => void;
   onSubmit: (activity: Activity) => void;
 };
 
 const createActivity = (
-  currentUser: User,
-  defaultDate: Date = new Date()
+  userId: string,
+  defaultDate: Date = new Date(),
 ): Activity => {
   const startDate = new Date(defaultDate);
   const endDate = new Date(defaultDate);
@@ -29,7 +28,7 @@ const createActivity = (
     isAllDay: false,
     startDate,
     endDate,
-    proposedBy: currentUser._id,
+    proposedBy: userId,
     reservationRequired: false,
   });
 };
@@ -37,11 +36,12 @@ const createActivity = (
 export function AddActivityModal({
   defaultDate,
   isOpen,
-  currentUser,
   setIsOpen,
   onSubmit,
 }: AddActivityModalProps) {
   const { t } = useTranslation();
+  const { userId } = useCurrentUser();
+
   return (
     <Modal title={t("AddActivityModal.title")} isOpen={isOpen}>
       <ActivityForm
@@ -54,7 +54,7 @@ export function AddActivityModal({
           onSubmit(activity);
           setIsOpen(false);
         }}
-        defaultValue={createActivity(currentUser, defaultDate)}
+        defaultValue={createActivity(userId, defaultDate)}
       />
     </Modal>
   );

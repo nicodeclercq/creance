@@ -7,7 +7,6 @@ import { useState } from "react";
 import { DEFAULT_CATEGORIES } from "../../models/Category";
 import type { Step3Data } from "./private/AddEventStep3";
 import { AddEventStep3 } from "./private/AddEventStep3";
-import { useData } from "../../store/useData";
 import { Card } from "../../ui/Card/Card";
 import { useRoute } from "../../hooks/useRoute";
 import { useTranslation } from "react-i18next";
@@ -21,6 +20,8 @@ import {
   updateMergeableCollection,
   updateMergeableRecord,
 } from "../../models/mergeable";
+import { useCurrentUser } from "../../store/useCurrentUser";
+import { useStoreData } from "../../store/useData";
 
 const now = new Date();
 
@@ -39,9 +40,9 @@ const initialStateStep1 = {
 export function AddEventPage() {
   const { t } = useTranslation();
   const { goTo } = useRoute();
-  const [_, setEvents] = useData("events");
+  const [, setState] = useStoreData();
   const [currentStep, setCurrentStep] = useState(0);
-  const [account, setAccount] = useData("account");
+  const { currentUser, userId } = useCurrentUser();
   const [step1Data, setStep1Data] = useState<Step1Data>(initialStateStep1);
   const [step2Data, setStep2Data] = useState<Step2Data>({
     categories: DEFAULT_CATEGORIES.map((category) => ({
@@ -52,10 +53,10 @@ export function AddEventPage() {
   const [step3Data, setStep3Data] = useState<Step3Data>({
     participants: [
       createMergeableRecord({
-        _id: account.currentUser._id,
-        name: account.currentUser.name,
-        avatar: account.currentUser.avatar,
-        share: account.currentUser.share,
+        _id: userId,
+        name: currentUser.name,
+        avatar: currentUser.avatar,
+        share: currentUser.share,
         participantShare: { type: "default" },
       }),
     ],
@@ -84,8 +85,21 @@ export function AddEventPage() {
       .then(() => generateKey(uid()))
       .then((eventKey) => {
         setStep3Data(data);
-        setEvents((events) =>
-          addMergeableCollectionItem(
+
+        setState(({ account, events, ...other }) => ({
+          ...other,
+          account: updateMergeableRecord({
+            ...(account as Account),
+            events: addMergeableCollectionItem(
+              eventId,
+              {
+                key: eventKey,
+                uid: userId,
+              },
+              account.events,
+            ),
+          }),
+          events: addMergeableCollectionItem(
             eventId,
             {
               _id: eventId,
@@ -104,23 +118,9 @@ export function AddEventPage() {
               activities: createEmptyMergeableCollection(),
               mealManager: {},
             },
-            events
-          )
-        );
-
-        setAccount((account) =>
-          updateMergeableRecord({
-            ...(account as Account),
-            events: addMergeableCollectionItem(
-              eventId,
-              {
-                key: eventKey,
-                uid: account.currentUser._id,
-              },
-              account.events
-            ),
-          })
-        );
+            events,
+          ),
+        }));
 
         goTo("EVENT_LIST");
       });

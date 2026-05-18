@@ -1,3 +1,8 @@
+import {
+  addMergeableCollectionItem,
+  createMergeableRecord,
+} from "../../../models/mergeable";
+
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import { Button } from "../../../ui/Button/Button";
 import { CheckboxList } from "../../../ui/FormField/CheckboxList/CheckboxList";
@@ -13,13 +18,10 @@ import type { Participant } from "../../../models/Participant";
 import { ParticipantForm } from "../../participants/ParticipantForm";
 import type { User } from "../../../models/User";
 import { uid } from "../../../service/crypto";
+import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useData } from "../../../store/useData";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  addMergeableCollectionItem,
-  createMergeableRecord,
-} from "../../../models/mergeable";
 
 export type Step3Data = {
   participants: Participant[];
@@ -87,11 +89,11 @@ export function AddEventStep3({
   const { t } = useTranslation();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selection, setSelection] = useState<Participant[]>(data.participants);
-  const [account] = useData("account");
+  const { currentUser, userId } = useCurrentUser();
   const [users, setUsers] = useData("users");
 
   const currentParticipant: Participant = {
-    ...account.currentUser,
+    ...currentUser,
     participantShare: { type: "default" },
   };
 
@@ -129,7 +131,7 @@ export function AddEventStep3({
         ({
           ...user,
           participantShare: { type: "default" },
-        } as Participant)
+        }) as Participant,
     );
     setSelection([currentParticipant, ...selectedParticipants]);
   };
@@ -157,7 +159,7 @@ export function AddEventStep3({
       <CheckboxList
         onChange={onSelectionChange}
         items={Object.values(users.collection)
-          .filter((user) => user._id !== account?.currentUser._id)
+          .filter((user) => user._id !== userId)
           .map((user) => ({
             label: user.name,
             id: user._id,

@@ -1,9 +1,16 @@
-import { Button, Dialog, DialogTrigger, Popover } from "react-aria-components";
+import {
+  Button,
+  Link,
+  Dialog,
+  DialogTrigger,
+  Popover,
+} from "react-aria-components";
 import {
   IconButton,
   type IconButtonPropsWhithoutVariantAndOverlays,
   type AsButton,
   type AsLink,
+  isButton,
 } from "../IconButton/IconButton";
 
 import { Icon } from "../Icon/Icon";
@@ -28,37 +35,56 @@ export function QuickActions<R extends RouteName>({
   label,
   actions,
 }: QuickActionsProps<R>) {
+  const isSingleAction = actions.length === 1;
+
   return (
     <div data-component="QuickActions" className={styles.quickActions}>
-      <DialogTrigger>
-        <Button
+      {isSingleAction ? (
+        <div
           className={classNames(
-            buttonStyles.button,
-            iconButtonStyles.button,
             buttonStyles["hasVariant-primary"],
+            iconButtonStyles.button,
             styles.button,
           )}
-          aria-label={label}
         >
-          <Icon name={icon} size="l" />
-        </Button>
-        <Popover>
-          <Dialog>
-            <div className={styles.actionsWrapper}>
-              {actions.map((action) => (
-                <div key={action.label} className={styles.action}>
-                  <span>{action.label}</span>
-                  <IconButton
-                    {...(action as IconButtonPropsWhithoutVariantAndOverlays<AsButton>)}
-                    variant="primary"
-                    overlays
-                  />
-                </div>
-              ))}
-            </div>
-          </Dialog>
-        </Popover>
-      </DialogTrigger>
+          <IconButton
+            {...(actions[0] as IconButtonPropsWhithoutVariantAndOverlays<AsButton>)}
+            variant="primary"
+            tooltip={actions[0].label}
+            overlays
+          />
+        </div>
+      ) : (
+        <DialogTrigger>
+          <Button
+            className={classNames(
+              buttonStyles.button,
+              iconButtonStyles.button,
+              buttonStyles["hasVariant-primary"],
+              styles.button,
+            )}
+            aria-label={label}
+          >
+            <Icon name={icon} size="l" />
+          </Button>
+          <Popover>
+            <Dialog>
+              <div className={styles.actionsWrapper}>
+                {actions.map((action) => (
+                  <div key={action.label} className={styles.action}>
+                    <span>{action.label}</span>
+                    <IconButton
+                      {...(action as IconButtonPropsWhithoutVariantAndOverlays<AsButton>)}
+                      variant="primary"
+                      overlays
+                    />
+                  </div>
+                ))}
+              </div>
+            </Dialog>
+          </Popover>
+        </DialogTrigger>
+      )}
     </div>
   );
 }

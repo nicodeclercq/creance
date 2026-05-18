@@ -2,9 +2,11 @@
   position: fixed;
   right: var(--ui-semantic-gap-l);
   bottom: calc(var(--ui-semantic-gap-m) + 6.4rem);
+  --layout-container-radius: var(--ui-semantic-radius-round);
 }
 
 .button{
+  position: relative;
   width: 6rem !important;
   height: 6rem !important;
   border-radius: var(--ui-semantic-radius-round);
@@ -12,7 +14,18 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--ui-semantic-shadow-l);
-  border: 0.1rem solid var(--ui-background-default);
+  background: var(--ui-semantic-color-primary-default);
+
+  & > * {
+    mix-blend-mode: revert-layer !important;
+  }
+
+  &:hover {
+    background-color: var(--ui-semantic-color-primary-strong);
+  }
+  &:active {
+    background-color: var(--ui-semantic-color-primary-stronger);
+  }
 
   & > *{
     @media (prefers-reduced-motion: no-preference) {
