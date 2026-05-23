@@ -7,7 +7,7 @@ export function useCurrentUser() {
   const [account, setAccount] = useData("account");
 
   const eventUserId = eventId
-    ? account.events.collection[eventId]?.uid
+    ? account.events.collection[eventId]?.userId
     : undefined;
 
   const isCurrentUser = (user: User) => {

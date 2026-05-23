@@ -11,29 +11,30 @@ import type { Event } from "../../models/Event";
 import { JoinEvent } from "./private/JoinEvent";
 import { Logger } from "../../service/Logger";
 import type { Participant } from "../../models/Participant";
-import { Redirect } from "../../Redirect";
+import { Redirect } from "../../router/Redirect";
 import { Welcome } from "./private/Welcome";
 import { useAuth } from "../../store/useAuth";
 import { useParams } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useStoreData } from "../../store/useData";
 
 export function JoinPage() {
-  const { state } = useAuth();
+  const { state: authState } = useAuth();
   const [, setState] = useStoreData();
   const [isNewUser, setIsNewUser] = useState(false);
   const { eventId, shareId } = useParams();
   const [step, setStep] = useState(0);
-  const decodedEventId = useMemo(() => eventId ? decodeURIComponent(eventId) : undefined, [eventId]);
-  const decodedShareId = useMemo(() => shareId ? decodeURIComponent(shareId) : undefined, [shareId]);
 
-  if (!eventId || !shareId) {
+  const decodedEventId = eventId ? decodeURIComponent(eventId) : undefined;
+  const decodedShareId = shareId ? decodeURIComponent(shareId) : undefined;
+
+  if (!decodedEventId || !decodedShareId) {
     Logger.log("Invalid join arguments")({ eventId, shareId });
 
     return <Redirect to="ROOT" />;
   }
 
-  if (state.type === "authenticated" && step === 0) {
+  if (authState.type === "authenticated" && step === 0) {
     setStep(1);
     return;
   }
@@ -75,15 +76,15 @@ export function JoinPage() {
             : {}),
         },
         events: addMergeableCollectionItem(
-          eventId,
+          decodedEventId,
           {
-            key: decodedShareId!,
-            uid: participation.participant._id,
+            eventId: decodedShareId,
+            userId: participation.participant._id,
           },
           account.events,
         ),
       }),
-      events: addMergeableCollectionItem(eventId, event, events),
+      events: addMergeableCollectionItem(decodedEventId, event, events),
     }));
 
     // Go to next step
@@ -119,7 +120,9 @@ export function JoinPage() {
             passKey={decodedShareId}
           />
         )}
-        {step === 2 && <Redirect to="EVENT" params={{ eventId }} />}
+        {step === 2 && (
+          <Redirect to="EVENT" params={{ eventId: decodedEventId }} />
+        )}
       </Card>
     </Container>
   );

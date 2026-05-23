@@ -1,7 +1,6 @@
 import { RadioGroup as Group, Radio } from "react-aria-components";
 
 import { FormField } from "../../FormField/FormField";
-import { InputText } from "../../FormField/InputText/InputText";
 import classNames from "classnames";
 import styles from "./RadioGroup.module.css";
 import { useId } from "react";

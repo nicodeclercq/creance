@@ -1,4 +1,4 @@
-import { ROUTES, getPath } from "../../routes";
+import { ROUTES, getPath } from "../../router/routes";
 
 import { Button } from "../../ui/Button/Button";
 import { Container } from "../../ui/Container/Container";
@@ -24,7 +24,7 @@ export function ShareButton() {
   const { eventId } = useParams();
 
   const [currentEvent] = useData(`events.collection.${eventId}`);
-  const [eventKey] = useData(`account.events.collection.${eventId}.key`);
+  const [eventKey] = useData(`account.events.collection.${eventId}.eventId`);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
@@ -32,6 +32,8 @@ export function ShareButton() {
     eventId: encodeURIComponent(currentEvent?._id),
     shareId: encodeURIComponent(eventKey),
   })}`;
+
+  console.log("TMP", shareLink, currentEvent, eventKey);
 
   return currentEvent && eventKey ? (
     <>

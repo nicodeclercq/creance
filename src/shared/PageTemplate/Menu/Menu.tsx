@@ -6,7 +6,7 @@ import { Icon } from "../../../ui/Icon/Icon";
 import type { IconName } from "../../../ui/Icon/private";
 import { NavLink } from "react-router-dom";
 import classNames from "classnames";
-import { getPath } from "../../../routes";
+import { getPath } from "../../../router/routes";
 import styles from "./Menu.module.css";
 
 type Action = DistributiveOmit<ButtonProps<AsLink>, "icon" | "variant"> & {

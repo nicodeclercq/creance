@@ -1,11 +1,10 @@
+import type { AuthManager, AuthState, Credentials } from "./AuthManager";
 import { BehaviorSubject, NEVER, map } from "rxjs";
 import { describe, expect, it, vi } from "vitest";
 
-import type { AuthManager, AuthState, Credentials } from "./AuthManager";
-import { createUserId, type UserId } from "./shared/alias";
+import { createEvent } from "../../service/test-helpers";
 import { createRemoteAdapter } from "./createRemoteAdapter";
 import { createTestState } from "../__tests__/builders";
-import { createEvent } from "../../service/test-helpers";
 
 vi.mock("./shared/e2ee", () => ({
   encryptState: (state: unknown) => Promise.resolve(JSON.stringify(state)),
@@ -36,7 +35,7 @@ const createFakeAuthManager = (
       stateSubject.next(nextState);
       return Promise.resolve(nextState);
     },
-    loginAdapter: (_loginFn) => Promise.resolve(createUserId("user-1")),
+    loginAdapter: (_loginFn) => Promise.resolve("user-1"),
     logout: () => {
       stateSubject.next({ type: "initial" });
     },
@@ -47,7 +46,7 @@ const createFakeAuthManager = (
 const createFakeAdapter = () => {
   const userData = new BehaviorSubject<string | undefined>(undefined);
   const events = new BehaviorSubject<Record<string, string>>({});
-  const userId = "1" as UserId;
+  const userId = "1";
   const authManager = createFakeAuthManager();
   const remoteAdapter = createRemoteAdapter({
     operations: {
@@ -127,9 +126,48 @@ describe("createRemoteAdapter", () => {
     expect(fetchedEvent).toStrictEqual(event);
   });
 
+  it("pushes remote event updates through adapter.change", async () => {
+    const { remoteAdapter, setEventData } = createFakeAdapter();
+    const d1 = new Date("2026-01-01T00:00:00Z");
+    const d2 = new Date("2026-01-02T00:00:00Z");
+    const passKey = "share-key";
+    const event = createEvent({ _id: "evt-1", name: "Initial", updatedAt: d1 });
+    const state = createTestState({
+      events: { "evt-1": event },
+      updatedAt: d1,
+    });
+    state.account.events = {
+      collection: {
+        "evt-1": { eventId: passKey, userId: "user-1", updatedAt: d1 },
+      },
+      updatedAt: d1,
+    };
+
+    const changeSpy = vi.fn();
+    remoteAdapter.change = changeSpy;
+
+    await remoteAdapter.load(state);
+
+    const remoteEvent = createEvent({
+      _id: "evt-1",
+      name: "Remote Update",
+      updatedAt: d2,
+    });
+    setEventData("evt-1", JSON.stringify(remoteEvent));
+
+    await vi.waitFor(() => {
+      expect(changeSpy).toHaveBeenCalled();
+    });
+
+    const lastChange = changeSpy.mock.calls.at(-1)?.[0] as ReturnType<
+      typeof createTestState
+    >;
+    expect(lastChange.events.collection["evt-1"].name).toBe("Remote Update");
+  });
+
   it("falls back to previous state when first remote emission never arrives", async () => {
     vi.useFakeTimers();
-    const userId = "1" as UserId;
+    const userId = "1";
     const previous = createTestState();
     const authManager = createFakeAuthManager();
     const remoteAdapter = createRemoteAdapter({

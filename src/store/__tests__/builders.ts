@@ -81,7 +81,7 @@ export const createTestState = (
 };
 
 export const getReadyData = (
-  store: ReturnType<typeof createStore<State>>,
+  store: ReturnType<typeof createStore<State, Event>>,
 ): State => {
   const state = store.getState();
   if (state.status !== "ready")

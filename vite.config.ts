@@ -10,6 +10,7 @@ export default defineConfig({
       ["src/store/**/*.test.ts", "node"],
     ],
   },
+
   plugins: [
     react(),
     VitePWA({
@@ -66,6 +67,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        maximumFileSizeToCacheInBytes: 3000000,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

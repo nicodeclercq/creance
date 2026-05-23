@@ -1,15 +1,15 @@
-import { ANONYMOUS_USER, type User } from "./models/User";
-import { Container } from "./ui/Container/Container";
-import { LoadingIcon } from "./ui/Button/LoadingIcon";
-import { LoginPage } from "./pages/auth/private/LoginPage";
-import { Modal } from "./ui/Modal/Modal";
-import { SetCurrentParticipantForm } from "./pages/auth/SetCurrentParticipantForm";
+import { ANONYMOUS_USER, type User } from "../models/User";
+import { Container } from "../ui/Container/Container";
+import { LoadingIcon } from "../ui/Button/LoadingIcon";
+import { LoginPage } from "../pages/auth/private/LoginPage";
+import { Modal } from "../ui/Modal/Modal";
+import { SetCurrentParticipantForm } from "../pages/auth/SetCurrentParticipantForm";
 import type { ReactNode } from "react";
-import { useAuth } from "./store/useAuth";
-import { useData } from "./store/useData";
-import { useStore } from "./store/useStore";
+import { useAuth } from "../store/useAuth";
+import { useData } from "../store/useData";
+import { useStore } from "../store/useStore";
 import { useTranslation } from "react-i18next";
-import { useCurrentUser } from "./store/useCurrentUser";
+import { useCurrentUser } from "../store/useCurrentUser";
 
 type Props = {
   children: ReactNode;

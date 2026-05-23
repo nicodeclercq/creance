@@ -1,12 +1,11 @@
-import { Observable } from "rxjs";
-import { pipe } from "fp-ts/function";
-
-import { Logger } from "../../service/Logger";
-import { createRemoteAdapter } from "./createRemoteAdapter";
-import { createUserId, type UserId } from "./shared/alias";
 import type { AuthManager } from "./AuthManager";
+import type { Event } from "../../models/Event";
+import { Logger } from "../../service/Logger";
+import { Observable } from "rxjs";
 import type { RemoteAdapter } from "../createStore";
 import type { State } from "../state";
+import { createRemoteAdapter } from "./createRemoteAdapter";
+import { pipe } from "fp-ts/function";
 
 const DB_NAME = "creance-db";
 const DB_VERSION = 1;
@@ -21,24 +20,24 @@ const POLL_INTERVAL = 1000;
 
 type IndexedDBState = {
   db: IDBDatabase | undefined;
-  userId: UserId | undefined;
+  userId: string | undefined;
   latestUserData: string | undefined;
   latestEventData: Record<string, string | undefined>;
 };
 
-const readPersistedUserId = (): UserId | undefined => {
+const readPersistedUserId = (): string | undefined => {
   const stored = localStorage.getItem(USER_ID_STORAGE_KEY);
-  return stored ? createUserId(stored) : undefined;
+  return stored ? stored : undefined;
 };
 
-const persistUserId = (userId: UserId | undefined): void =>
+const persistUserId = (userId: string | undefined): void =>
   userId
     ? localStorage.setItem(USER_ID_STORAGE_KEY, userId as string)
     : localStorage.removeItem(USER_ID_STORAGE_KEY);
 
 export const createIndexedDBAdapter = (config?: {
   authManager?: AuthManager;
-}): RemoteAdapter<State> => {
+}): RemoteAdapter<State, Event> => {
   const state: IndexedDBState = {
     db: undefined,
     userId: readPersistedUserId(),
@@ -79,7 +78,6 @@ export const createIndexedDBAdapter = (config?: {
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("")
           .substring(0, 24),
-      createUserId,
     );
 
   const login = ({
@@ -88,7 +86,7 @@ export const createIndexedDBAdapter = (config?: {
   }: {
     login: string;
     password: string;
-  }): Promise<UserId | Error> => {
+  }): Promise<string | Error> => {
     if (login !== TEST_LOGIN && password !== TEST_PASSWORD) {
       return Promise.resolve(new Error("Invalid credentials"));
     }
@@ -103,7 +101,7 @@ export const createIndexedDBAdapter = (config?: {
   }: {
     login: string;
     password: string;
-  }): Promise<UserId | Error> => {
+  }): Promise<string | Error> => {
     state.userId = getUserId(TEST_LOGIN);
     persistUserId(state.userId);
     return Promise.resolve(state.userId);

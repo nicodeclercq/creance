@@ -1,7 +1,6 @@
 import * as z from "zod";
 
 import { BehaviorSubject } from "rxjs";
-import type { UserId } from "./shared/alias";
 import { generateKey } from "../../service/crypto";
 import {
   type SecureKeyStore,
@@ -26,7 +25,7 @@ export type Credentials = {
   password: string;
 };
 
-type AdapterLogin = (credentials: Credentials) => Promise<UserId | Error>;
+type AdapterLogin = (credentials: Credentials) => Promise<string | Error>;
 
 export type AuthManager = {
   stateSubject: BehaviorSubject<AuthState>;

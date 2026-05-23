@@ -1,8 +1,8 @@
+import { createStore, runAdaptersCascade } from "./createStore";
 import { describe, expect, it, vi } from "vitest";
 
-import { AuthManagerFactory } from "./adapters/AuthManager";
 import type { Adapter } from "./createStore";
-import { createStore, runAdaptersCascade } from "./createStore";
+import { AuthManagerFactory } from "./adapters/AuthManager";
 import { createMemoryStorage } from "./__tests__/createMemoryStorage";
 
 vi.mock("../service/secureKeyStore", () => ({
@@ -15,7 +15,7 @@ vi.mock("../service/secureKeyStore", () => ({
 
 describe("runAdaptersCascade", () => {
   const createMockAdapter = <T>(
-    loadFn: (prev: T | undefined) => T | undefined | Promise<T | undefined>
+    loadFn: (prev: T | undefined) => T | undefined | Promise<T | undefined>,
   ): Adapter<T> => ({
     load: loadFn,
     onChange: () => {},
@@ -35,7 +35,7 @@ describe("runAdaptersCascade", () => {
 
     const result = await runAdaptersCascade<number>(
       [adapter1, adapter2, adapter3],
-      undefined
+      undefined,
     );
 
     expect(result).toStrictEqual({ success: true, data: 22 }); // ((1) + 10) * 2
@@ -48,7 +48,7 @@ describe("runAdaptersCascade", () => {
 
     const result = await runAdaptersCascade<number>(
       [adapter1, adapter2, adapter3],
-      undefined
+      undefined,
     );
 
     expect(result).toStrictEqual({ success: true, data: 6 });
@@ -63,7 +63,7 @@ describe("runAdaptersCascade", () => {
 
     const result = await runAdaptersCascade<number>(
       [adapter1, adapter2, adapter3],
-      undefined
+      undefined,
     );
 
     expect(result).toStrictEqual({ success: true, data: 6 });
@@ -79,7 +79,7 @@ describe("runAdaptersCascade", () => {
 
     const result = await runAdaptersCascade<string>(
       [adapter1, adapter2],
-      undefined
+      undefined,
     );
 
     expect(result.success).toBe(false);
@@ -94,7 +94,7 @@ describe("runAdaptersCascade", () => {
 
     const result = await runAdaptersCascade<string>(
       [adapter1, adapter2],
-      undefined
+      undefined,
     );
 
     expect(result.success).toBe(false);
@@ -112,7 +112,7 @@ describe("runAdaptersCascade", () => {
 
     const result = await runAdaptersCascade<number>(
       [adapter1, adapter2],
-      undefined
+      undefined,
     );
 
     expect(result).toStrictEqual({ success: true, data: 15 });
@@ -136,13 +136,13 @@ describe("runAdaptersCascade", () => {
 });
 
 describe("createStore", () => {
-  const createTestStore = <T,>() =>
-    createStore<T>({
+  const createTestStore = <T, U>() =>
+    createStore<T, U>({
       authManager: AuthManagerFactory({ storage: createMemoryStorage() }),
     });
 
   it("prevents infinite loops when adapters call change inside onChange", async () => {
-    const store = createTestStore<number>();
+    const store = createTestStore<number, number>();
     const onChangeCalls = { a: 0, b: 0 };
 
     const adapterA: Adapter<number> = {
@@ -172,7 +172,7 @@ describe("createStore", () => {
   });
 
   it("adapters still receive notifications after a guarded cycle", async () => {
-    const store = createTestStore<number>();
+    const store = createTestStore<number, number>();
     const onChangeCalls = { a: 0, b: 0 };
 
     const adapterA: Adapter<number> = {

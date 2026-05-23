@@ -1,4 +1,23 @@
-import { describe, it, expect, vi } from "vitest";
+import {
+  createMockSecureKeyStore,
+  createTestState,
+  createTestUserData,
+  getReadyData,
+  preAuthenticate,
+} from "./builders";
+import { describe, expect, it, vi } from "vitest";
+
+import { AuthManagerFactory } from "../adapters/AuthManager";
+import type { Event } from "../../models/Event";
+import type { State } from "../state";
+import { createEvent } from "../../service/test-helpers";
+import { createInMemoryBackend } from "./createInMemoryBackend";
+import { createInMemoryLocalStorage } from "./createInMemoryLocalStorage";
+import { createLocalAdapter } from "../adapters/createLocalAdapter";
+import { createMemoryStorage } from "./createMemoryStorage";
+import { createRemoteAdapter } from "../adapters/createRemoteAdapter";
+import { createStore } from "../createStore";
+import { encryptState } from "../adapters/shared/e2ee";
 
 vi.mock("../../service/secureKeyStore", () => ({
   createSecureKeyStore: () => ({
@@ -7,24 +26,6 @@ vi.mock("../../service/secureKeyStore", () => ({
     clear: () => Promise.resolve(),
   }),
 }));
-
-import { createStore } from "../createStore";
-import { createLocalAdapter } from "../adapters/createLocalAdapter";
-import { createRemoteAdapter } from "../adapters/createRemoteAdapter";
-import { AuthManagerFactory } from "../adapters/AuthManager";
-import type { State } from "../state";
-import { encryptState } from "../adapters/shared/e2ee";
-import { createEvent } from "../../service/test-helpers";
-import { createMemoryStorage } from "./createMemoryStorage";
-import { createInMemoryBackend } from "./createInMemoryBackend";
-import { createInMemoryLocalStorage } from "./createInMemoryLocalStorage";
-import {
-  preAuthenticate,
-  createMockSecureKeyStore,
-  createTestUserData,
-  createTestState,
-  getReadyData,
-} from "./builders";
 
 const d1 = new Date("2026-01-01T00:00:00Z");
 
@@ -36,7 +37,7 @@ describe("Remote adapter integration", () => {
     const backend = createInMemoryBackend();
     const local = createInMemoryLocalStorage();
 
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -75,7 +76,7 @@ describe("Remote adapter integration", () => {
     backend.setUserData(encrypted);
 
     const local = createInMemoryLocalStorage();
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({

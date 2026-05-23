@@ -4,7 +4,6 @@ import {
   getDefaultAuthManager,
 } from "./adapters/AuthManager";
 import { BehaviorSubject } from "rxjs";
-import type { UserId } from "./adapters/shared/alias";
 import { uid } from "../service/crypto";
 
 export type StoreState<T> =
@@ -35,8 +34,8 @@ export type Adapter<T> = {
 };
 
 export type RemoteAdapter<T, Item> = Adapter<T> & {
-  login: (credentials: Credentials) => Promise<UserId | Error>;
-  signup: (credentials: Credentials) => Promise<UserId | Error>;
+  login: (credentials: Credentials) => Promise<string | Error>;
+  signup: (credentials: Credentials) => Promise<string | Error>;
   logout: () => Promise<void>;
   fetchItem: (id: string, passKey: string) => Promise<Item>;
 };
@@ -324,7 +323,7 @@ export const createStore = <T, Item>(config?: {
             remoteAdapters.map((adapter) => adapter[method](credentials)),
           ).then((results) => {
             const hasSuccess = results.some(
-              (r): r is UserId => !(r instanceof Error),
+              (r): r is string => !(r instanceof Error),
             );
             if (!hasSuccess) {
               throw (

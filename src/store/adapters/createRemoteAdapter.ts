@@ -83,10 +83,16 @@ export const createRemoteAdapter = ({
 
   const state: {
     userData: UserData | undefined;
-    subscription: Subscription | undefined;
+    subscriptions: {
+      user: Subscription | undefined;
+      events: Record<string, Subscription | undefined>;
+    };
   } = {
     userData: undefined,
-    subscription: undefined,
+    subscriptions: {
+      user: undefined,
+      events: {},
+    },
   };
 
   const saveAllEvents = (events: Record<string, Event>): void => {
@@ -126,15 +132,91 @@ export const createRemoteAdapter = ({
     return mergedState;
   };
 
+  const unsubscribeAll = () => {
+    state.subscriptions.user?.unsubscribe();
+    Object.values(state.subscriptions.events).forEach((subscription) =>
+      subscription?.unsubscribe(),
+    );
+    state.subscriptions = {
+      user: undefined,
+      events: {},
+    };
+  };
+
+  const applyRemoteEventUpdate = (
+    actualEventId: string,
+    remoteEvent: Event,
+  ): void => {
+    const currentState = state.userData?.state;
+    if (!currentState || !adapter.change) {
+      return;
+    }
+
+    const localEvent = currentState.events.collection[actualEventId];
+    const mergedEvent = localEvent
+      ? merge(localEvent, remoteEvent)
+      : remoteEvent;
+
+    adapter.change({
+      ...currentState,
+      events: {
+        collection: {
+          ...currentState.events.collection,
+          [actualEventId]: mergedEvent,
+        },
+        updatedAt:
+          mergedEvent.updatedAt > currentState.events.updatedAt
+            ? mergedEvent.updatedAt
+            : currentState.events.updatedAt,
+      },
+    });
+  };
+
+  const getEventSubscriptions = () => {
+    const accountEvents =
+      state.userData?.state.account.events.collection ?? {};
+
+    return Object.entries(accountEvents).reduce(
+      (acc, [actualEventId, { eventId: passKey }]) => {
+        acc[actualEventId] = operations
+          .getEventData?.(actualEventId)
+          .pipe(distinctUntilChanged())
+          .subscribe({
+            next: (encryptedData) => {
+              if (encryptedData == null) {
+                return;
+              }
+
+              Promise.resolve(encryptedData)
+                .then((encryptedEvent) =>
+                  decryptAndValidate(encryptedEvent, passKey, eventSchema),
+                )
+                .then((remoteEvent) => {
+                  applyRemoteEventUpdate(actualEventId, remoteEvent);
+                })
+                .catch((error) => {
+                  Logger.error(
+                    `RemoteAdapter[${operations.name}]: event subscription processing failed`,
+                  )(error);
+                });
+            },
+          });
+
+        return acc;
+      },
+      {} as Record<string, Subscription | undefined>,
+    );
+  };
+
   const setupSubscription = (): void => {
-    state.subscription?.unsubscribe();
+    unsubscribeAll();
 
     const userKey = authManager.getUserKey();
     if (!userKey) {
       return;
     }
 
-    state.subscription = operations
+    state.subscriptions.user = operations
       .getUserData()
       .pipe(distinctUntilChanged())
       .subscribe({
@@ -166,6 +248,7 @@ export const createRemoteAdapter = ({
           );
         },
       });
+    state.subscriptions.events = getEventSubscriptions();
   };
 
   const fetchAndMerge = (
@@ -237,7 +320,7 @@ export const createRemoteAdapter = ({
     }
 
     const knownEvent = state.userData?.state.account.events.collection[eventId];
-    const eventKey = knownEvent?.key;
+    const eventKey = knownEvent?.eventId;
 
     if (!eventKey) {
       return Promise.reject("No event key found");
@@ -261,8 +344,23 @@ export const createRemoteAdapter = ({
   };
 
   // TODO: change deletion workflow
-  const cleanupDeletedEvents = (currentEvents: Record<string, Event>): void => {
+  const cleanupDeletedEvents = (
+    _currentEvents: Record<string, Event>,
+  ): void => {
     // TODO
+  };
+
+  const hasEventsListChanged = (newState: State) => {
+    const currentIds = Object.keys(
+      state.userData?.state.account.events.collection ?? {},
+    )
+      .sort()
+      .join("|");
+    const newIds = Object.keys(newState.account.events.collection)
+      .sort()
+      .join("|");
+
+    return currentIds !== newIds;
   };
 
   const onChange = (newState: State): void => {
@@ -282,11 +380,14 @@ export const createRemoteAdapter = ({
         saveEventData(eventId, event);
       });
     }
+
+    if (hasEventsListChanged(newState)) {
+      state.subscriptions.events = getEventSubscriptions();
+    }
   };
 
   const dispose = (): void => {
-    state.subscription?.unsubscribe();
-    state.subscription = undefined;
+    unsubscribeAll();
   };
 
   const onLogout = (): void => {

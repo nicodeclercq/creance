@@ -93,8 +93,8 @@ export function AddEventPage() {
             events: addMergeableCollectionItem(
               eventId,
               {
-                key: eventKey,
-                uid: userId,
+                eventId: eventKey,
+                userId,
               },
               account.events,
             ),

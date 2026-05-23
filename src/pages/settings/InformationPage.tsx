@@ -10,7 +10,7 @@ import { ConfirmButton } from "../../ui/ConfirmButton/ConfirmButton";
 import { Logger } from "../../service/Logger";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import { Paragraph } from "../../ui/Paragraph/Paragraph";
-import { ROUTES } from "../../routes";
+import { ROUTES } from "../../router/routes";
 import { Select } from "../../ui/FormField/Select/Select";
 import { Stack } from "../../ui/Stack/Stack";
 import { fork } from "../../helpers/fp-ts";

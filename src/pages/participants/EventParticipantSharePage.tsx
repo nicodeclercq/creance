@@ -9,7 +9,9 @@ import { useParams } from "react-router-dom";
 export function EventParticipantSharePage() {
   const { eventId } = useParams();
   const [currentEvent] = useData(`events.collection.${eventId}`);
-  const [currentParticipantId] = useData(`account.events.collection.${eventId}.uid`);
+  const [currentParticipantId] = useData(
+    `account.events.collection.${eventId}.userId`,
+  );
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {

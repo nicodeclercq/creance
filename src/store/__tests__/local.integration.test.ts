@@ -1,14 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../service/secureKeyStore", () => ({
-  createSecureKeyStore: () => ({
-    store: () => Promise.resolve(),
-    retrieve: () => Promise.resolve(undefined),
-    clear: () => Promise.resolve(),
-  }),
-}));
-
 import { AuthManagerFactory } from "../adapters/AuthManager";
+import type { Event } from "../../models/Event";
 import type { State } from "../state";
 import { createEvent } from "../../service/test-helpers";
 import { createInMemoryLocalStorage } from "./createInMemoryLocalStorage";
@@ -17,13 +10,22 @@ import { createMemoryStorage } from "./createMemoryStorage";
 import { createStore } from "../createStore";
 import { getReadyData } from "./builders";
 
+vi.mock("../../service/secureKeyStore", () => ({
+  createSecureKeyStore: () => ({
+    store: () => Promise.resolve(),
+    retrieve: () => Promise.resolve(undefined),
+    clear: () => Promise.resolve(),
+  }),
+}));
+
+
 const date = new Date("2026-01-01T00:00:00Z");
 
 describe("Local adapter integration", () => {
   it("first connection initializes with default state", async () => {
     const local = createInMemoryLocalStorage();
     const authManager = AuthManagerFactory({ storage: createMemoryStorage() });
-    const store = createStore<State>({ authManager });
+    const store = createStore<State, Event>({ authManager });
 
     store.register(createLocalAdapter(local.config));
     await store.init();
@@ -36,7 +38,7 @@ describe("Local adapter integration", () => {
   it("persists state changes to storage", async () => {
     const local = createInMemoryLocalStorage();
     const authManager = AuthManagerFactory({ storage: createMemoryStorage() });
-    const store = createStore<State>({ authManager });
+    const store = createStore<State, Event>({ authManager });
 
     store.register(createLocalAdapter(local.config));
     await store.init();
@@ -64,7 +66,7 @@ describe("Local adapter integration", () => {
 
     // First connection
     const authManager1 = AuthManagerFactory({ storage: createMemoryStorage() });
-    const store1 = createStore<State>({ authManager: authManager1 });
+    const store1 = createStore<State, Event>({ authManager: authManager1 });
     store1.register(createLocalAdapter(local.config));
     await store1.init();
 
@@ -91,7 +93,7 @@ describe("Local adapter integration", () => {
 
     // Second connection — same local storage
     const authManager2 = AuthManagerFactory({ storage: createMemoryStorage() });
-    const store2 = createStore<State>({ authManager: authManager2 });
+    const store2 = createStore<State, Event>({ authManager: authManager2 });
     store2.register(createLocalAdapter(local.config));
     await store2.init();
 

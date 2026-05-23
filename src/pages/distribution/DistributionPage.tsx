@@ -18,7 +18,9 @@ export function DistributionPage() {
   const { t } = useTranslation();
   const { eventId } = useParams();
   const [currentEvent] = useData(`events.collection.${eventId}`);
-  const [currentParticipantId] = useData(`account.events.collection.${eventId}.uid`);
+  const [currentParticipantId] = useData(
+    `account.events.collection.${eventId}.userId`,
+  );
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
@@ -43,7 +45,7 @@ export function DistributionPage() {
         currentParticipantDistribution,
         otherParticipantsDistribution: dist,
       };
-    })
+    }),
   );
 
   return (
@@ -75,7 +77,7 @@ export function DistributionPage() {
                   distributions={distributions ?? []}
                   participants={participants}
                 />
-              )
+              ),
             )}
           </Stack>
         )}

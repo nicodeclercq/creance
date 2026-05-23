@@ -3,7 +3,7 @@ import { EventParticipantNotFoundPage } from "../participants/private/EventParti
 import { EventParticipantShareForm } from "../participants/private/EventParticipantShareForm";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import type { ParticipantShare } from "../../models/ParticipantShare";
-import { Redirect } from "../../Redirect";
+import { Redirect } from "../../router/Redirect";
 import { updateMergeableCollectionItem } from "../../models/mergeable";
 import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
@@ -32,7 +32,8 @@ export function ParticipantSharePage() {
     return <Redirect to="EVENT" params={{ eventId: currentEvent._id }} />;
   }
 
-  const share = currentEvent.participants.collection[participantId].participantShare;
+  const share =
+    currentEvent.participants.collection[participantId].participantShare;
 
   const saveShare = (data: ParticipantShare) => {
     setEvent((event) => ({
@@ -43,7 +44,7 @@ export function ParticipantSharePage() {
           ...event.participants.collection[participantId],
           participantShare: data,
         },
-        event.participants
+        event.participants,
       ),
     }));
     goTo("EVENT_USERS", { eventId: currentEvent._id });

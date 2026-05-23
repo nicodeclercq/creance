@@ -1,12 +1,12 @@
-import { addMergeableCollectionItem } from "../../models/mergeable";
 import { Card } from "../../ui/Card/Card";
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
-import { ROUTES } from "../../routes";
-import { Redirect } from "../../Redirect";
+import { ROUTES } from "../../router/routes";
+import { Redirect } from "../../router/Redirect";
 import { Stack } from "../../ui/Stack/Stack";
 import type { Transaction } from "../../models/Transaction";
 import { TransactionForm } from "./private/TransactionForm";
+import { addMergeableCollectionItem } from "../../models/mergeable";
 import { uid } from "../../service/crypto";
 import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
@@ -20,7 +20,9 @@ export function AddTransactionPage() {
   const { goTo } = useRoute();
   const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
   const participants = useEventParticipants(eventId);
-  const [currentParticipantId] = useData(`account.events.collection.${eventId}.uid`);
+  const [currentParticipantId] = useData(
+    `account.events.collection.${eventId}.userId`,
+  );
 
   if (!eventId || !currentEvent) {
     return <EventNotFoundPage />;
@@ -41,7 +43,7 @@ export function AddTransactionPage() {
         expenses: addMergeableCollectionItem(
           transaction.data._id,
           transaction.data,
-          event.expenses
+          event.expenses,
         ),
       }));
     } else {
@@ -50,7 +52,7 @@ export function AddTransactionPage() {
         deposits: addMergeableCollectionItem(
           transaction.data._id,
           transaction.data,
-          event.deposits
+          event.deposits,
         ),
       }));
     }

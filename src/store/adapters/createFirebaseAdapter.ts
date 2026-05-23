@@ -161,6 +161,8 @@ export const createFirebaseAdapter = (config?: {
 
     if (!userId) return Promise.resolve();
 
+    console.log("TMP firebase save user data");
+
     const userRef = ref(db, `${COLLECTIONS.USERS}/${userId}`);
     return set(userRef, encryptedData).catch((error: unknown) => {
       Logger.error("Firebase: setUserData failed")(error);
@@ -196,6 +198,9 @@ export const createFirebaseAdapter = (config?: {
   ): Promise<void> => {
     const { db } = getFirebase();
     const eventRef = ref(db, `${COLLECTIONS.EVENTS}/${eventId}`);
+
+    console.log("TMP firebase save event data");
+
     return set(eventRef, encryptedData).catch((error: unknown) => {
       Logger.error("Firebase: setEventData failed")(error);
       throw error;

@@ -11,7 +11,7 @@ import type { DistributiveOmit } from "../../helpers/DistributiveOmit";
 import { Stack } from "../Stack/Stack";
 import { Columns } from "../Columns/Columns";
 import { Link } from "react-router-dom";
-import { getPath } from "../../routes";
+import { getPath } from "../../router/routes";
 import type { ConfirmProps } from "../ConfirmButton/ConfirmButton";
 import { ConfirmButton } from "../ConfirmButton/ConfirmButton";
 import type { ReactNode } from "react";

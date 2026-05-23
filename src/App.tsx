@@ -3,7 +3,7 @@ import "./App.css";
 import { DialogStackHook } from "./ui/DialogProvider/DialogStackHook";
 import { I18nProvider } from "react-aria";
 import { LoadingPage } from "./pages/loading/LoadingPage";
-import { Router } from "./router";
+import { Router } from "./router/router";
 import { StoreProvider } from "./store/StoreProvider";
 import { useTheme } from "./hooks/useTheme";
 

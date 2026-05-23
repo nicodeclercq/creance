@@ -5,7 +5,7 @@ import { type ButtonProps } from "../Button/Button";
 import type { DistributiveOmit } from "../../helpers/DistributiveOmit";
 import { Columns } from "../Columns/Columns";
 import { Link } from "react-router-dom";
-import { getPath } from "../../routes";
+import { getPath } from "../../router/routes";
 import styles from "./ContextualMenu.module.css";
 import { entries } from "../../utils/object";
 import { Icon } from "../Icon/Icon";

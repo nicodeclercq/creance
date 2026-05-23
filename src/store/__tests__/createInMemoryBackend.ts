@@ -1,7 +1,5 @@
 import { BehaviorSubject } from "rxjs";
-
 import type { RemoteOperations } from "../adapters/createRemoteAdapter";
-import { createUserId } from "../adapters/shared/alias";
 
 export type InMemoryBackend = {
   operations: RemoteOperations;
@@ -31,8 +29,8 @@ export const createInMemoryBackend = (): InMemoryBackend => {
 
   const operations: RemoteOperations = {
     name: "InMemory",
-    login: ({ login }) => Promise.resolve(createUserId(`user-${login}`)),
-    signup: ({ login }) => Promise.resolve(createUserId(`user-${login}`)),
+    login: ({ login }) => Promise.resolve(`user-${login}`),
+    signup: ({ login }) => Promise.resolve(`user-${login}`),
     logout: () => Promise.resolve(),
     getUserData: () => userDataSubject.asObservable(),
     setUserData: (data) => {

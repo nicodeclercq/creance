@@ -9,8 +9,8 @@ import {
 } from "./mergeable";
 
 const accountEventShape = {
-  key: z.string().max(100, "Account.validation.events.key.maxLength"),
-  uid: z.string().max(100, "Account.validation.events.uid.maxLength"),
+  eventId: z.string().max(100, "Account.validation.events.key.maxLength"),
+  userId: z.string().max(100, "Account.validation.events.uid.maxLength"),
 };
 
 export const accountEventSchema = mergeableRecord(accountEventShape);

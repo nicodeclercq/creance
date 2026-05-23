@@ -3,8 +3,8 @@ import type { Deposit } from "../../models/Deposit";
 import { EventNotFoundPage } from "./private/EventNotFoundPage";
 import type { Expense } from "../../models/Expense";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
-import { ROUTES } from "../../routes";
-import { Redirect } from "../../Redirect";
+import { ROUTES } from "../../router/routes";
+import { Redirect } from "../../router/Redirect";
 import type { Transaction } from "../../models/Transaction";
 import { TransactionForm } from "./private/TransactionForm";
 import { updateMergeableCollectionItem } from "../../models/mergeable";
@@ -51,20 +51,21 @@ export function EditTransactionPage() {
     isExpense && currentExpense
       ? { type: "expense", data: currentExpense }
       : isDeposit && currentDeposit
-      ? { type: "deposit", data: currentDeposit }
-      : {
-          type: "expense",
-          data: {
-            _id: "",
-            reason: "",
-            category: Object.values(currentEvent.categories.collection)[0]?._id || "",
-            lender: Object.values(participants)[0]?._id || "",
-            amount: "0",
-            date: new Date(),
-            share: { type: "default" },
-            updatedAt: new Date(),
-          },
-        };
+        ? { type: "deposit", data: currentDeposit }
+        : {
+            type: "expense",
+            data: {
+              _id: "",
+              reason: "",
+              category:
+                Object.values(currentEvent.categories.collection)[0]?._id || "",
+              lender: Object.values(participants)[0]?._id || "",
+              amount: "0",
+              date: new Date(),
+              share: { type: "default" },
+              updatedAt: new Date(),
+            },
+          };
 
   const handleSubmit = (transaction: Transaction) => {
     if (transaction.type === "expense") {
@@ -73,7 +74,7 @@ export function EditTransactionPage() {
         expenses: updateMergeableCollectionItem(
           transaction.data._id,
           transaction.data,
-          event.expenses
+          event.expenses,
         ),
       }));
     } else {
@@ -82,7 +83,7 @@ export function EditTransactionPage() {
         deposits: updateMergeableCollectionItem(
           transaction.data._id,
           transaction.data,
-          event.deposits
+          event.deposits,
         ),
       }));
     }

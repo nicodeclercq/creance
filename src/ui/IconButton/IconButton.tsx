@@ -3,8 +3,8 @@ import buttonStyles from "../Button/Button.module.css";
 import styles from "./IconButton.module.css";
 import { Icon, type IconProps } from "../Icon/Icon";
 import { Link } from "react-router-dom";
-import type { Params, RouteName } from "../../routes";
-import { getPath } from "../../routes";
+import type { Params, RouteName } from "../../router/routes";
+import { getPath } from "../../router/routes";
 import { Button, Tooltip, TooltipTrigger } from "react-aria-components";
 type CommonProps = {
   label: string;

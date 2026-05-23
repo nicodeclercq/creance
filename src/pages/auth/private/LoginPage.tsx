@@ -6,7 +6,7 @@ import type { Credentials } from "../../../store/adapters/AuthManager";
 import { LoadingIcon } from "../../../ui/Button/LoadingIcon";
 import { LoginForm } from "./LoginForm";
 import { Modal } from "../../../ui/Modal/Modal";
-import { ROUTES_DEFINITION } from "../../../routes";
+import { ROUTES_DEFINITION } from "../../../router/routes";
 import { redirect } from "react-router-dom";
 import { useAuth } from "../../../store/useAuth";
 import { useTranslation } from "react-i18next";

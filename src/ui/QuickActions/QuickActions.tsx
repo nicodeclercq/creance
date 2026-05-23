@@ -1,16 +1,9 @@
-import {
-  Button,
-  Link,
-  Dialog,
-  DialogTrigger,
-  Popover,
-} from "react-aria-components";
+import { Button, Dialog, DialogTrigger, Popover } from "react-aria-components";
 import {
   IconButton,
   type IconButtonPropsWhithoutVariantAndOverlays,
   type AsButton,
   type AsLink,
-  isButton,
 } from "../IconButton/IconButton";
 
 import { Icon } from "../Icon/Icon";
@@ -19,7 +12,7 @@ import buttonStyles from "../Button/Button.module.css";
 import classNames from "classnames";
 import iconButtonStyles from "../IconButton/IconButton.module.css";
 import styles from "./QuickActions.module.css";
-import type { RouteName } from "../../routes";
+import type { RouteName } from "../../router/routes";
 
 export type Action<R extends RouteName> =
   IconButtonPropsWhithoutVariantAndOverlays<AsLink<R> | AsButton>;

@@ -3,7 +3,7 @@ import { CategoriesForm } from "../events/private/CategoriesForm";
 import type { Category } from "../../models/Category";
 import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
-import { Redirect } from "../../Redirect";
+import { Redirect } from "../../router/Redirect";
 import { updateMergeableCollection } from "../../models/mergeable";
 import { useData } from "../../store/useData";
 import { useParams } from "react-router-dom";

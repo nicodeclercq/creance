@@ -13,7 +13,6 @@ type NoActivityCardProps = {
 
 export function NoActivityCard({
   defaultDate,
-  currentUser,
   addActivity,
 }: NoActivityCardProps) {
   const { t } = useTranslation();

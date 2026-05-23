@@ -1,4 +1,24 @@
-import { describe, it, expect, vi } from "vitest";
+import {
+  TEST_CREDENTIALS,
+  createMockSecureKeyStore,
+  createTestState,
+  createTestUserData,
+  getReadyData,
+  preAuthenticate,
+} from "./builders";
+import { describe, expect, it, vi } from "vitest";
+
+import { AuthManagerFactory } from "../adapters/AuthManager";
+import type { Event } from "../../models/Event";
+import type { State } from "../state";
+import { createEvent } from "../../service/test-helpers";
+import { createInMemoryBackend } from "./createInMemoryBackend";
+import { createInMemoryLocalStorage } from "./createInMemoryLocalStorage";
+import { createLocalAdapter } from "../adapters/createLocalAdapter";
+import { createMemoryStorage } from "./createMemoryStorage";
+import { createRemoteAdapter } from "../adapters/createRemoteAdapter";
+import { createStore } from "../createStore";
+import { encryptState } from "../adapters/shared/e2ee";
 
 vi.mock("../../service/secureKeyStore", () => ({
   createSecureKeyStore: () => ({
@@ -7,25 +27,6 @@ vi.mock("../../service/secureKeyStore", () => ({
     clear: () => Promise.resolve(),
   }),
 }));
-
-import { createStore } from "../createStore";
-import { createLocalAdapter } from "../adapters/createLocalAdapter";
-import { createRemoteAdapter } from "../adapters/createRemoteAdapter";
-import { AuthManagerFactory } from "../adapters/AuthManager";
-import type { State } from "../state";
-import { encryptState } from "../adapters/shared/e2ee";
-import { createEvent } from "../../service/test-helpers";
-import { createMemoryStorage } from "./createMemoryStorage";
-import { createInMemoryBackend } from "./createInMemoryBackend";
-import { createInMemoryLocalStorage } from "./createInMemoryLocalStorage";
-import {
-  TEST_CREDENTIALS,
-  preAuthenticate,
-  createMockSecureKeyStore,
-  createTestUserData,
-  createTestState,
-  getReadyData,
-} from "./builders";
 
 const d1 = new Date("2026-01-01T00:00:00Z");
 const d2 = new Date("2026-01-02T00:00:00Z");
@@ -40,7 +41,7 @@ describe("Full integration (local + remote)", () => {
     const backend = createInMemoryBackend();
     const local = createInMemoryLocalStorage();
 
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -79,7 +80,7 @@ describe("Full integration (local + remote)", () => {
     );
 
     const local = createInMemoryLocalStorage();
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -107,7 +108,7 @@ describe("Full integration (local + remote)", () => {
     const backend = createInMemoryBackend();
     const local = createInMemoryLocalStorage();
 
-    const store1 = createStore<State>({ authManager: auth1 });
+    const store1 = createStore<State, Event>({ authManager: auth1 });
     store1.register(createLocalAdapter(local.config));
     store1.register(
       createRemoteAdapter({
@@ -137,7 +138,7 @@ describe("Full integration (local + remote)", () => {
     });
 
     const auth2 = AuthManagerFactory({ storage: authStorage, secureKeyStore });
-    const store2 = createStore<State>({ authManager: auth2 });
+    const store2 = createStore<State, Event>({ authManager: auth2 });
     store2.register(createLocalAdapter(local.config));
     store2.register(
       createRemoteAdapter({
@@ -185,7 +186,7 @@ describe("Full integration (local + remote)", () => {
     local.setData(JSON.stringify(localState));
 
     const auth = AuthManagerFactory({ storage: authStorage, secureKeyStore });
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -233,7 +234,7 @@ describe("Full integration (local + remote)", () => {
     );
 
     const auth = AuthManagerFactory({ storage: authStorage, secureKeyStore });
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -281,7 +282,7 @@ describe("Full integration (local + remote)", () => {
     );
 
     const auth = AuthManagerFactory({ storage: authStorage, secureKeyStore });
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -338,7 +339,7 @@ describe("Full integration (local + remote)", () => {
     );
 
     const auth = AuthManagerFactory({ storage: authStorage, secureKeyStore });
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -361,7 +362,7 @@ describe("Full integration (local + remote)", () => {
     const backend = createInMemoryBackend();
     const local = createInMemoryLocalStorage();
 
-    const store1 = createStore<State>({ authManager: auth });
+    const store1 = createStore<State, Event>({ authManager: auth });
     store1.register(createLocalAdapter(local.config));
     store1.register(
       createRemoteAdapter({
@@ -411,7 +412,7 @@ describe("Full integration (local + remote)", () => {
 
     const auth = AuthManagerFactory({ storage: authStorage, secureKeyStore });
 
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({
@@ -455,7 +456,7 @@ describe("Full integration (local + remote)", () => {
     const backend = createInMemoryBackend();
     const local = createInMemoryLocalStorage();
 
-    const store = createStore<State>({ authManager: auth });
+    const store = createStore<State, Event>({ authManager: auth });
     store.register(createLocalAdapter(local.config));
     store.register(
       createRemoteAdapter({

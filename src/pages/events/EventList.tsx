@@ -4,7 +4,7 @@ import { EmptyEventList } from "./EmptyEventList";
 import type { Event } from "../../models/Event";
 import { EventItem } from "./EventItem/EventItem";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
-import { ROUTES } from "../../routes";
+import { ROUTES } from "../../router/routes";
 import { Stack } from "../../ui/Stack/Stack";
 import { useTranslation } from "react-i18next";
 

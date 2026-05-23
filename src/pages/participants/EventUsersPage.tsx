@@ -12,7 +12,7 @@ import { EventParticipantsList } from "./private/EventParticipantsList";
 import { Modal } from "../../ui/Modal/Modal";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
 import type { Participant } from "../../models/Participant";
-import { Redirect } from "../../Redirect";
+import { Redirect } from "../../router/Redirect";
 import { Stack } from "../../ui/Stack/Stack";
 import { useData } from "../../store/useData";
 import { useParams } from "react-router-dom";

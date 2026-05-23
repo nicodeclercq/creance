@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AuthManagerFactory, type AuthState } from "./AuthManager";
 import type { SecureKeyStore } from "../../service/secureKeyStore";
-import { createUserId } from "./shared/alias";
 
 const createMockStorage = (): Storage => {
   const store = new Map<string, string>();
@@ -62,10 +61,7 @@ describe("AuthManagerFactory", () => {
 
   it("restores authenticated state from storage and secureKeyStore after init", async () => {
     const storage = createMockStorage();
-    storage.setItem(
-      "creance-auth",
-      JSON.stringify({ type: "authenticated" }),
-    );
+    storage.setItem("creance-auth", JSON.stringify({ type: "authenticated" }));
     const secureKeyStore = createMockSecureKeyStore();
     await secureKeyStore.store("key123");
 
@@ -82,10 +78,7 @@ describe("AuthManagerFactory", () => {
 
   it("falls back to initial when storage says authenticated but secureKeyStore has no key", async () => {
     const storage = createMockStorage();
-    storage.setItem(
-      "creance-auth",
-      JSON.stringify({ type: "authenticated" }),
-    );
+    storage.setItem("creance-auth", JSON.stringify({ type: "authenticated" }));
     const secureKeyStore = createMockSecureKeyStore();
 
     const auth = AuthManagerFactory({ storage, secureKeyStore });
@@ -160,7 +153,7 @@ describe("AuthManagerFactory", () => {
       storage: createMockStorage(),
       secureKeyStore: createMockSecureKeyStore(),
     });
-    const adapterLogin = vi.fn(() => Promise.resolve(createUserId("uid-1")));
+    const adapterLogin = vi.fn(() => Promise.resolve("uid-1"));
 
     await auth.login({ login: "user", password: "pass" });
     const result = await auth.loginAdapter(adapterLogin);
@@ -205,7 +198,7 @@ describe("AuthManagerFactory", () => {
       storage: createMockStorage(),
       secureKeyStore: createMockSecureKeyStore(),
     });
-    const adapterLogin = vi.fn(() => Promise.resolve(createUserId("uid-1")));
+    const adapterLogin = vi.fn(() => Promise.resolve("uid-1"));
 
     await auth.login({ login: "user", password: "pass" });
     auth.logout();

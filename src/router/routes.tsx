@@ -1,20 +1,20 @@
 import { type ReactNode } from "react";
 import { redirect } from "react-router-dom";
-import { EventsPage } from "./pages/events/EventsPage";
+import { EventsPage } from "../pages/events/EventsPage";
 import { Redirect } from "./Redirect";
-import { AddEventPage } from "./pages/events/AddEventPage";
-import { EventPage } from "./pages/event/EventPage";
-import { AddTransactionPage } from "./pages/event/AddTransactionPage";
-import { EditTransactionPage } from "./pages/event/EditTransactionPage";
-import { CategoriesPage } from "./pages/categories/CategoriesPage";
-import { EventUsersPage } from "./pages/participants/EventUsersPage";
-import { ParticipantSharePage } from "./pages/shares/ParticipantSharePage";
-import { EventParticipantSharePage } from "./pages/participants/EventParticipantSharePage";
-import { DistributionPage } from "./pages/distribution/DistributionPage";
-import type { ValueOf } from "./utils/object";
-import { InformationPage } from "./pages/settings/InformationPage";
-import { CalendarPage } from "./pages/calendar/CalendarPage";
-import { JoinPage } from "./pages/join/JoinPage";
+import { AddEventPage } from "../pages/events/AddEventPage";
+import { EventPage } from "../pages/event/EventPage";
+import { AddTransactionPage } from "../pages/event/AddTransactionPage";
+import { EditTransactionPage } from "../pages/event/EditTransactionPage";
+import { CategoriesPage } from "../pages/categories/CategoriesPage";
+import { EventUsersPage } from "../pages/participants/EventUsersPage";
+import { ParticipantSharePage } from "../pages/shares/ParticipantSharePage";
+import { EventParticipantSharePage } from "../pages/participants/EventParticipantSharePage";
+import { DistributionPage } from "../pages/distribution/DistributionPage";
+import type { ValueOf } from "../utils/object";
+import { InformationPage } from "../pages/settings/InformationPage";
+import { CalendarPage } from "../pages/calendar/CalendarPage";
+import { JoinPage } from "../pages/join/JoinPage";
 
 export const ROUTES_DEFINITION = {
   ROOT: {
