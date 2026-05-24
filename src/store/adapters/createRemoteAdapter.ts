@@ -172,6 +172,29 @@ export const createRemoteAdapter = ({
     });
   };
 
+  const hasEventsListChanged = (
+    newState: State,
+    previousState: State | undefined,
+  ) => {
+    const currentIds = Object.keys(
+      previousState?.account.events.collection ?? {},
+    )
+      .sort()
+      .join("|");
+    const newIds = Object.keys(newState.account.events.collection)
+      .sort()
+      .join("|");
+
+    return currentIds !== newIds;
+  };
+
+  const refreshEventSubscriptions = () => {
+    Object.values(state.subscriptions.events).forEach((subscription) =>
+      subscription?.unsubscribe(),
+    );
+    state.subscriptions.events = getEventSubscriptions();
+  };
+
   const getEventSubscriptions = () => {
     const accountEvents =
       state.userData?.state.account.events.collection ?? {};
@@ -227,13 +250,16 @@ export const createRemoteAdapter = ({
 
           decryptAndValidate(encryptedData, userKey, userDataSchema)
             .then((remoteUserData) => {
-              const currentState = state.userData?.state;
+              const previousState = state.userData?.state;
               const mergedState = handleRemoteData(
                 remoteUserData,
-                currentState,
+                previousState,
               );
               if (mergedState && adapter.change) {
                 adapter.change(mergedState);
+                if (hasEventsListChanged(mergedState, previousState)) {
+                  refreshEventSubscriptions();
+                }
               }
             })
             .catch((error) => {
@@ -350,23 +376,13 @@ export const createRemoteAdapter = ({
     // TODO
   };
 
-  const hasEventsListChanged = (newState: State) => {
-    const currentIds = Object.keys(
-      state.userData?.state.account.events.collection ?? {},
-    )
-      .sort()
-      .join("|");
-    const newIds = Object.keys(newState.account.events.collection)
-      .sort()
-      .join("|");
-
-    return currentIds !== newIds;
-  };
-
   const onChange = (newState: State): void => {
     if (authManager.getState().type !== "authenticated") {
       return;
     }
+
+    const previousState = state.userData?.state;
+    const eventsListChanged = hasEventsListChanged(newState, previousState);
 
     state.userData = state.userData
       ? { ...state.userData, state: newState, updatedAt: new Date() }
@@ -381,8 +397,8 @@ export const createRemoteAdapter = ({
       });
     }
 
-    if (hasEventsListChanged(newState)) {
-      state.subscriptions.events = getEventSubscriptions();
+    if (eventsListChanged) {
+      refreshEventSubscriptions();
     }
   };
 

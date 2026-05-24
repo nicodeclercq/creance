@@ -126,6 +126,63 @@ describe("createRemoteAdapter", () => {
     expect(fetchedEvent).toStrictEqual(event);
   });
 
+  it("subscribes to new events when account events list grows", async () => {
+    const eventData = new BehaviorSubject<Record<string, string>>({});
+    const subscribedEventIds: string[] = [];
+    const userData = new BehaviorSubject<string | undefined>(undefined);
+    const authManager = createFakeAuthManager();
+    const remoteAdapter = createRemoteAdapter({
+      operations: {
+        login: () => Promise.resolve("1"),
+        logout: () => Promise.resolve(),
+        signup: () => Promise.resolve("1"),
+        getUserData: () => userData,
+        name: "test",
+        setUserData: (data: string) => {
+          userData.next(data);
+          return Promise.resolve();
+        },
+        getEventData: (eventId) => {
+          subscribedEventIds.push(eventId);
+          return eventData.asObservable().pipe(
+            map((events) => events[eventId]),
+          );
+        },
+        setEventData: (eventId, data) => {
+          eventData.next({ ...eventData.value, [eventId]: data });
+          return Promise.resolve();
+        },
+      },
+      authManager,
+    });
+
+    const d1 = new Date("2026-01-01T00:00:00Z");
+    const initialState = createTestState({ updatedAt: d1 });
+    await remoteAdapter.load(initialState);
+
+    expect(subscribedEventIds).toStrictEqual([]);
+
+    const event = createEvent({ _id: "evt-joined", name: "Joined", updatedAt: d1 });
+    remoteAdapter.onChange({
+      ...initialState,
+      account: {
+        ...initialState.account,
+        events: {
+          collection: {
+            "evt-joined": { eventId: "share-key", userId: "user-1", updatedAt: d1 },
+          },
+          updatedAt: d1,
+        },
+      },
+      events: {
+        collection: { "evt-joined": event },
+        updatedAt: d1,
+      },
+    });
+
+    expect(subscribedEventIds).toStrictEqual(["evt-joined"]);
+  });
+
   it("pushes remote event updates through adapter.change", async () => {
     const { remoteAdapter, setEventData } = createFakeAdapter();
     const d1 = new Date("2026-01-01T00:00:00Z");
