@@ -38,7 +38,7 @@ type ShareFormProps = {
   defaultValues: ParticipantShare;
   submitLabel: string;
   onSubmit: (data: ParticipantShare) => void;
-  cancel: DistributiveOmit<ButtonProps, "variant">;
+  cancel?: DistributiveOmit<ButtonProps, "variant">;
 };
 
 function ShareItem({
@@ -159,19 +159,19 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
         name="multiplier.adults"
         rules={{
           required: t(
-            "page.share.form.type.custom.field.shares.adults.validation.required"
+            "page.share.form.type.custom.field.shares.adults.validation.required",
           ),
           min: {
             value: 0,
             message: t(
-              "page.share.form.type.custom.field.shares.adults.validation.min"
+              "page.share.form.type.custom.field.shares.adults.validation.min",
             ),
           },
           validate: (value) => {
             const children = getValues("multiplier.children");
             if (value + children === 0) {
               return t(
-                "page.share.form.type.custom.field.shares.multipliers.validation.min"
+                "page.share.form.type.custom.field.shares.multipliers.validation.min",
               );
             }
           },
@@ -196,19 +196,19 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
         name="multiplier.children"
         rules={{
           required: t(
-            "page.share.form.type.custom.field.shares.children.validation.required"
+            "page.share.form.type.custom.field.shares.children.validation.required",
           ),
           min: {
             value: 0,
             message: t(
-              "page.share.form.type.custom.field.shares.children.validation.min"
+              "page.share.form.type.custom.field.shares.children.validation.min",
             ),
           },
           validate: (value) => {
             const adults = getValues("multiplier.adults");
             if (value + adults === 0) {
               return t(
-                "page.share.form.type.custom.field.shares.multipliers.validation.min"
+                "page.share.form.type.custom.field.shares.multipliers.validation.min",
               );
             }
           },
@@ -233,12 +233,12 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
         control={control}
         rules={{
           required: t(
-            "page.share.form.type.custom.field.dates.validation.required"
+            "page.share.form.type.custom.field.dates.validation.required",
           ),
           validate: (value) => {
             if (isInInterval(event.period)(value)) {
               return t(
-                "page.share.form.type.custom.field.dates.validation.between"
+                "page.share.form.type.custom.field.dates.validation.between",
               );
             }
           },
@@ -344,7 +344,7 @@ export function EventParticipantShareForm({
         if (type === "custom") {
           if (value.length === 0) {
             return t(
-              "page.share.form.type.custom.field.shares.validation.minLength"
+              "page.share.form.type.custom.field.shares.validation.minLength",
             );
           }
         }
@@ -480,7 +480,7 @@ export function EventParticipantShareForm({
                       "page.share.form.type.custom.actions.showAddForm",
                       {
                         count: fields.length,
-                      }
+                      },
                     )}
                     variant="tertiary"
                     icon={{ name: "add", position: "start" }}

@@ -12,6 +12,7 @@ import { JoinEvent } from "./private/JoinEvent";
 import { Logger } from "../../service/Logger";
 import type { Participant } from "../../models/Participant";
 import { Redirect } from "../../router/Redirect";
+import { SetParticipantShare } from "./private/SetParticipantShare";
 import { Welcome } from "./private/Welcome";
 import { useAuth } from "../../store/useAuth";
 import { useParams } from "react-router-dom";
@@ -24,6 +25,13 @@ export function JoinPage() {
   const [isNewUser, setIsNewUser] = useState(false);
   const { eventId, shareId } = useParams();
   const [step, setStep] = useState(0);
+  const [tmpEvent, setTmpEvent] = useState<{
+    event: Event;
+    participation: {
+      isNew: boolean;
+      participant: Participant;
+    };
+  }>();
 
   const decodedEventId = eventId ? decodeURIComponent(eventId) : undefined;
   const decodedShareId = shareId ? decodeURIComponent(shareId) : undefined;
@@ -35,20 +43,28 @@ export function JoinPage() {
   }
 
   if (authState.type === "authenticated" && step === 0) {
-    setStep(1);
+    setStep((a) => a + 1);
     return;
   }
 
-  const addUserParticipation = ({
-    event,
-    participation,
-  }: {
+  const addUserParticipation = (tmp: {
     event: Event;
     participation: {
       isNew: boolean;
       participant: Participant;
     };
   }) => {
+    setTmpEvent(tmp);
+    // Go to next step
+    setStep((a) => a + 1);
+  };
+
+  const storeDataAndContinue = () => {
+    if (!tmpEvent) {
+      throw new Error("Previous step was not complete");
+    }
+
+    const { participation, event } = tmpEvent;
     setState(({ account, events, users, ...other }) => ({
       ...other,
       users: addMergeableCollectionItem(
@@ -88,7 +104,7 @@ export function JoinPage() {
     }));
 
     // Go to next step
-    setStep(2);
+    setStep((a) => a + 1);
   };
 
   return (
@@ -120,7 +136,18 @@ export function JoinPage() {
             passKey={decodedShareId}
           />
         )}
-        {step === 2 && (
+        {step === 2 && tmpEvent != null && (
+          <SetParticipantShare
+            event={tmpEvent.event}
+            onPrevious={() => setStep((a) => a - 1)}
+            onNext={storeDataAndContinue}
+            participant={tmpEvent.participation.participant}
+            participantShare={
+              tmpEvent.participation.participant.participantShare
+            }
+          />
+        )}
+        {step === 3 && (
           <Redirect to="EVENT" params={{ eventId: decodedEventId }} />
         )}
       </Card>

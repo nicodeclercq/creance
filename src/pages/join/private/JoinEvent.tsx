@@ -66,14 +66,17 @@ function JoinEventHandler({
       return;
     }
 
+    const tmpParticipant =
+      participant === addedParticipant._id &&
+      participant in event.participants.collection
+        ? event.participants.collection[participant]
+        : addedParticipant;
+
     onNext({
       event,
       participation: {
         isNew: participant === addedParticipant._id,
-        participant:
-          participant === addedParticipant._id
-            ? event.participants.collection[participant]
-            : addedParticipant,
+        participant: tmpParticipant,
       },
     });
   };
