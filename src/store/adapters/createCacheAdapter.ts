@@ -22,7 +22,11 @@ export const createCacheAdapter = (
         return workerClient.read();
       }),
 
-    write: (data) => workerClient.write(data),
+    write: (data) =>
+      (initialized ? Promise.resolve() : workerClient.init()).then(() => {
+        initialized = true;
+        return workerClient.write(data);
+      }),
 
     clear: () => {
       workerClient.clear().catch(() => {});

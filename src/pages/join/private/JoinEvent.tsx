@@ -67,10 +67,9 @@ function JoinEventHandler({
     }
 
     const tmpParticipant =
-      participant === addedParticipant._id &&
-      participant in event.participants.collection
-        ? event.participants.collection[participant]
-        : addedParticipant;
+      participant === addedParticipant._id
+        ? addedParticipant
+        : event.participants.collection[participant];
 
     onNext({
       event,

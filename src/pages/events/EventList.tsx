@@ -9,7 +9,6 @@ import { Stack } from "../../ui/Stack/Stack";
 import { useTranslation } from "react-i18next";
 
 type Props = {
-  currentParticipantId: string;
   events: Event[];
 };
 

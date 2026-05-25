@@ -1,6 +1,7 @@
 import {
   addMergeableCollectionItem,
   createEmptyMergeableCollection,
+  updateMergeableCollectionItem,
   updateMergeableRecord,
 } from "../../models/mergeable";
 
@@ -11,6 +12,7 @@ import type { Event } from "../../models/Event";
 import { JoinEvent } from "./private/JoinEvent";
 import { Logger } from "../../service/Logger";
 import type { Participant } from "../../models/Participant";
+import type { ParticipantShare } from "../../models/ParticipantShare";
 import { Redirect } from "../../router/Redirect";
 import { SetParticipantShare } from "./private/SetParticipantShare";
 import { Welcome } from "./private/Welcome";
@@ -59,21 +61,40 @@ export function JoinPage() {
     setStep((a) => a + 1);
   };
 
-  const storeDataAndContinue = () => {
+  const storeDataAndContinue = (participantShare: ParticipantShare) => {
     if (!tmpEvent) {
       throw new Error("Previous step was not complete");
     }
 
     const { participation, event } = tmpEvent;
+    const participant = {
+      ...participation.participant,
+      participantShare,
+    };
+    const eventWithParticipant = {
+      ...event,
+      participants:
+        participant._id in event.participants.collection
+          ? updateMergeableCollectionItem(
+              participant._id,
+              participant,
+              event.participants,
+            )
+          : addMergeableCollectionItem(
+              participant._id,
+              participant,
+              event.participants,
+            ),
+    };
     setState(({ account, events, users, ...other }) => ({
       ...other,
       users: addMergeableCollectionItem(
-        participation.participant._id,
+        participant._id,
         {
-          _id: participation.participant._id,
-          share: participation.participant.share,
-          avatar: participation.participant.avatar,
-          name: participation.participant.name,
+          _id: participant._id,
+          share: participant.share,
+          avatar: participant.avatar,
+          name: participant.name,
         },
         users ?? createEmptyMergeableCollection(),
       ),
@@ -85,8 +106,8 @@ export function JoinPage() {
           ...(isNewUser
             ? {
                 share: {
-                  adults: participation.participant.share.adults,
-                  children: participation.participant.share.children,
+                  adults: participant.share.adults,
+                  children: participant.share.children,
                 },
               }
             : {}),
@@ -95,12 +116,16 @@ export function JoinPage() {
           decodedEventId,
           {
             eventId: decodedShareId,
-            userId: participation.participant._id,
+            userId: participant._id,
           },
           account.events,
         ),
       }),
-      events: addMergeableCollectionItem(decodedEventId, event, events),
+      events: addMergeableCollectionItem(
+        decodedEventId,
+        eventWithParticipant,
+        events,
+      ),
     }));
 
     // Go to next step
