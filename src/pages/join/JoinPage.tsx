@@ -23,7 +23,7 @@ import { useStoreData } from "../../store/useData";
 
 export function JoinPage() {
   const { state: authState } = useAuth();
-  const [, setState] = useStoreData();
+  const [state, setState] = useStoreData();
   const [isNewUser, setIsNewUser] = useState(false);
   const { eventId, shareId } = useParams();
   const [step, setStep] = useState(0);
@@ -42,6 +42,12 @@ export function JoinPage() {
     Logger.log("Invalid join arguments")({ eventId, shareId });
 
     return <Redirect to="ROOT" />;
+  }
+
+  if (state.events.collection[decodedEventId] != null) {
+    Logger.log("Already joined event")({ eventId });
+
+    return <Redirect to="EVENT" params={{ eventId: decodedEventId }} />;
   }
 
   if (authState.type === "authenticated" && step === 0) {
