@@ -81,6 +81,26 @@ export const createRemoteAdapter = ({
 }: RemoteAdapterConfig): RemoteAdapter<State, Event> => {
   Logger.log(`RemoteAdapter[${operations.name}]: creating`)({});
 
+  const removeEventsFromAccount = (
+    currentState: State,
+    eventIds: string[],
+  ): State =>
+    eventIds.length === 0
+      ? currentState
+      : {
+          ...currentState,
+          account: {
+            ...currentState.account,
+            events: {
+              ...currentState.account.events,
+              collection: eventIds.reduce((acc, eventId) => {
+                const { [eventId]: removed, ...others } = acc;
+                return others;
+              }, currentState.account.events.collection),
+            },
+          },
+        };
+
   const state: {
     userData: UserData | undefined;
     subscriptions: {
@@ -127,9 +147,25 @@ export const createRemoteAdapter = ({
     const localUserData = state.userData ?? createEmptyUserData(prev);
     const mergedUserData = merge(localUserData, remoteUserData);
     const mergedState = merge(localUserData.state, remoteUserData.state);
-    state.userData = { ...mergedUserData, state: mergedState };
-    cleanupDeletedEvents(mergedState.events.collection);
-    return mergedState;
+    const previousEventIds = [
+      ...new Set([
+        ...Object.keys(localUserData.state.events.collection),
+        ...Object.keys(remoteUserData.state.events.collection),
+      ]),
+    ];
+    const deletedEventIds = previousEventIds.filter(
+      (eventId) => mergedState.events.collection[eventId] === undefined,
+    );
+    const cleanedMergedState = removeEventsFromAccount(
+      mergedState,
+      deletedEventIds,
+    );
+    state.userData = { ...mergedUserData, state: cleanedMergedState };
+    cleanupDeletedEvents(
+      cleanedMergedState.events.collection,
+      previousEventIds,
+    );
+    return cleanedMergedState;
   };
 
   const unsubscribeAll = () => {
@@ -196,8 +232,7 @@ export const createRemoteAdapter = ({
   };
 
   const getEventSubscriptions = () => {
-    const accountEvents =
-      state.userData?.state.account.events.collection ?? {};
+    const accountEvents = state.userData?.state.account.events.collection ?? {};
 
     return Object.entries(accountEvents).reduce(
       (acc, [actualEventId, { eventId: passKey }]) => {
@@ -349,7 +384,7 @@ export const createRemoteAdapter = ({
     const eventKey = knownEvent?.eventId;
 
     if (!eventKey) {
-      return Promise.reject("No event key found");
+      return Promise.resolve();
     }
 
     return encryptState(event, eventKey as string)
@@ -369,11 +404,28 @@ export const createRemoteAdapter = ({
       });
   };
 
-  // TODO: change deletion workflow
   const cleanupDeletedEvents = (
-    _currentEvents: Record<string, Event>,
+    currentEvents: Record<string, Event>,
+    previousEventIds: readonly string[],
   ): void => {
-    // TODO
+    if (!operations.deleteEventData) {
+      return;
+    }
+
+    const currentEventIds = new Set(Object.keys(currentEvents));
+
+    previousEventIds
+      .filter((eventId) => !currentEventIds.has(eventId))
+      .forEach((eventId) => {
+        state.subscriptions.events[eventId]?.unsubscribe();
+        delete state.subscriptions.events[eventId];
+
+        operations.deleteEventData!(eventId).catch((error) => {
+          Logger.error(
+            `RemoteAdapter[${operations.name}]: cleanupDeletedEvents failed`,
+          )(error);
+        });
+      });
   };
 
   const onChange = (newState: State): void => {
@@ -383,18 +435,27 @@ export const createRemoteAdapter = ({
 
     const previousState = state.userData?.state;
     const eventsListChanged = hasEventsListChanged(newState, previousState);
+    const previousEventIds = Object.keys(
+      previousState?.events.collection ?? {},
+    );
+    const deletedEventIds = previousEventIds.filter(
+      (eventId) => newState.events.collection[eventId] === undefined,
+    );
+    const cleanedNewState = removeEventsFromAccount(newState, deletedEventIds);
 
     state.userData = state.userData
-      ? { ...state.userData, state: newState, updatedAt: new Date() }
-      : createEmptyUserData(newState);
+      ? { ...state.userData, state: cleanedNewState, updatedAt: new Date() }
+      : createEmptyUserData(cleanedNewState);
 
-    cleanupDeletedEvents(newState.events.collection);
+    cleanupDeletedEvents(cleanedNewState.events.collection, previousEventIds);
     saveUserData(state.userData);
 
     if (operations.setEventData) {
-      Object.entries(newState.events.collection).forEach(([eventId, event]) => {
-        saveEventData(eventId, event);
-      });
+      Object.entries(cleanedNewState.events.collection).forEach(
+        ([eventId, event]) => {
+          saveEventData(eventId, event);
+        },
+      );
     }
 
     if (eventsListChanged) {
