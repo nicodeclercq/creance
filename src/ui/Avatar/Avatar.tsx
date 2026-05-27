@@ -5,6 +5,7 @@ import styles from "./Avatar.module.css";
 type Size = "s" | "m" | "l" | "xl";
 
 export type AvatarProps = {
+  id?: string;
   label: string;
   image: string;
   size?: Size;
@@ -48,9 +49,15 @@ function computeFirstLetters(label: string, length: number) {
   return (label ?? "").substring(0, length).toUpperCase();
 }
 
-export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
+export function Avatar({
+  id,
+  label = "",
+  image,
+  size,
+  statusIcon,
+}: AvatarProps) {
   const computedSize = computeSize(size);
-  const backgroundColor = computeRandomColor(label);
+  const backgroundColor = computeRandomColor(id ?? label);
 
   return (
     <div
@@ -79,7 +86,7 @@ export function Avatar({ label = "", image, size, statusIcon }: AvatarProps) {
           "var(--ui-shadow-inset-subtle), 0 0 0 0.1rem hsl(from var(--ui-primitive-grey-200) h s l / 0.1)",
         borderRadius: "var(--ui-semantic-radius-round)",
         transition: "background-color ease-in 0.2s, color ease-in 0.2s",
-        lineHeight: 1,
+        lineHeight: 0.75,
       }}
     >
       <span aria-hidden="true">{computeFirstLetters(label, 2)}</span>

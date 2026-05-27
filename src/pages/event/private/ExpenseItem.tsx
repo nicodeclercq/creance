@@ -54,11 +54,8 @@ export function ExpenseItem({
         </Paragraph>
         <Columns align="center" gap="s">
           <Avatar
-            label={
-              isCurrentUser(lender)
-                ? t("currentUser.anonymous.name")
-                : lender.name
-            }
+            id={lender._id}
+            label={lender.name}
             image={lender.avatar}
             size="s"
           />
@@ -89,19 +86,19 @@ export function ExpenseItem({
               onClick: onDelete,
               confirmation: {
                 title: t(
-                  "page.event.expenseList.actions.delete.confirmation.title"
+                  "page.event.expenseList.actions.delete.confirmation.title",
                 ),
                 description: t(
-                  "page.event.expenseList.actions.delete.confirmation.description"
+                  "page.event.expenseList.actions.delete.confirmation.description",
                 ),
                 cancel: {
                   label: t(
-                    "page.event.expenseList.actions.delete.confirmation.cancel"
+                    "page.event.expenseList.actions.delete.confirmation.cancel",
                   ),
                 },
                 confirm: {
                   label: t(
-                    "page.event.expenseList.actions.delete.confirmation.delete"
+                    "page.event.expenseList.actions.delete.confirmation.delete",
                   ),
                   onClick: onDelete,
                 },

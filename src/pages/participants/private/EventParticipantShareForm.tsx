@@ -387,6 +387,7 @@ export function EventParticipantShareForm({
           <Columns align="center" justify="center">
             <Stack width="auto" gap="s" alignItems="center">
               <Avatar
+                id={participant._id}
                 label={participant.name}
                 image={participant.avatar}
                 size="l"

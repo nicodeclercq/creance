@@ -37,10 +37,10 @@ export function MealManagementCard({
     lunchManager === "none" && dinnerManager === "none"
       ? "both"
       : lunchManager === "none"
-      ? "lunch"
-      : dinnerManager === "none"
-      ? "dinner"
-      : undefined;
+        ? "lunch"
+        : dinnerManager === "none"
+          ? "dinner"
+          : undefined;
 
   return (
     <MediaCard image="noodles" color="var(--ui-semantic-color-warning)">
@@ -91,6 +91,7 @@ export function MealManagementCard({
                 valueRenderer={({ value }) =>
                   value !== "none" ? (
                     <Avatar
+                      id={value}
                       label={participants[value]?.name}
                       image={participants[value]?.avatar}
                       size="s"
@@ -129,6 +130,7 @@ export function MealManagementCard({
                 valueRenderer={({ value }) =>
                   value !== "none" ? (
                     <Avatar
+                      id={value}
                       label={participants[value]?.name}
                       image={participants[value]?.avatar}
                       size="s"

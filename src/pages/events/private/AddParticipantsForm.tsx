@@ -10,6 +10,7 @@ import type { ParticipantShare } from "../../../models/ParticipantShare";
 import { Stack } from "../../../ui/Stack/Stack";
 import { createMergeableRecord } from "../../../models/mergeable";
 import { uid } from "../../../service/crypto";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { userSchema } from "../../../models/User";
 import { z } from "zod";
@@ -51,6 +52,7 @@ export function AddParticipantsForm({
   onClose,
   participants: participants,
 }: AddParticipantsFormProps) {
+  const _id = useMemo(uid, []);
   const { t } = useTranslation();
   const { control, handleSubmit, watch, reset } =
     useForm<AddParticipantsFormData>({
@@ -64,7 +66,7 @@ export function AddParticipantsForm({
 
   const addParticipant = (data: AddParticipantsFormData) => {
     const newParticipant: Participant = createMergeableRecord({
-      _id: uid(),
+      _id,
       name: data.name,
       avatar: "",
       share: {
@@ -80,7 +82,7 @@ export function AddParticipantsForm({
   return (
     <Stack gap="m">
       <Columns justify="center">
-        <Avatar label={watch("name")} image={""} size="xl" />
+        <Avatar id={_id} label={watch("name")} image={""} size="xl" />
       </Columns>
       <Controller
         control={control}

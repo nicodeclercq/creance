@@ -58,8 +58,8 @@ export function DepositItem({
         <Columns align="center" gap="s">
           <AvatarGroup
             avatars={[
-              { label: from.name, image: from.avatar },
-              { label: to.name, image: to.avatar },
+              { id: from._id, label: from.name, image: from.avatar },
+              { id: to._id, label: to.name, image: to.avatar },
             ]}
             size="s"
           />
@@ -92,20 +92,20 @@ export function DepositItem({
               onClick: onDelete,
               confirmation: {
                 title: t(
-                  "page.event.depositItem.actions.delete.confirmation.title"
+                  "page.event.depositItem.actions.delete.confirmation.title",
                 ),
                 description: t(
                   "page.event.depositItem.actions.delete.confirmation.description",
-                  { from: from.name, amount: deposit.amount, to: to.name }
+                  { from: from.name, amount: deposit.amount, to: to.name },
                 ),
                 cancel: {
                   label: t(
-                    "page.event.expenseList.actions.delete.confirmation.cancel"
+                    "page.event.expenseList.actions.delete.confirmation.cancel",
                   ),
                 },
                 confirm: {
                   label: t(
-                    "page.event.depositItem.actions.delete.confirmation.submit"
+                    "page.event.depositItem.actions.delete.confirmation.submit",
                   ),
                   onClick: onDelete,
                 },

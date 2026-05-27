@@ -64,7 +64,9 @@ export function ExpenseShare({
                   : t(key === "deposit" ? "deposit" : "category.unknwon"),
               value: centToDecimal(value),
               color: computeRandomColor(
-                key in event.categories.collection ? event.categories.collection[key].icon : key
+                key in event.categories.collection
+                  ? event.categories.collection[key].icon
+                  : key,
               ),
             }))}
           />
@@ -84,6 +86,7 @@ export function ExpenseShare({
                 </Paragraph>
                 <Columns align="center" gap="s">
                   <Avatar
+                    id={expense.lender}
                     label={participants[expense.lender].name}
                     image={participants[expense.lender].avatar}
                     size="s"

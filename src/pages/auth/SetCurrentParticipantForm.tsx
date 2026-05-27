@@ -19,6 +19,7 @@ type SetCurrentParticipantPageProps = {
 
 const fromUserToFormData = (user: User): FormData => {
   return {
+    _id: user._id,
     name: user.name,
     avatar: user.avatar,
     share: user.share,
@@ -69,7 +70,8 @@ export function SetCurrentParticipantForm({
         cancel={
           onCancel
             ? {
-                label: cancelLabel ?? t("page.setCurrentParticipant.actions.cancel"),
+                label:
+                  cancelLabel ?? t("page.setCurrentParticipant.actions.cancel"),
                 onCancel,
               }
             : undefined

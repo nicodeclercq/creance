@@ -32,7 +32,7 @@ export function DistributionItem({
   const { isCurrentUser } = useCurrentUser();
   const { left, right } = pipe(
     distributions,
-    ArrayFp.partition((d) => d.type === "receive")
+    ArrayFp.partition((d) => d.type === "receive"),
   );
   const values = {
     gives: left,
@@ -55,6 +55,7 @@ export function DistributionItem({
       <Stack>
         <Wrapper>
           <Avatar
+            id={participantId}
             label={participants[participantId].name}
             image={participants[participantId].avatar}
             size={isCurrentParticipant ? "l" : "m"}
@@ -119,7 +120,7 @@ export function DistributionItem({
                               values={{
                                 value: amount,
                                 participant: isCurrentUser(
-                                  participants[participantId]
+                                  participants[participantId],
                                 )
                                   ? t("currentUser.anonymous.name")
                                   : participants[participantId].name,
@@ -135,7 +136,7 @@ export function DistributionItem({
                           </Paragraph>
                         </Columns>
                       </li>
-                    )
+                    ),
                   )}
                 </ul>
               </>

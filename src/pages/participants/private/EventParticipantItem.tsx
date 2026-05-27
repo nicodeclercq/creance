@@ -26,7 +26,11 @@ export function EventParticipantItem({
 
   return (
     <Columns align="center" gap="s" as="li" styles={{ flexGrow: true }}>
-      <Avatar label={participant.name} image={participant.avatar} />
+      <Avatar
+        id={participant._id}
+        label={participant.name}
+        image={participant.avatar}
+      />
       <Stack>
         <Paragraph>
           {isCurrentUser(participant)
@@ -58,16 +62,16 @@ export function EventParticipantItem({
               title: t("page.event.shares.actions.delete.confirmation.title"),
               description: t(
                 "page.event.shares.actions.delete.confirmation.description",
-                { participant: participant.name }
+                { participant: participant.name },
               ),
               cancel: {
                 label: t(
-                  "page.event.shares.actions.delete.confirmation.cancel"
+                  "page.event.shares.actions.delete.confirmation.cancel",
                 ),
               },
               confirm: {
                 label: t(
-                  "page.event.shares.actions.delete.confirmation.delete"
+                  "page.event.shares.actions.delete.confirmation.delete",
                 ),
                 onClick: onDelete,
               },

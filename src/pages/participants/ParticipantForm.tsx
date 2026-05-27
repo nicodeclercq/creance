@@ -17,6 +17,7 @@ const createParticipantFormSchema = (
 ) =>
   z
     .object({
+      _id: z.string(),
       name: userSchema.shape.name
         .min(1)
         .refine(
@@ -101,7 +102,12 @@ export function ParticipantForm({
           gap: "m",
         }}
       >
-        <Avatar label={name} image={defaultValue?.avatar} size="xl" />
+        <Avatar
+          id={defaultValue._id}
+          label={name}
+          image={defaultValue.avatar}
+          size="xl"
+        />
       </Container>
       <Controller
         name="name"

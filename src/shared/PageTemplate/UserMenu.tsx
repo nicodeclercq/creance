@@ -56,7 +56,9 @@ export function UserMenu() {
       onClick: handleLogin,
       confirmation: {
         title: t("component.pageTemplate.actions.login.confirmation.title"),
-        description: t("component.pageTemplate.actions.login.confirmation.description"),
+        description: t(
+          "component.pageTemplate.actions.login.confirmation.description",
+        ),
         confirm: {
           label: t("component.pageTemplate.actions.login.confirmation.confirm"),
           onClick: handleLogin,
@@ -81,7 +83,9 @@ export function UserMenu() {
           label: t("component.pageTemplate.actions.login"),
         }}
         title={t("component.pageTemplate.actions.login.confirmation.title")}
-        description={t("component.pageTemplate.actions.login.confirmation.description")}
+        description={t(
+          "component.pageTemplate.actions.login.confirmation.description",
+        )}
         confirm={{
           label: t("component.pageTemplate.actions.login.confirmation.confirm"),
           onClick: handleLogin,
@@ -99,6 +103,7 @@ export function UserMenu() {
         label={t("component.pageTemplate.actions.more")}
         labelRenderer={() => (
           <Avatar
+            id={currentUser._id}
             label={currentUser.name}
             image={currentUser.avatar}
             size="m"

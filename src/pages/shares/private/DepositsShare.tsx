@@ -53,6 +53,7 @@ export function DepositsShare({ deposits, participants }: DepositsShareProps) {
                 </Paragraph>
                 <Columns align="center" gap="s">
                   <Avatar
+                    id={deposit.participantId}
                     label={
                       deposit.participantId in participants
                         ? participants[deposit.participantId].name

@@ -2,6 +2,7 @@ import {
   addMergeableCollectionItem,
   createMergeableRecord,
 } from "../../../models/mergeable";
+import { useMemo, useState } from "react";
 
 import { Avatar } from "../../../ui/Avatar/Avatar";
 import { Button } from "../../../ui/Button/Button";
@@ -20,7 +21,6 @@ import type { User } from "../../../models/User";
 import { uid } from "../../../service/crypto";
 import { useCurrentUser } from "../../../store/useCurrentUser";
 import { useData } from "../../../store/useData";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export type Step3Data = {
@@ -44,6 +44,7 @@ const UserRenderer = ({
     <Columns align="center" gap="s" styles={{ radius: "s" }}>
       <Container styles={{ display: "inline-block", position: "relative" }}>
         <Avatar
+          id={user._id}
           label={isCurrentUser ? t("currentUser.anonymous.name") : user.name}
           image={user.avatar}
           size={isCurrentUser ? "l" : "m"}
@@ -86,6 +87,7 @@ export function AddEventStep3({
   onNext,
   onPrevious,
 }: AddEventStep3Props) {
+  const defaultId = useMemo(uid, []);
   const { t } = useTranslation();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selection, setSelection] = useState<Participant[]>(data.participants);
@@ -186,6 +188,7 @@ export function AddEventStep3({
       >
         <ParticipantForm
           defaultValue={{
+            _id: defaultId,
             name: "",
             avatar: "",
             share: {

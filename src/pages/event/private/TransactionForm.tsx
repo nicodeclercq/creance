@@ -298,6 +298,7 @@ export function TransactionForm({
             }}
             valueRenderer={({ value }) => (
               <Avatar
+                id={value}
                 label={participants[value]?.name}
                 image={participants[value]?.avatar}
                 size="m"
@@ -360,6 +361,7 @@ export function TransactionForm({
               }}
               valueRenderer={({ value }) => (
                 <Avatar
+                  id={value}
                   label={participants[value]?.name}
                   image={participants[value]?.avatar}
                   size="m"
@@ -486,6 +488,7 @@ export function TransactionForm({
                   <Grid columns={["1fr", "min-content"]} gap="m">
                     <Columns align="center" gap="s" styles={{ flexGrow: true }}>
                       <Avatar
+                        id={participant._id}
                         label={participant.name}
                         image={participant.avatar}
                       />
@@ -527,6 +530,7 @@ export function TransactionForm({
                   <Columns gap="m">
                     <Columns align="center" gap="s" styles={{ flexGrow: true }}>
                       <Avatar
+                        id={participant._id}
                         label={participant.name}
                         image={participant.avatar}
                       />

@@ -58,17 +58,19 @@ export function ParticipantShareList({
         return otherCategories;
       }
       return shares;
-    })
+    }),
   );
 
   const totalShares = pipe(
     eventSharesByParticipant,
-    Either.map((shares) => getParticipantTotalSharesAmount({ shares }))
+    Either.map((shares) => getParticipantTotalSharesAmount({ shares })),
   );
 
   const expenseShares = pipe(
     eventSharesByParticipant,
-    Either.map((expenses) => expenses.sort((a, b) => -1 * sort(a.date, b.date)))
+    Either.map((expenses) =>
+      expenses.sort((a, b) => -1 * sort(a.date, b.date)),
+    ),
   );
 
   const depositShares = pipe(
@@ -76,8 +78,8 @@ export function ParticipantShareList({
     Either.map((deposits) =>
       deposits[participantId]
         ? deposits[participantId].sort((a, b) => -1 * sort(a.date, b.date))
-        : []
-    )
+        : [],
+    ),
   );
 
   const totalExpenseAmount = getParticipantTotalExpenseAmount({
@@ -87,7 +89,7 @@ export function ParticipantShareList({
 
   const totalDepositsAmount = pipe(
     depositShares,
-    Either.map((depositShares) => getTotalDepositAmount(depositShares))
+    Either.map((depositShares) => getTotalDepositAmount(depositShares)),
   );
 
   return (
@@ -128,11 +130,8 @@ export function ParticipantShareList({
               <div>
                 <Columns gap="s" align="center">
                   <Avatar
-                    label={
-                      isCurrentUser(participants[option.id])
-                        ? t("currentUser.anonymous.name")
-                        : option.label
-                    }
+                    id={option.id}
+                    label={participants[option.id].name}
                     image={participants[option.id].avatar}
                     size="m"
                   />

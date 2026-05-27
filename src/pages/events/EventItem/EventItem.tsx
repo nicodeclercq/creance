@@ -28,9 +28,12 @@ export function EventItem({
   const { t } = useTranslation();
   const eventParticipantIds = Object.keys(eventParticipants.collection);
 
-  const totalAmount = Object.values(expenses.collection).reduce((sum, expense) => {
-    return sum + asNumber(expense.amount);
-  }, 0);
+  const totalAmount = Object.values(expenses.collection).reduce(
+    (sum, expense) => {
+      return sum + asNumber(expense.amount);
+    },
+    0,
+  );
 
   return (
     <Columns
@@ -46,6 +49,7 @@ export function EventItem({
       }}
     >
       <Avatar
+        id={_id}
         label={name}
         image={""}
         statusIcon={isClosed ? "lock" : undefined}
@@ -58,6 +62,7 @@ export function EventItem({
           <AvatarGroup
             size="s"
             avatars={eventParticipantIds.map((participantId) => ({
+              id: participantId,
               label: participants[participantId].name,
               image: participants[participantId].avatar,
             }))}
