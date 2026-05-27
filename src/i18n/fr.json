@@ -154,7 +154,7 @@
   "page.event.add.form.field.share.type.label": "Type de répartition",
   "page.event.add.form.field.share.type.default.description": "La répartition est calculée automatiquement en fonction du nombre de parts de chaque participant sur la durée de la liste de créances.",
   "page.event.add.form.field.share.type.percentage.description": "La répartition est calculée en fonction du nombre de parts que vous définisser pour chaque participant. Si l'un d'eux ne participe pas à une dépense laissez le champs à zéro il ne sera pas pris en compte dans le calcul.",
-  "page.event.add.form.field.share.type.fixed.description": "La répartition est calculée en fonction du montant que vous définissez pour chaque participant. Vous pouvez simplifier la saisie en utilisant des calculs: \"120 - 2.99\".",
+  "page.event.add.form.field.share.type.fixed.description": "La répartition est calculée en fonction du montant que vous définissez pour chaque participant.",
   "page.event.add.form.field.share.type.option.default.label": "Par défaut",
   "page.event.add.form.field.share.type.option.percentage.label": "Par parts",
   "page.event.add.form.field.share.type.option.fixed.label": "Montant fixe",

@@ -45,7 +45,7 @@ const UserRenderer = ({
       <Container styles={{ display: "inline-block", position: "relative" }}>
         <Avatar
           id={user._id}
-          label={isCurrentUser ? t("currentUser.anonymous.name") : user.name}
+          label={user.name}
           image={user.avatar}
           size={isCurrentUser ? "l" : "m"}
         />
