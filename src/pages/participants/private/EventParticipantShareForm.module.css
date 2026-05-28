@@ -1,5 +1,6 @@
 .addShareItemForm {
   background: var(--ui-primitive-green-900);
+  color: var(--ui-semantic-color-neutral-default);
   border: 0.2rem dashed var(--ui-primitive-green-800);
   border-radius: var(--ui-semantic-radius-s);
   padding: var(--ui-semantic-padding-y-m) var(--ui-semantic-padding-x-s);

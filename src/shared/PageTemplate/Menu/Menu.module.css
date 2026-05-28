@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding: var(--ui-component-menu-padding-y) var(--ui-semantic-padding-x-xs);
+  padding: var(--ui-component-menu-padding-y, var(--ui-semantic-padding-y-m)) var(--ui-semantic-padding-x-xs);
   text-align: center;
   border-block-end: var(--ui-component-menu-border-active-bottom, none);
   border-inline-start: var(--ui-component-menu-border-active-left, none);
