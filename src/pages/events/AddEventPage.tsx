@@ -104,6 +104,7 @@ export function AddEventPage() {
             {
               _id: eventId,
               name: step1Data.name,
+              hasProgram: step1Data.hasProgram,
               participants: updateMergeableCollection(data.participants),
               period: {
                 start: dates.start,
