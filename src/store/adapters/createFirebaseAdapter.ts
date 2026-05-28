@@ -27,6 +27,7 @@ import type { Event } from "../../models/Event";
 const COLLECTIONS = {
   USERS: firebaseConfig.collections.USERS,
   EVENTS: firebaseConfig.collections.EVENTS,
+  DELETED_EVENTS: firebaseConfig.collections.DELETED_EVENTS,
 } as const;
 
 const USER_ID_STORAGE_KEY = "creance-fb-uid";
@@ -216,6 +217,52 @@ export const createFirebaseAdapter = (config?: {
     });
   };
 
+  const getDeletedEventIds = (): Observable<string[]> =>
+    new Observable((subscriber) => {
+      const { db } = getFirebase();
+      const userId = state.userId;
+
+      if (!userId) {
+        subscriber.next([]);
+        return () => {};
+      }
+
+      const deletedEventsRef = ref(db, `${COLLECTIONS.DELETED_EVENTS}/${userId}`);
+      const unsubscribe = onValue(
+        deletedEventsRef,
+        (snapshot) => {
+          const data = snapshot.exists()
+            ? (snapshot.val() as Record<string, true>)
+            : {};
+          subscriber.next(Object.keys(data));
+        },
+        (error) => {
+          Logger.error("Firebase: getDeletedEventIds subscription error")(error);
+          subscriber.error(error);
+        },
+      );
+
+      return () => unsubscribe();
+    });
+
+  const addDeletedEventId = (eventId: string): Promise<void> => {
+    const { db } = getFirebase();
+    const userId = state.userId;
+
+    if (!userId) {
+      return Promise.resolve();
+    }
+
+    const deletedEventRef = ref(
+      db,
+      `${COLLECTIONS.DELETED_EVENTS}/${userId}/${eventId}`,
+    );
+    return set(deletedEventRef, true).catch((error: unknown) => {
+      Logger.error("Firebase: addDeletedEventId failed")(error);
+      throw error;
+    });
+  };
+
   return createRemoteAdapter({
     operations: {
       name: "Firebase",
@@ -227,6 +274,8 @@ export const createFirebaseAdapter = (config?: {
       getEventData,
       setEventData,
       deleteEventData,
+      getDeletedEventIds,
+      addDeletedEventId,
     },
     authManager: config?.authManager,
   });

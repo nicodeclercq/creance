@@ -47,10 +47,11 @@ const mergeCollection = <T extends Timestamped>(
     if (itemA !== undefined && itemB !== undefined) {
       return { ...result, [key]: merge(itemA, itemB) };
     }
-    if (winnerCollection.collection[key] !== undefined) {
-      return { ...result, [key]: winnerCollection.collection[key] };
-    }
-    return result;
+    return itemA !== undefined
+      ? { ...result, [key]: itemA }
+      : itemB !== undefined
+        ? { ...result, [key]: itemB }
+        : result;
   }, {});
 
   return {

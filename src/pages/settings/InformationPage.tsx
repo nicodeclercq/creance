@@ -26,6 +26,7 @@ import { DarkThemeImage } from "./private/DarkThemeImage";
 import { SystemThemeImage } from "./private/SystemThemeImage";
 import { updateMergeableRecord } from "../../models/mergeable";
 import { useCurrentUser } from "../../store/useCurrentUser";
+import { generateKey, uid } from "../../service/crypto";
 
 const ThemeImage = ({ theme }: { theme: Theme | "system" }): ReactNode => {
   switch (theme) {
@@ -46,6 +47,7 @@ export function InformationPage() {
 
   const { userId } = useCurrentUser();
   const [events, setEvents] = useData("events");
+  const [account, setAccount] = useData("account");
 
   const reset = () => {
     goTo("ROOT");
@@ -72,14 +74,51 @@ export function InformationPage() {
         },
         onSuccess: (data) => {
           setHasImportError(false);
-
-          setEvents((events) =>
-            updateMergeableRecord({
-              ...events,
-              collection: { ...events.collection, ...data.events },
-            }),
+          const missingEventIds = Object.keys(data.events).filter(
+            (eventId) => account.events.collection[eventId] === undefined,
           );
-          goTo(ROUTES.ROOT);
+
+          Promise.all(
+            missingEventIds.map((eventId) =>
+              generateKey(uid()).then((eventKey) => [eventId, eventKey] as const),
+            ),
+          ).then((generatedEventKeys) => {
+            const importedAccountEvents = generatedEventKeys.reduce<
+              typeof account.events.collection
+            >(
+              (acc, [eventId, eventKey]) => ({
+                ...acc,
+                [eventId]: {
+                  eventId: eventKey,
+                  userId,
+                  updatedAt: new Date(),
+                },
+              }),
+              {},
+            );
+
+            setEvents((events) =>
+              updateMergeableRecord({
+                ...events,
+                collection: { ...events.collection, ...data.events },
+              }),
+            );
+
+            setAccount((currentAccount) =>
+              updateMergeableRecord({
+                ...currentAccount,
+                events: updateMergeableRecord({
+                  ...currentAccount.events,
+                  collection: {
+                    ...currentAccount.events.collection,
+                    ...importedAccountEvents,
+                  },
+                }),
+              }),
+            );
+
+            goTo(ROUTES.ROOT);
+          });
         },
       }),
     );

@@ -42,6 +42,8 @@ export type RemoteOperations = {
   getEventData?: (eventId: string) => Observable<string | undefined>;
   setEventData?: (eventId: string, encryptedData: string) => Promise<void>;
   deleteEventData?: (eventId: string) => Promise<void>;
+  getDeletedEventIds?: () => Observable<string[]>;
+  addDeletedEventId?: (eventId: string) => Promise<void>;
 };
 
 export type RemoteAdapterConfig = {
@@ -106,13 +108,53 @@ export const createRemoteAdapter = ({
     subscriptions: {
       user: Subscription | undefined;
       events: Record<string, Subscription | undefined>;
+      deletedEvents: Subscription | undefined;
     };
   } = {
     userData: undefined,
     subscriptions: {
       user: undefined,
       events: {},
+      deletedEvents: undefined,
     },
+  };
+
+  const removeEventsFromState = (
+    currentState: State,
+    eventIds: string[],
+  ): State =>
+    eventIds.length === 0
+      ? currentState
+      : {
+          ...removeEventsFromAccount(currentState, eventIds),
+          events: {
+            ...currentState.events,
+            collection: eventIds.reduce((acc, eventId) => {
+              const { [eventId]: removed, ...others } = acc;
+              return others;
+            }, currentState.events.collection),
+            updatedAt: new Date(),
+          },
+        };
+
+  const applyDeletedEventIdsToLocalState = (deletedEventIds: string[]): void => {
+    const currentState = state.userData?.state;
+    if (!currentState || !adapter.change || deletedEventIds.length === 0) {
+      return;
+    }
+
+    const existingDeletedEventIds = deletedEventIds.filter(
+      (eventId) => currentState.events.collection[eventId] !== undefined,
+    );
+    if (existingDeletedEventIds.length === 0) {
+      return;
+    }
+
+    const cleanedState = removeEventsFromState(currentState, existingDeletedEventIds);
+    state.userData = state.userData
+      ? { ...state.userData, state: cleanedState, updatedAt: new Date() }
+      : createEmptyUserData(cleanedState);
+    adapter.change(cleanedState);
   };
 
   const saveAllEvents = (events: Record<string, Event>): void => {
@@ -170,12 +212,14 @@ export const createRemoteAdapter = ({
 
   const unsubscribeAll = () => {
     state.subscriptions.user?.unsubscribe();
+    state.subscriptions.deletedEvents?.unsubscribe();
     Object.values(state.subscriptions.events).forEach((subscription) =>
       subscription?.unsubscribe(),
     );
     state.subscriptions = {
       user: undefined,
       events: {},
+      deletedEvents: undefined,
     };
   };
 
@@ -309,6 +353,20 @@ export const createRemoteAdapter = ({
           );
         },
       });
+
+    state.subscriptions.deletedEvents = operations
+      .getDeletedEventIds?.()
+      .pipe(distinctUntilChanged())
+      .subscribe({
+        next: (deletedEventIds) => {
+          applyDeletedEventIdsToLocalState(deletedEventIds);
+        },
+        error: (error) => {
+          Logger.error(
+            `RemoteAdapter[${operations.name}]: deleted events subscription error`,
+          )(error);
+        },
+      });
     state.subscriptions.events = getEventSubscriptions();
   };
 
@@ -336,6 +394,20 @@ export const createRemoteAdapter = ({
                 (remoteUserData) => handleRemoteData(remoteUserData, prev),
               ),
         ),
+      )
+      .then((mergedState) =>
+        mergedState === undefined || !operations.getDeletedEventIds
+          ? mergedState
+          : firstValueFrom(operations.getDeletedEventIds())
+              .then((deletedEventIds) =>
+                removeEventsFromState(mergedState, deletedEventIds),
+              )
+              .catch((error) => {
+                Logger.error(
+                  `RemoteAdapter[${operations.name}]: failed to read deleted events`,
+                )(error);
+                return mergedState;
+              }),
       )
       .catch((error) => {
         Logger.error(`RemoteAdapter[${operations.name}]: fetchAndMerge failed`)(
@@ -448,6 +520,15 @@ export const createRemoteAdapter = ({
       : createEmptyUserData(cleanedNewState);
 
     cleanupDeletedEvents(cleanedNewState.events.collection, previousEventIds);
+    if (operations.addDeletedEventId) {
+      deletedEventIds.forEach((eventId) => {
+        operations.addDeletedEventId!(eventId).catch((error) => {
+          Logger.error(
+            `RemoteAdapter[${operations.name}]: addDeletedEventId failed`,
+          )(error);
+        });
+      });
+    }
     saveUserData(state.userData);
 
     if (operations.setEventData) {
