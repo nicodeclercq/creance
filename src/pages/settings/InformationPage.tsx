@@ -27,6 +27,7 @@ import { SystemThemeImage } from "./private/SystemThemeImage";
 import { updateMergeableRecord } from "../../models/mergeable";
 import { useCurrentUser } from "../../store/useCurrentUser";
 import { generateKey, uid } from "../../service/crypto";
+import { lastBuiltAt } from "../../secrets";
 
 const ThemeImage = ({ theme }: { theme: Theme | "system" }): ReactNode => {
   switch (theme) {
@@ -80,7 +81,9 @@ export function InformationPage() {
 
           Promise.all(
             missingEventIds.map((eventId) =>
-              generateKey(uid()).then((eventKey) => [eventId, eventKey] as const),
+              generateKey(uid()).then(
+                (eventKey) => [eventId, eventKey] as const,
+              ),
             ),
           ).then((generatedEventKeys) => {
             const importedAccountEvents = generatedEventKeys.reduce<
@@ -154,6 +157,11 @@ export function InformationPage() {
             )}
             <Paragraph styles={{ font: "body-smaller", color: "neutral-weak" }}>
               {userId}
+            </Paragraph>
+            <Paragraph styles={{ font: "body-small" }}>
+              {t("page.information.lastBuildTime", {
+                date: new Date(lastBuiltAt).toLocaleDateString(),
+              })}
             </Paragraph>
           </Stack>
         </Card>

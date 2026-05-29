@@ -135,6 +135,7 @@
   "page.information.disconnected": "Vous n'êtes pas connecté",
   "page.information.actions.back": "Retour",
   "page.information.synchronization": "Dernières synchronisation:",
+  "page.information.lastBuildTime": "Dernières mise à jour le {date}",
   "page.information.actions.clear": "Supprimer les données",
   "page.information.clear.confirmation.title": "Supprimer les données ?",
   "page.information.clear.confirmation.description": "Cette action supprimera toutes les données locale de l'application. Vous devrez vous reconnecter pour récupérer vos données.",

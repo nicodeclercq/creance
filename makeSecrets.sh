@@ -1,4 +1,7 @@
+LAST_BUILT_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
 cat > ./src/secrets.ts << EOF
+export const lastBuiltAt = "$LAST_BUILT_AT";
 export const salt = "$SALT";
 export const storageFileName = "$STORAGE_FILE_NAME";
 export const firebaseConfig = {
