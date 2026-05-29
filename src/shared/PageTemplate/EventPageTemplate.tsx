@@ -53,6 +53,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
       updateMergeableRecord({
         ...prev,
         name: data.name,
+        hasProgram: data.hasProgram,
         description: data.description,
         period: {
           start: data.dates.start,
