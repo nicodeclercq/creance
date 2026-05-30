@@ -16,7 +16,7 @@ import type { ConfirmProps } from "../ConfirmButton/ConfirmButton";
 import { ConfirmButton } from "../ConfirmButton/ConfirmButton";
 import type { ReactNode } from "react";
 
-type Action =
+export type MenuAction =
   | (DistributiveOmit<ButtonProps<AsLink>, "icon"> & {
       icon: IconName;
     })
@@ -30,7 +30,7 @@ export type MenuProps = {
   labelRenderer?: () => ReactNode;
   variant?: "primary" | "secondary" | "tertiary";
   icon?: IconName;
-  actions: Action[];
+  actions: MenuAction[];
 };
 
 export function Menu({

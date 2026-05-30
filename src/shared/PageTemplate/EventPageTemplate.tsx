@@ -4,8 +4,7 @@ import * as ArrayFP from "fp-ts/Array";
 import { PageTemplate } from "./PageTemplate";
 import type { Event } from "../../models/Event";
 import { useTranslation } from "react-i18next";
-import type { Action } from "../../ui/QuickActions/QuickActions";
-import { QuickActions } from "../../ui/QuickActions/QuickActions";
+import { QuickActions, type Action } from "../../ui/QuickActions/QuickActions";
 import { useData } from "../../store/useData";
 import { useRoute } from "../../hooks/useRoute";
 import type { RouteName } from "../../router/routes";
@@ -22,6 +21,7 @@ import {
   updateMergeableRecord,
 } from "../../models/mergeable";
 import type { MenuProps } from "./Menu/Menu";
+import type { MenuAction } from "../../ui/Menu/Menu";
 
 type EventPageTemplateProps = {
   children: ReactNode;
@@ -165,7 +165,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
         },
       ] as const);
 
-  const rightActions = event.isClosed
+  const rightActions: MenuAction[] = event.isClosed
     ? [
         {
           as: "link",

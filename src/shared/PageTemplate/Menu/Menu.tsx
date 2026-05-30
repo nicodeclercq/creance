@@ -9,7 +9,10 @@ import classNames from "classnames";
 import { getPath } from "../../../router/routes";
 import styles from "./Menu.module.css";
 
-type Action = DistributiveOmit<ButtonProps<AsLink>, "icon" | "variant"> & {
+export type Action = DistributiveOmit<
+  ButtonProps<AsLink>,
+  "icon" | "variant"
+> & {
   icon: IconName;
 };
 

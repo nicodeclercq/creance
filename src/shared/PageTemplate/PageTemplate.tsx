@@ -16,7 +16,7 @@ import { UserMenu } from "./UserMenu";
 import { MediaHidden } from "../../ui/MediaHidden/MediaHidden";
 import { ShareButton } from "./ShareButton";
 
-type PageTemplateProps<R extends RouteName> = {
+export type PageTemplateProps<R extends RouteName> = {
   title: string;
   children: ReactNode;
   leftAction?: IconButtonPropsWhithoutVariantAndOverlays<AsLink<R> | AsButton>;
