@@ -39,7 +39,7 @@ export const validateStateV0 = (state: unknown): StateV0 => {
 };
 
 export const validateOrDefaultsToStateV0 = (
-  state: unknown
+  state: unknown,
 ): StateV0 | Promise<StateV0> => {
   const parsed = stateSchemaV0.safeParse(state);
   if (parsed.success) {
@@ -56,14 +56,14 @@ export const validateOrDefaultsToStateV0 = (
     import("./ResetStateConfirmationDialog"),
   ])
     .then(([{ openDialog }, { ResetStateConfirmationDialog }]) =>
-      openDialog({
-        component: ResetStateConfirmationDialog,
+      openDialog<unknown>({
+        component: ResetStateConfirmationDialog(state),
         title: "ResetStateConfirmationDialog.title",
-      })
+      }),
     )
     .then((result) =>
       result.type === "submit"
-        ? DEFAULT_STATE_V0
-        : Promise.reject(new Error("State is invalid"))
+        ? ((result.data as StateV0) ?? DEFAULT_STATE_V0)
+        : Promise.reject(new Error("State is invalid")),
     );
 };

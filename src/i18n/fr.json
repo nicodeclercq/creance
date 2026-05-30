@@ -393,7 +393,7 @@
   "ResetStateConfirmationDialog.title": "Réinitialiser l'application",
   "ResetStateConfirmationDialog.description": "Les données enregistrées sur votre appareil sont invalides et ne peuvent pas être restaurées. Voulez-vous réinitialiser l'application ?",
   "ResetStateConfirmationDialog.actions.submit": "Réinitialiser",
-  "ResetStateConfirmationDialog.actions.cancel": "Laisser les données existantes",
+  "ResetStateConfirmationDialog.actions.fix": "Corriger les données existantes",
   "page.event.edit.participants.actions.addParticipant": "Ajouter un participant",
   "LoginForm.title": "Connexion",
   "LoginForm.description": "Connectez-vous pour synchroniser vos données entre vos appareils.",
