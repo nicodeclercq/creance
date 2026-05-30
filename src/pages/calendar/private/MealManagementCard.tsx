@@ -38,11 +38,14 @@ export function MealManagementCard({
   const { isCurrentUser } = useCurrentUser();
 
   const missingManager =
-    lunchManager === "none" && dinnerManager === "none"
+    presence.lunch &&
+    lunchManager === "none" &&
+    presence.dinner &&
+    dinnerManager === "none"
       ? "both"
-      : lunchManager === "none"
+      : presence.lunch && lunchManager === "none"
         ? "lunch"
-        : dinnerManager === "none"
+        : presence.dinner && dinnerManager === "none"
           ? "dinner"
           : undefined;
 
