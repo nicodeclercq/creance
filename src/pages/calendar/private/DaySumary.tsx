@@ -25,6 +25,7 @@ import { Card } from "../../../ui/Card/Card";
 import { Heading } from "../../../ui/Heading/Heading";
 
 type DaySumaryProps = {
+  isReadOnly: boolean;
   currentUser: User;
   day: Date;
   presence: Presence;
@@ -40,6 +41,7 @@ type DaySumaryProps = {
 };
 
 export function DaySumary({
+  isReadOnly,
   day,
   presence,
   currentUser,
@@ -115,6 +117,8 @@ export function DaySumary({
           </div>
         </Grid>
         <MealManagementCard
+          isReadOnly={isReadOnly}
+          isActive={currentDay.current === dateToKey(day)}
           presence={presence}
           participants={participants}
           lunchManager={lunchManager}
@@ -125,7 +129,7 @@ export function DaySumary({
         {sortedActivities.length > 0 && (
           <Heading level={3}>{t("DaySumary.subtilte.activities")}</Heading>
         )}
-        {sortedActivities.length === 0 && (
+        {!isReadOnly && sortedActivities.length === 0 && (
           <NoActivityCard
             addActivity={addActivity}
             currentUser={currentUser}
@@ -134,12 +138,14 @@ export function DaySumary({
         )}
         {sortedActivities.map((activity) => (
           <ActivityCard
+            isActive={currentDay.current === dateToKey(day)}
+            isReadOnly={isReadOnly}
             key={activity._id}
             activity={activity}
             updateActivity={updateActivity}
           />
         ))}
-        {sortedActivities.length > 0 && (
+        {sortedActivities.length > 0 && !isReadOnly && (
           <Container
             styles={{
               display: "flex",
@@ -158,12 +164,14 @@ export function DaySumary({
           </Container>
         )}
       </Stack>
-      <AddActivityModal
-        defaultDate={day}
-        isOpen={isAddActivityModalOpen}
-        setIsOpen={setIsAddActivityModalOpen}
-        onSubmit={addActivity}
-      />
+      {!isReadOnly && (
+        <AddActivityModal
+          defaultDate={day}
+          isOpen={isAddActivityModalOpen}
+          setIsOpen={setIsAddActivityModalOpen}
+          onSubmit={addActivity}
+        />
+      )}
     </Card>
   );
 }

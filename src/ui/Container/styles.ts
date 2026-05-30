@@ -146,6 +146,7 @@ type CalcDimension =
   | `${"min" | "max" | "clamp"}(${Dimension}, ${Dimension})`;
 
 export type Styles = {
+  opacity?: WithMediaQuery<number>;
   cursor?: WithMediaQuery<"pointer" | "default">;
   display?: WithMediaQuery<Display>;
   background?: WithMediaQuery<Background>;
@@ -465,6 +466,10 @@ function computeFlexWrap(value: boolean) {
   return value ? "wrap" : "nowrap";
 }
 
+function computeOpacity(value: number) {
+  return `${value}`;
+}
+
 const transformers = {
   alignItems: { computeIfUndefined: false, transformer: computeAlignItems },
   alignSelf: { computeIfUndefined: false, transformer: computeAlignItems },
@@ -502,6 +507,7 @@ const transformers = {
   maxWidth: { computeIfUndefined: false, transformer: computeDistance },
   width: { computeIfUndefined: true, transformer: computeDistance },
   minWidth: { computeIfUndefined: false, transformer: computeDistance },
+  opacity: { computeIfUndefined: false, transformer: computeOpacity },
   overflow: { computeIfUndefined: false, transformer: identity },
   padding: { computeIfUndefined: false, transformer: computePadding },
   position: { computeIfUndefined: false, transformer: computePosition },

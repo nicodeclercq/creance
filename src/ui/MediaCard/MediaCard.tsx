@@ -10,6 +10,7 @@ import { MediaOnly } from "../MediaOnly/MediaOnly";
 import type { ReactNode } from "react";
 
 type MediaCardProps = {
+  isActive: boolean;
   children: ReactNode;
   image: string;
   color?: string;
@@ -56,6 +57,7 @@ function Image({ image, color }: { image: string; color: string }) {
 }
 
 export function MediaCard({
+  isActive,
   children,
   image,
   color = "transparent",
@@ -70,6 +72,7 @@ export function MediaCard({
         {isIllustration(image) ? (
           <Container
             styles={{
+              opacity: isActive ? 1 : 0.125,
               width: "100%",
               height: "100%",
               display: "flex",

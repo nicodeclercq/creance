@@ -165,6 +165,46 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
         },
       ] as const);
 
+  const rightActions = event.isClosed
+    ? [
+        {
+          as: "link",
+          label: t("settings.actions.information"),
+          icon: "help",
+          to: ROUTES.INFORMATION,
+        },
+        ...eventActions,
+      ]
+    : [
+        {
+          label: t("page.event.list.actions.editEvent"),
+          icon: "edit",
+          as: "button",
+          onClick: () => setIsEditEventModalOpen(true),
+        },
+        {
+          label: t("page.event.list.actions.updateCategories"),
+          icon: "folder",
+          as: "link",
+          to: "CATEGORIES_EDIT",
+          params: { eventId: event._id },
+        },
+        {
+          label: t("page.event.list.actions.updateParticipants"),
+          icon: "user-group",
+          as: "link",
+          to: "EVENT_USERS",
+          params: { eventId: event._id },
+        },
+        {
+          as: "link",
+          label: t("settings.actions.information"),
+          icon: "help",
+          to: ROUTES.INFORMATION,
+        },
+        ...eventActions,
+      ];
+
   return (
     <>
       <PageTemplate
@@ -175,35 +215,7 @@ export function EventPageTemplate({ children, event }: EventPageTemplateProps) {
           label: t("page.event.list.actions.backToList"),
           icon: "chevron-left",
         }}
-        rightActions={[
-          {
-            label: t("page.event.list.actions.editEvent"),
-            icon: "edit",
-            as: "button",
-            onClick: () => setIsEditEventModalOpen(true),
-          },
-          {
-            label: t("page.event.list.actions.updateCategories"),
-            icon: "folder",
-            as: "link",
-            to: "CATEGORIES_EDIT",
-            params: { eventId: event._id },
-          },
-          {
-            label: t("page.event.list.actions.updateParticipants"),
-            icon: "user-group",
-            as: "link",
-            to: "EVENT_USERS",
-            params: { eventId: event._id },
-          },
-          {
-            as: "link",
-            label: t("settings.actions.information"),
-            icon: "help",
-            to: ROUTES.INFORMATION,
-          },
-          ...eventActions,
-        ]}
+        rightActions={rightActions}
         menu={menu}
       >
         {children}

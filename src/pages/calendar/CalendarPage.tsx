@@ -25,10 +25,10 @@ export function CalendarPage() {
   const { hash } = useLocation();
   const { currentUser } = useCurrentUser();
   const [currentEvent, setCurrentEvent] = useData(
-    `events.collection.${eventId}`
+    `events.collection.${eventId}`,
   );
   const [mealManagers, setMealManagers] = useData(
-    `events.collection.${eventId}.mealManager`
+    `events.collection.${eventId}.mealManager`,
   );
 
   const setLunchManager = (day: string) => (lunchManager: string) => {
@@ -50,7 +50,7 @@ export function CalendarPage() {
       activities: addMergeableCollectionItem(
         activity._id,
         activity,
-        prev.activities
+        prev.activities,
       ),
     }));
   };
@@ -60,7 +60,7 @@ export function CalendarPage() {
       activities: updateMergeableCollectionItem(
         activity._id,
         activity,
-        prev.activities
+        prev.activities,
       ),
     }));
   };
@@ -94,6 +94,7 @@ export function CalendarPage() {
       <Stack gap="l">
         {Object.entries(presenceByDays).map(([day, presence]) => (
           <DaySumary
+            isReadOnly={currentEvent.isClosed ?? false}
             key={day}
             day={keyToDate(day)}
             presence={presence}

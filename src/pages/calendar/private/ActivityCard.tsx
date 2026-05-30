@@ -13,11 +13,18 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 type ActivityCardProps = {
+  isReadOnly: boolean;
+  isActive: boolean;
   activity: Activity;
   updateActivity: (activity: Activity) => void;
 };
 
-export function ActivityCard({ activity, updateActivity }: ActivityCardProps) {
+export function ActivityCard({
+  isReadOnly,
+  isActive,
+  activity,
+  updateActivity,
+}: ActivityCardProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,6 +38,7 @@ export function ActivityCard({ activity, updateActivity }: ActivityCardProps) {
       <MediaCard
         image={activity.image ?? ""}
         color={computeRandomColor(activity.name)}
+        isActive={isActive}
       >
         <Stack gap="s">
           <Container
@@ -67,7 +75,7 @@ export function ActivityCard({ activity, updateActivity }: ActivityCardProps) {
                     {
                       start: activity.startDate,
                       end: activity.endDate,
-                    }
+                    },
                   )}
             </Paragraph>
             {activity.description && (
@@ -85,12 +93,14 @@ export function ActivityCard({ activity, updateActivity }: ActivityCardProps) {
               ) : (
                 <span></span>
               )}
-              <IconButton
-                variant="tertiary"
-                icon="edit"
-                onClick={() => setIsOpen(true)}
-                label={t("ActivityCard.actions.edit")}
-              />
+              {!isReadOnly && (
+                <IconButton
+                  variant="tertiary"
+                  icon="edit"
+                  onClick={() => setIsOpen(true)}
+                  label={t("ActivityCard.actions.edit")}
+                />
+              )}
             </Grid>
           </Stack>
         </Stack>

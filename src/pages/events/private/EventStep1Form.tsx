@@ -134,17 +134,6 @@ export function EventStep1Form({
           )}
         />
         <Controller
-          name="hasProgram"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <Checkbox
-              label={t("page.events.add.form.field.hasProgram.label")}
-              value={value ?? false}
-              onChange={onChange}
-            />
-          )}
-        />
-        <Controller
           name="dates"
           control={control}
           render={({ field: { onChange, value } }) => (
@@ -200,6 +189,17 @@ export function EventStep1Form({
                   label: t("page.events.add.form.field.period.pm"),
                 },
               ]}
+            />
+          )}
+        />
+        <Controller
+          name="hasProgram"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Checkbox
+              label={t("page.events.add.form.field.hasProgram.label")}
+              value={value ?? false}
+              onChange={onChange}
             />
           )}
         />
