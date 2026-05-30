@@ -1,7 +1,11 @@
 import * as z from "zod";
 
 import { addDays, isBefore } from "../utils/date";
-import { mergeableCollection, mergeableRecord } from "./mergeable";
+import {
+  mergeableCollection,
+  mergeableRecord,
+  updatedAtSchema,
+} from "./mergeable";
 
 import { activitySchema } from "./Activity";
 import { categorySchema } from "./Category";
@@ -15,6 +19,7 @@ export const DAYS_BEFORE_CLOSE = 7;
 const mealManagerEntrySchema = z.strictObject({
   lunch: z.union([z.string().max(100), z.undefined()]),
   dinner: z.union([z.string().max(100), z.undefined()]),
+  updatedAt: updatedAtSchema.optional(),
 });
 
 export const eventSchema = mergeableRecord({

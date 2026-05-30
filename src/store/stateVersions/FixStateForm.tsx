@@ -46,7 +46,7 @@ export function FixTextForm({ defaultState, onCancel, onSubmit }: Props) {
       }}
     >
       {validationResult.error && (
-        <Container styles={{ color: "failure-default" }}>
+        <Container styles={{ color: "failure-default", width: "100%" }}>
           <pre
             style={{
               font: "inherit",
