@@ -106,6 +106,35 @@ export const addMergeableCollectionItem = <T>(
   updatedAt: now,
 });
 
+export const sanitizeMergeableCollection = <T extends { _id: string }>(
+  value: unknown,
+): MergeableCollection<T> | unknown => {
+  if (typeof value !== "object" || value === null) {
+    return value;
+  }
+
+  const { collection, updatedAt, ...stray } = value as Record<string, unknown>;
+  const strayItems = Object.values(stray).filter(
+    (item): item is MergeableRecord<T> =>
+      typeof item === "object" &&
+      item !== null &&
+      "_id" in item &&
+      typeof (item as T)._id === "string",
+  );
+
+  return strayItems.length === 0
+    ? value
+    : {
+        collection: {
+          ...(typeof collection === "object" && collection !== null
+            ? collection
+            : {}),
+          ...Object.fromEntries(strayItems.map((item) => [item._id, item])),
+        },
+        updatedAt: updatedAt ?? PAST_DATE,
+      };
+};
+
 export const deleteMergeableCollectionItem = <T>(
   key: string,
   { collection }: MergeableCollection<T>,

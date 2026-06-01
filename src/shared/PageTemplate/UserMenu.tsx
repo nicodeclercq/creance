@@ -4,6 +4,7 @@ import { Menu } from "../../ui/Menu/Menu";
 import { Modal } from "../../ui/Modal/Modal";
 import { SetCurrentParticipantForm } from "../../pages/auth/SetCurrentParticipantForm";
 import type { User } from "../../models/User";
+import { updateMergeableCollectionItem } from "../../models/mergeable";
 import { useAuth } from "../../store/useAuth";
 import { useCurrentUser } from "../../store/useCurrentUser";
 import { useData } from "../../store/useData";
@@ -19,10 +20,9 @@ export function UserMenu() {
   const [, setCurrentUser] = useData("account.currentUser");
 
   const handleUpdateProfile = (updatedUser: User) => {
-    setUsers((users) => ({
-      ...users,
-      [updatedUser._id]: updatedUser,
-    }));
+    setUsers((users) =>
+      updateMergeableCollectionItem(updatedUser._id, updatedUser, users),
+    );
     setCurrentUser(() => updatedUser);
     setIsEditProfileOpen(false);
   };

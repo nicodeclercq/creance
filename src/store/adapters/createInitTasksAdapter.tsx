@@ -6,6 +6,11 @@ import type { Adapter } from "../createStore";
 import type { State } from "../state";
 import { pipe } from "fp-ts/function";
 import { shouldCloseEvent } from "../../models/Event";
+import type { User } from "../../models/User";
+import {
+  type MergeableCollection,
+  sanitizeMergeableCollection,
+} from "../../models/mergeable";
 
 /**
  * After the end and a delay some events are automatically closed.
@@ -35,6 +40,17 @@ export const autoCloseEvents = (state: State): State => {
     };
   }
   return state;
+};
+
+export const sanitizeUsersCollection = (state: State): State => {
+  const users = sanitizeMergeableCollection<User>(state.users);
+
+  return users === state.users
+    ? state
+    : {
+        ...state,
+        users: users as MergeableCollection<User>,
+      };
 };
 
 /**
@@ -144,6 +160,7 @@ export const fillInMissingAccountEvents = (state: State): Promise<State> => {
 export const createInitTasksAdapter = (): Adapter<State> => {
   const runTasks = (state: State): Promise<State> =>
     Promise.resolve(state)
+      .then(sanitizeUsersCollection)
       .then(autoCloseEvents)
       .then(fillInMissingParticipants)
       .then(removeDanglingAccountEvents)
