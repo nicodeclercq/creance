@@ -46,6 +46,7 @@ export function SetCurrentParticipantForm({
   const { t } = useTranslation();
 
   const submit = (formData: FormData) => {
+    console.log("submit", formData);
     onSubmit(toUserFromFormData(formData, defaultData));
   };
 

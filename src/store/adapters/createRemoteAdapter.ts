@@ -19,6 +19,7 @@ import { Logger } from "../../service/Logger";
 import { merge } from "./shared/merge";
 import { encryptState, decryptState } from "./shared/e2ee";
 import { type AuthManager, getDefaultAuthManager } from "./AuthManager";
+import { runAccountEventsSyncTasks } from "./createInitTasksAdapter";
 
 const dateSchema = z.union([
   z.string().transform((date) => new Date(date)),
@@ -44,6 +45,7 @@ export type RemoteOperations = {
   deleteEventData?: (eventId: string) => Promise<void>;
   getDeletedEventIds?: () => Observable<string[]>;
   addDeletedEventId?: (eventId: string) => Promise<void>;
+  beforeLoad?: () => Promise<void>;
 };
 
 export type RemoteAdapterConfig = {
@@ -370,6 +372,117 @@ export const createRemoteAdapter = ({
     state.subscriptions.events = getEventSubscriptions();
   };
 
+  const fetchRemoteEvent = (
+    actualEventId: string,
+    passKey: string,
+  ): Promise<Event | undefined> =>
+    operations.getEventData
+      ? firstValueFrom(
+          operations.getEventData(actualEventId).pipe(
+            distinctUntilChanged(),
+            timeout({ first: FIRST_REMOTE_EMISSION_TIMEOUT_MS }),
+            catchError((error) => {
+              Logger.error(
+                `RemoteAdapter[${operations.name}]: fetch event timeout or error`,
+              )(error);
+              return of(undefined);
+            }),
+          ),
+        )
+          .then((encryptedData) =>
+            encryptedData === undefined
+              ? undefined
+              : decryptAndValidate(encryptedData, passKey, eventSchema),
+          )
+          .catch((error) => {
+            Logger.error(
+              `RemoteAdapter[${operations.name}]: fetchRemoteEvent failed`,
+            )(error);
+            return undefined;
+          })
+      : Promise.resolve(undefined);
+
+  const mergeAccountEventsIntoState = (
+    currentState: State,
+  ): Promise<{ state: State; unresolvedEventIds: string[] }> => {
+    const accountEventEntries = Object.entries(
+      currentState.account.events.collection,
+    );
+
+    return accountEventEntries.length === 0
+      ? Promise.resolve({ state: currentState, unresolvedEventIds: [] })
+      : Promise.all(
+          accountEventEntries.map(([actualEventId, { eventId: passKey }]) =>
+            fetchRemoteEvent(actualEventId, passKey).then((remoteEvent) => ({
+              actualEventId,
+              remoteEvent,
+            })),
+          ),
+        ).then((fetchResults) => {
+          const fetchedEvents = fetchResults.filter(
+            (
+              result,
+            ): result is { actualEventId: string; remoteEvent: Event } =>
+              result.remoteEvent !== undefined,
+          );
+          const unresolvedEventIds = fetchResults
+            .filter((result) => result.remoteEvent === undefined)
+            .map((result) => result.actualEventId);
+
+          const stateWithEvents = fetchedEvents.reduce<State>(
+            (accState, { actualEventId, remoteEvent }) => {
+              const localEvent = accState.events.collection[actualEventId];
+              const mergedEvent = localEvent
+                ? merge(localEvent, remoteEvent)
+                : remoteEvent;
+
+              return {
+                ...accState,
+                events: {
+                  collection: {
+                    ...accState.events.collection,
+                    [actualEventId]: mergedEvent,
+                  },
+                  updatedAt:
+                    mergedEvent.updatedAt > accState.events.updatedAt
+                      ? mergedEvent.updatedAt
+                      : accState.events.updatedAt,
+                },
+              };
+            },
+            currentState,
+          );
+
+          return { state: stateWithEvents, unresolvedEventIds };
+        });
+  };
+
+  const finalizeLoadedState = (
+    mergedState: State | undefined,
+  ): Promise<State | undefined> =>
+    mergedState === undefined
+      ? Promise.resolve(undefined).then((loadedState) => {
+          setupSubscription();
+          return loadedState;
+        })
+      : mergeAccountEventsIntoState(mergedState).then(
+          ({ state: stateWithEvents, unresolvedEventIds }) =>
+            runAccountEventsSyncTasks(
+              stateWithEvents,
+              unresolvedEventIds,
+            ).then((syncedState) => {
+              state.userData = state.userData
+                ? {
+                    ...state.userData,
+                    state: syncedState,
+                    updatedAt: new Date(),
+                  }
+                : createEmptyUserData(syncedState);
+              setupSubscription();
+              return syncedState;
+            }),
+        );
+
   const fetchAndMerge = (
     userKey: string,
     prev: State | undefined,
@@ -426,10 +539,11 @@ export const createRemoteAdapter = ({
       return Promise.resolve(prev);
     }
 
-    return fetchAndMerge(authState.userKey, prev).then((result) => {
-      setupSubscription();
-      return result;
-    });
+    const beforeLoad = operations.beforeLoad ?? (() => Promise.resolve());
+
+    return beforeLoad()
+      .then(() => fetchAndMerge(authState.userKey, prev))
+      .then((result) => finalizeLoadedState(result));
   };
 
   const saveUserData = (userData: UserData): Promise<void> => {

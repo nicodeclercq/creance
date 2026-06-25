@@ -222,6 +222,102 @@ describe("createRemoteAdapter", () => {
     expect(lastChange.events.collection["evt-1"].name).toBe("Remote Update");
   });
 
+  it("loads per-event remote data on initial load", async () => {
+    const eventData = new BehaviorSubject<Record<string, string>>({});
+    const userData = new BehaviorSubject<string | undefined>(undefined);
+    const authManager = createFakeAuthManager();
+    const d1 = new Date("2026-01-01T00:00:00Z");
+    const passKey = "share-key";
+    const event = createEvent({
+      _id: "evt-remote-only",
+      name: "Remote Event",
+      updatedAt: d1,
+    });
+    const remoteState = createTestState({ updatedAt: d1 });
+    remoteState.account.events = {
+      collection: {
+        "evt-remote-only": {
+          eventId: passKey,
+          userId: "user-1",
+          updatedAt: d1,
+        },
+      },
+      updatedAt: d1,
+    };
+
+    const remoteAdapter = createRemoteAdapter({
+      operations: {
+        login: () => Promise.resolve("1"),
+        logout: () => Promise.resolve(),
+        signup: () => Promise.resolve("1"),
+        getUserData: () => userData,
+        name: "test",
+        setUserData: (data: string) => {
+          userData.next(data);
+          return Promise.resolve();
+        },
+        getEventData: (eventId) =>
+          eventData.asObservable().pipe(map((events) => events[eventId])),
+        setEventData: (eventId, data) => {
+          eventData.next({ ...eventData.value, [eventId]: data });
+          return Promise.resolve();
+        },
+      },
+      authManager,
+    });
+
+    userData.next(JSON.stringify({ state: remoteState, updatedAt: d1 }));
+    eventData.next({
+      "evt-remote-only": JSON.stringify(event),
+    });
+
+    const loadedState = await remoteAdapter.load(undefined);
+
+    expect(loadedState?.account.events.collection["evt-remote-only"]).toBeDefined();
+    expect(loadedState?.events.collection["evt-remote-only"]).toBeDefined();
+    expect(loadedState?.events.collection["evt-remote-only"].name).toBe(
+      "Remote Event",
+    );
+  });
+
+  it("keeps account event refs when remote event fetch fails on load", async () => {
+    const userData = new BehaviorSubject<string | undefined>(undefined);
+    const authManager = createFakeAuthManager();
+    const d1 = new Date("2026-01-01T00:00:00Z");
+    const passKey = "share-key";
+    const remoteState = createTestState({ updatedAt: d1 });
+    remoteState.account.events = {
+      collection: {
+        "evt-missing": {
+          eventId: passKey,
+          userId: "user-1",
+          updatedAt: d1,
+        },
+      },
+      updatedAt: d1,
+    };
+
+    const remoteAdapter = createRemoteAdapter({
+      operations: {
+        login: () => Promise.resolve("1"),
+        logout: () => Promise.resolve(),
+        signup: () => Promise.resolve("1"),
+        getUserData: () => userData,
+        name: "test",
+        setUserData: () => Promise.resolve(),
+        getEventData: () => NEVER,
+      },
+      authManager,
+    });
+
+    userData.next(JSON.stringify({ state: remoteState, updatedAt: d1 }));
+
+    const loadedState = await remoteAdapter.load(undefined);
+
+    expect(loadedState?.account.events.collection["evt-missing"]).toBeDefined();
+    expect(loadedState?.events.collection["evt-missing"]).toBeUndefined();
+  });
+
   it("falls back to previous state when first remote emission never arrives", async () => {
     vi.useFakeTimers();
     const userId = "1";

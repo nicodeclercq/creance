@@ -12,6 +12,7 @@ import { AuthManagerFactory } from "../adapters/AuthManager";
 import type { Event } from "../../models/Event";
 import type { State } from "../state";
 import { createEvent } from "../../service/test-helpers";
+import { generateKey } from "../../service/crypto";
 import { createInMemoryBackend } from "./createInMemoryBackend";
 import { createInMemoryLocalStorage } from "./createInMemoryLocalStorage";
 import { createLocalAdapter } from "../adapters/createLocalAdapter";
@@ -19,6 +20,7 @@ import { createMemoryStorage } from "./createMemoryStorage";
 import { createRemoteAdapter } from "../adapters/createRemoteAdapter";
 import { createStore } from "../createStore";
 import { encryptState } from "../adapters/shared/e2ee";
+import { InitTasksAdapter } from "../adapters/createInitTasksAdapter";
 
 vi.mock("../../service/secureKeyStore", () => ({
   createSecureKeyStore: () => ({
@@ -446,6 +448,57 @@ describe("Full integration (local + remote)", () => {
     await vi.waitFor(() => {
       expect(backend.getUserData()).toBeDefined();
     });
+  });
+
+  it("loads per-event remote data before init tasks run", async () => {
+    const authStorage = createMemoryStorage();
+    const secureKeyStore = createMockSecureKeyStore();
+    const userKey = await preAuthenticate(authStorage, secureKeyStore);
+    const auth = AuthManagerFactory({ storage: authStorage, secureKeyStore });
+    const backend = createInMemoryBackend();
+    const passKey = await generateKey("event-pass");
+    const event = createEvent({
+      _id: "evt-remote-only",
+      name: "Remote Event",
+      updatedAt: d2,
+    });
+
+    const remoteState = createTestState({ updatedAt: d2 });
+    remoteState.account.events = {
+      collection: {
+        "evt-remote-only": {
+          eventId: passKey,
+          userId: "user-1",
+          updatedAt: d2,
+        },
+      },
+      updatedAt: d2,
+    };
+
+    backend.setUserData(
+      await encryptState(createTestUserData(remoteState), userKey),
+    );
+    await backend.operations.setEventData!(
+      "evt-remote-only",
+      await encryptState(event, passKey),
+    );
+
+    const local = createInMemoryLocalStorage();
+    const store = createStore<State, Event>({ authManager: auth });
+    store.register(createLocalAdapter(local.config));
+    store.register(
+      createRemoteAdapter({
+        operations: backend.operations,
+        authManager: auth,
+      }),
+    );
+    store.register(InitTasksAdapter);
+    await store.init();
+
+    const data = getReadyData(store);
+    expect(data.account.events.collection["evt-remote-only"]).toBeDefined();
+    expect(data.events.collection["evt-remote-only"]).toBeDefined();
+    expect(data.events.collection["evt-remote-only"].name).toBe("Remote Event");
   });
 
   it("logout clears state and re-initializes with defaults", async () => {

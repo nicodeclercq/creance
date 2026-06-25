@@ -88,9 +88,15 @@ export const fillInMissingParticipants = (state: State): State => {
   return state;
 };
 
-export const removeDanglingAccountEvents = (state: State): State => {
+export const removeDanglingAccountEvents = (
+  state: State,
+  protectedEventIds: readonly string[] = [],
+): State => {
+  const protectedIds = new Set(protectedEventIds);
   const danglingEventIds = Object.keys(state.account.events.collection).filter(
-    (eventId) => state.events.collection[eventId] === undefined,
+    (eventId) =>
+      state.events.collection[eventId] === undefined &&
+      !protectedIds.has(eventId),
   );
 
   return danglingEventIds.length > 0
@@ -157,14 +163,22 @@ export const fillInMissingAccountEvents = (state: State): Promise<State> => {
       });
 };
 
+export const runAccountEventsSyncTasks = (
+  state: State,
+  protectedEventIds: readonly string[] = [],
+): Promise<State> =>
+  Promise.resolve(state)
+    .then((currentState) =>
+      removeDanglingAccountEvents(currentState, protectedEventIds),
+    )
+    .then(fillInMissingAccountEvents);
+
 export const createInitTasksAdapter = (): Adapter<State> => {
   const runTasks = (state: State): Promise<State> =>
     Promise.resolve(state)
       .then(sanitizeUsersCollection)
       .then(autoCloseEvents)
-      .then(fillInMissingParticipants)
-      .then(removeDanglingAccountEvents)
-      .then(fillInMissingAccountEvents);
+      .then(fillInMissingParticipants);
 
   return {
     load: (prev) =>

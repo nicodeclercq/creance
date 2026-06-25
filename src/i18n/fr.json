@@ -434,5 +434,7 @@
   "SetParticipantShare.title": "Comment participez-vous à cette liste de créances ?",
   "SetParticipantShare.description": "Vous pouvez reprendre votre participation par défaut (en fonction du nombre d'adultes et d'enfants que vous avez renseigné à la création de votre compte) ou ajuster votre participation au séjour en fonction de vos jours de départ et d'arrivé ou du nombre de personnes que vous prendrez en charge sur l'évènement.",
   "SetParticipantShare.action.cancel.label": "Précédent",
-  "SetParticipantShare.action.submit.label": "Valider"
+  "SetParticipantShare.action.submit.label": "Valider",
+  "UserMenu.editProfile.event.alert": "Les changements que vous effectuerez ici ne seront appliqués qu'à cette liste de créances.",
+  "UserMenu.editProfile.main.alert": "Les changements que vous effectuerez ici ne seront pas appliqués sur les listes de créances déjà existantes."
 }

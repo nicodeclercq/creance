@@ -259,6 +259,22 @@ export const createStore = <T, Item>(config?: {
 
   const init = async (): Promise<void> => {
     await authManager.init();
+
+    if (authManager.getState().type === "authenticated") {
+      await Promise.all(
+        remoteAdapters.map((adapter) =>
+          Promise.resolve(authManager.loginAdapter(adapter.login)).catch(
+            (error) => {
+              console.error(
+                "[StoreManager] Remote adapter login on init failed:",
+                error,
+              );
+            },
+          ),
+        ),
+      );
+    }
+
     const result = await runAdaptersCascade(adapters, config?.defaultState);
 
     if (result.success) {

@@ -3,6 +3,7 @@ import { initializeApp, type FirebaseApp } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
   type Auth,
@@ -75,6 +76,26 @@ export const createFirebaseAdapter = (config?: {
   const state: FirebaseState = {
     userId: readPersistedUserId(),
   };
+
+  const syncUserIdFromAuth = (): void => {
+    const { auth } = getFirebase();
+    const authUserId = auth.currentUser?.uid;
+
+    if (authUserId && state.userId !== authUserId) {
+      state.userId = authUserId;
+      persistUserId(authUserId);
+    }
+  };
+
+  const waitForFirebaseAuth = (): Promise<void> =>
+    new Promise((resolve) => {
+      const { auth } = getFirebase();
+      const unsubscribe = onAuthStateChanged(auth, () => {
+        syncUserIdFromAuth();
+        unsubscribe();
+        resolve();
+      });
+    });
 
   const login = ({
     login: email,
@@ -276,6 +297,7 @@ export const createFirebaseAdapter = (config?: {
       deleteEventData,
       getDeletedEventIds,
       addDeletedEventId,
+      beforeLoad: waitForFirebaseAuth,
     },
     authManager: config?.authManager,
   });
