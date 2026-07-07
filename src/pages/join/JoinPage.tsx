@@ -67,15 +67,33 @@ export function JoinPage() {
     setStep((a) => a + 1);
   };
 
-  const storeDataAndContinue = (participantShare: ParticipantShare) => {
+  const storeDataAndContinue = (
+    participantShare:
+      | ParticipantShare
+      | { type: "default"; shares: { adults: number; children: number } },
+  ) => {
     if (!tmpEvent) {
       throw new Error("Previous step was not complete");
     }
 
     const { participation, event } = tmpEvent;
-    const participant = {
+    const participant: Participant = {
       ...participation.participant,
-      participantShare,
+      share:
+        participantShare.type === "default" &&
+        "shares" in participantShare &&
+        participantShare.shares
+          ? {
+              adults: participantShare.shares.adults,
+              children: participantShare.shares.children,
+            }
+          : participation.participant.share,
+      participantShare:
+        participantShare.type === "default"
+          ? {
+              type: "default",
+            }
+          : participantShare,
     };
     const eventWithParticipant = {
       ...event,

@@ -206,6 +206,8 @@
   "page.share.form.type.label": "Répartition",
   "page.share.form.type.default.label": "automatique",
   "page.share.form.type.default.description": "La répartition sera calculée en fonction du nombre de parts prédéfinies pour le participant sur toute la durée de la liste de créances.",
+  "page.share.form.type.default.field.adults": "Nombre d'adultes",
+  "page.share.form.type.default.field.children": "Nombre d'enfants (1/2 part)",
   "page.share.form.type.custom.label": "personnalisée",
   "page.share.form.type.custom.description": "Vous pouvez définir plusieurs périodes de temps pour un ou plusieurs participants. Par exemple, si une personne du groupe ne reste pas pendant toute la durée de l'événement, vous pouvez lui définir une période de temps spécifique en plus de celle du reste du groupe.",
   "page.share.form.type.daily.label": "par jour",

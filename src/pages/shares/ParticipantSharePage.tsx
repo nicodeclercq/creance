@@ -35,18 +35,51 @@ export function ParticipantSharePage() {
   const share =
     currentEvent.participants.collection[participantId].participantShare;
 
-  const saveShare = (data: ParticipantShare) => {
-    setEvent((event) => ({
-      ...event,
-      participants: updateMergeableCollectionItem(
-        participantId,
-        {
-          ...event.participants.collection[participantId],
-          participantShare: data,
-        },
-        event.participants,
-      ),
-    }));
+  const saveShare = (
+    data:
+      | ParticipantShare
+      | { type: "default"; shares: { adults: number; children: number } },
+  ) => {
+    if (data.type === "default") {
+      const newShare: { adults: number; children: number } | undefined =
+        data.type === "default" && "shares" in data && data.shares
+          ? {
+              adults: data.shares.adults,
+              children: data.shares.children,
+            }
+          : undefined;
+
+      setEvent((event) => ({
+        ...event,
+        participants: updateMergeableCollectionItem(
+          participantId,
+          {
+            ...event.participants.collection[participantId],
+            share:
+              newShare ?? event.participants.collection[participantId].share,
+            participantShare:
+              data.type === "default"
+                ? {
+                    type: "default",
+                  }
+                : data,
+          },
+          event.participants,
+        ),
+      }));
+    } else {
+      setEvent((event) => ({
+        ...event,
+        participants: updateMergeableCollectionItem(
+          participantId,
+          {
+            ...event.participants.collection[participantId],
+            participantShare: data,
+          },
+          event.participants,
+        ),
+      }));
+    }
     goTo("EVENT_USERS", { eventId: currentEvent._id });
   };
 

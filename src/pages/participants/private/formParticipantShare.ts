@@ -1,6 +1,7 @@
 import * as Either from "fp-ts/Either";
 
 import { addDays, dateToKey } from "../../../utils/date";
+
 import type { Event } from "../../../models/Event";
 import type { ParticipantShare } from "../../../models/ParticipantShare";
 import type { Period } from "../../../models/Period";
@@ -22,6 +23,10 @@ export type CustomShare = {
 
 export type FormShare = {
   type: "default" | "custom" | "daily";
+  defaultShares: {
+    adults: number;
+    children: number;
+  };
   shares: {
     label: string;
     multiplier: {
@@ -51,11 +56,19 @@ export type FormShare = {
 
 export const toShare = (
   data: FormShare,
-): Either.Either<Error, ParticipantShare> => {
+): Either.Either<
+  Error,
+  | ParticipantShare
+  | { type: "default"; shares: { adults: number; children: number } }
+> => {
   switch (data.type) {
     case "default":
       return Either.right({
         type: "default",
+        shares: {
+          adults: data.defaultShares.adults,
+          children: data.defaultShares.children,
+        },
       });
 
     case "daily":
@@ -131,6 +144,10 @@ export const fromShare = (
 ): FormShare => {
   return {
     type: data.type,
+    defaultShares: {
+      adults: user.share.adults,
+      children: user.share.children,
+    },
     periods: getDefaultPeriods(
       "periods" in data ? data.periods : {},
       event,

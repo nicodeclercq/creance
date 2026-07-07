@@ -33,8 +33,6 @@ export function ShareButton() {
     shareId: encodeURIComponent(eventKey),
   })}`;
 
-  console.log("TMP", shareLink, currentEvent, eventKey);
-
   return currentEvent && eventKey ? (
     <>
       <IconButton

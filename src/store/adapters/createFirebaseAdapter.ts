@@ -163,7 +163,6 @@ export const createFirebaseAdapter = (config?: {
       const unsubscribe = onValue(
         userRef,
         (snapshot) => {
-          console.log("TMP firebase user data changed");
           subscriber.next(
             snapshot.exists() ? (snapshot.val() as string) : undefined,
           );
@@ -183,8 +182,6 @@ export const createFirebaseAdapter = (config?: {
 
     if (!userId) return Promise.resolve();
 
-    console.log("TMP firebase save user data");
-
     const userRef = ref(db, `${COLLECTIONS.USERS}/${userId}`);
     return set(userRef, encryptedData).catch((error: unknown) => {
       Logger.error("Firebase: setUserData failed")(error);
@@ -200,7 +197,6 @@ export const createFirebaseAdapter = (config?: {
       const unsubscribe = onValue(
         eventRef,
         (snapshot) => {
-          console.log("TMP firebase event data changed");
           subscriber.next(
             snapshot.exists() ? (snapshot.val() as string) : undefined,
           );
@@ -220,8 +216,6 @@ export const createFirebaseAdapter = (config?: {
   ): Promise<void> => {
     const { db } = getFirebase();
     const eventRef = ref(db, `${COLLECTIONS.EVENTS}/${eventId}`);
-
-    console.log("TMP firebase save event data");
 
     return set(eventRef, encryptedData).catch((error: unknown) => {
       Logger.error("Firebase: setEventData failed")(error);
@@ -248,7 +242,10 @@ export const createFirebaseAdapter = (config?: {
         return () => {};
       }
 
-      const deletedEventsRef = ref(db, `${COLLECTIONS.DELETED_EVENTS}/${userId}`);
+      const deletedEventsRef = ref(
+        db,
+        `${COLLECTIONS.DELETED_EVENTS}/${userId}`,
+      );
       const unsubscribe = onValue(
         deletedEventsRef,
         (snapshot) => {
@@ -258,7 +255,9 @@ export const createFirebaseAdapter = (config?: {
           subscriber.next(Object.keys(data));
         },
         (error) => {
-          Logger.error("Firebase: getDeletedEventIds subscription error")(error);
+          Logger.error("Firebase: getDeletedEventIds subscription error")(
+            error,
+          );
           subscriber.error(error);
         },
       );

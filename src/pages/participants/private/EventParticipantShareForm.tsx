@@ -437,6 +437,40 @@ export function EventParticipantShareForm({
               daily={t("page.share.form.type.daily.description")}
             />
           </Paragraph>
+          {type === "default" && (
+            <>
+              <Controller
+                key="participant.parts.adults"
+                control={control}
+                name={`defaultShares.adults`}
+                render={({ field: { value, onChange } }) => (
+                  <InputNumber
+                    type="number"
+                    as="number"
+                    label={t("page.share.form.type.default.field.adults")}
+                    value={value}
+                    onChange={onChange}
+                    isRequired
+                  />
+                )}
+              />
+              <Controller
+                key="participant.parts.children"
+                control={control}
+                name={`defaultShares.children`}
+                render={({ field: { value, onChange } }) => (
+                  <InputNumber
+                    type="number"
+                    as="number"
+                    label={t("page.share.form.type.default.field.children")}
+                    value={value}
+                    onChange={onChange}
+                    isRequired
+                  />
+                )}
+              />
+            </>
+          )}
           {type === "daily" && (
             <Stack gap="s">
               {daysInPeriod.map((day) => (

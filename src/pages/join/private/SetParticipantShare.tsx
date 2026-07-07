@@ -12,7 +12,11 @@ type Props = {
   participantShare: ParticipantShare;
   participant: Participant;
   onPrevious: () => void;
-  onNext: (participantShare: ParticipantShare) => void;
+  onNext: (
+    participantShare:
+      | ParticipantShare
+      | { type: "default"; shares: { adults: number; children: number } },
+  ) => void;
 };
 
 export function SetParticipantShare({
