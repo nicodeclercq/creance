@@ -19,6 +19,7 @@ import { SunIcon } from "./SunIcon";
 import { UmbrellaIcon } from "./UmbrellaIcon";
 import { UserFullIcon } from "./UserFullIcon";
 import { UserIcon } from "./UserIcon";
+import { WineIcon } from "./WineIcon";
 import { WrenchIcon } from "./WrenchIcon";
 
 export const CATEGORY_ICONS = {
@@ -106,6 +107,10 @@ export const CATEGORY_ICONS = {
     name: "component.categoryIcon.user-full",
     component: UserFullIcon,
   },
+  wine: {
+    name: "component.categoryIcon.wine",
+    component: WineIcon,
+  },
   wrench: {
     name: "component.categoryIcon.wrench",
     component: WrenchIcon,
@@ -114,6 +119,6 @@ export const CATEGORY_ICONS = {
 
 export const CATEGORY_ICONS_NAMES = Object.keys(CATEGORY_ICONS) as [
   CategoryIconName,
-  ...CategoryIconName[]
+  ...CategoryIconName[],
 ];
 export type CategoryIconName = keyof typeof CATEGORY_ICONS;
