@@ -7,10 +7,10 @@ import { Form } from "../../../ui/Form/Form";
 import { InputText } from "../../../ui/FormField/InputText/InputText";
 import { Select } from "../../../ui/FormField/Select/Select";
 import { categorySchema } from "../../../models/Category";
+import { updateMergeableRecord } from "../../../models/mergeable";
 import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { updateMergeableRecord } from "../../../models/mergeable";
 
 type CategoryFormProps = {
   data: Category;
@@ -46,13 +46,13 @@ export function CategoryForm({
       (value) =>
         !categories.some(
           (category) =>
-            category._id !== data._id && category.name === value.name
+            category._id !== data._id && category.name === value.name,
         ),
-      t("page.events.add.form.field.categoryName.validation.isUnique")
+      t("page.events.add.form.field.categoryName.validation.isUnique"),
     ),
     {
       defaultValues: data,
-    }
+    },
   );
 
   const hasError = Object.keys(errors).length > 0;
@@ -83,11 +83,13 @@ export function CategoryForm({
                 label={label}
               />
             )}
-            options={Object.entries(CATEGORY_ICONS).map(([key, { name }]) => ({
-              id: key,
-              label: t(name),
-              value: key,
-            }))}
+            options={Object.entries(CATEGORY_ICONS)
+              .map(([key, { name }]) => ({
+                id: key,
+                label: t(name),
+                value: key,
+              }))
+              .sort((a, b) => a.label.localeCompare(b.label))}
             value={value}
             onChange={onChange}
           />
