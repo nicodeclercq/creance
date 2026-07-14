@@ -214,22 +214,27 @@ export function ActivityForm({
     if (!value || !value.startsWith("http")) return;
     setIsLoadingImage(true);
 
-    loadingImagePromise.current = getURLImage(value);
+    try {
+      loadingImagePromise.current = getURLImage(value);
 
-    Promise.race([
-      wait(MAX_WAITING_TIME),
-      (loadingImagePromise.current as Promise<string | undefined>).then(
-        (image) => {
-          if (isMounted.current) {
-            setValue("image", image);
-          }
-        },
-      ),
-    ]).finally(() => {
-      if (isMounted.current) {
-        setIsLoadingImage(false);
-      }
-    });
+      Promise.race([
+        wait(MAX_WAITING_TIME),
+        (loadingImagePromise.current as Promise<string | undefined>).then(
+          (image) => {
+            if (isMounted.current) {
+              setValue("image", image);
+            }
+          },
+        ),
+      ]).finally(() => {
+        if (isMounted.current) {
+          setIsLoadingImage(false);
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      setIsLoadingImage(false);
+    }
   };
 
   return (
