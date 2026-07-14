@@ -16,11 +16,11 @@ import { InputTime } from "../../../ui/FormField/InputTime/InputTime";
 import { LoadingIcon } from "../../../ui/Button/LoadingIcon";
 import { Stack } from "../../../ui/Stack/Stack";
 import { activitySchema } from "../../../models/Activity";
+import { createMergeableRecord } from "../../../models/mergeable";
 import { uid } from "../../../service/crypto";
 import { useForm } from "../../../hooks/useForm";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { createMergeableRecord } from "../../../models/mergeable";
 
 type ActivityFormProps = {
   defaultValue: Activity;
@@ -28,6 +28,10 @@ type ActivityFormProps = {
   onSubmit: (activity: Activity) => void;
   cancel: DistributiveOmit<ButtonProps, "variant">;
 };
+
+const MAX_WAITING_TIME = 5_000;
+const wait = (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time));
 
 const activityFormSchema = z.object({
   image: activitySchema.shape.image,
@@ -46,7 +50,7 @@ type FormActivity = z.infer<typeof activityFormSchema>;
 const getURLImage = (url: string): Promise<string | undefined> => {
   // Use CORS proxy to fetch the website
   const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(
-    url
+    url,
   )}`;
 
   return fetch(proxyUrl)
@@ -76,7 +80,7 @@ const getURLImage = (url: string): Promise<string | undefined> => {
         .filter(Boolean)
         .map(
           (image) =>
-            image?.getAttribute("content") ?? image?.getAttribute("href")
+            image?.getAttribute("content") ?? image?.getAttribute("href"),
         );
 
       const imageUrl = images[0];
@@ -99,7 +103,7 @@ const getURLImage = (url: string): Promise<string | undefined> => {
 const formActivityToActivity = (
   formActivity: FormActivity,
   proposedBy: string,
-  id?: string
+  id?: string,
 ): Activity => {
   const startDate = addTimeToDate(formActivity.date, formActivity.startTime);
   const endDate = formActivity.endTime
@@ -159,7 +163,7 @@ export function ActivityForm({
   const isMounted = useRef(false);
   const { t } = useTranslation();
   const loadingImagePromise = useRef<Promise<string | undefined> | undefined>(
-    undefined
+    undefined,
   );
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const {
@@ -191,7 +195,7 @@ export function ActivityForm({
         const newActivity = formActivityToActivity(
           { ...data, image },
           defaultValue.proposedBy,
-          defaultValue._id
+          defaultValue._id,
         );
         return onSubmit(newActivity);
       });
@@ -199,7 +203,7 @@ export function ActivityForm({
       const newActivity = formActivityToActivity(
         data,
         defaultValue.proposedBy,
-        defaultValue._id
+        defaultValue._id,
       );
 
       return onSubmit(newActivity);
@@ -212,17 +216,20 @@ export function ActivityForm({
 
     loadingImagePromise.current = getURLImage(value);
 
-    (loadingImagePromise.current as Promise<string | undefined>)
-      .then((image) => {
-        if (isMounted.current) {
-          setValue("image", image);
-        }
-      })
-      .finally(() => {
-        if (isMounted.current) {
-          setIsLoadingImage(false);
-        }
-      });
+    Promise.race([
+      wait(MAX_WAITING_TIME),
+      (loadingImagePromise.current as Promise<string | undefined>).then(
+        (image) => {
+          if (isMounted.current) {
+            setValue("image", image);
+          }
+        },
+      ),
+    ]).finally(() => {
+      if (isMounted.current) {
+        setIsLoadingImage(false);
+      }
+    });
   };
 
   return (
