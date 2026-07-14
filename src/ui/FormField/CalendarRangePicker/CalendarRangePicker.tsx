@@ -43,11 +43,17 @@ export function CalendarRangePicker({
       newValue.start.year,
       newValue.start.month - 1,
       newValue.start.day + 1,
+      0,
+      0,
+      0,
     );
     const end = new Date(
       newValue.end.year,
       newValue.end.month - 1,
       newValue.end.day + 1,
+      23,
+      59,
+      59,
     );
     onChange({ start, end });
   };
