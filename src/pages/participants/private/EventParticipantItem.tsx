@@ -33,9 +33,9 @@ export function EventParticipantItem({
       />
       <Stack>
         <Paragraph>
-          {isCurrentUser(participant)
-            ? t("currentUser.anonymous.name")
-            : participant.name}
+          {participant.name}
+          {isCurrentUser(participant) &&
+            ` (${t("currentUser.anonymous.name")})`}
         </Paragraph>
         <Paragraph styles={{ font: "body-small" }}>
           {t("page.event.shares.type", {
