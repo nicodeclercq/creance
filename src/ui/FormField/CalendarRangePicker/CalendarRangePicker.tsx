@@ -23,6 +23,17 @@ export type CalendarRangePickerProps = InputProps<
   max?: Date;
 };
 
+const toZonedDateTime = ({ start, end }: { start: Date; end: Date }) => {
+  const tmpStart = new Date(start);
+  tmpStart.setDate(start?.getDate() + 1);
+  tmpStart.setHours(0, 0, 0);
+  const tmpEnd = new Date(end);
+  tmpEnd.setDate(end?.getDate() + 1);
+  tmpEnd.setHours(0, 0, 0);
+
+  return { start: fromDate(tmpStart, "UTC"), end: fromDate(tmpEnd, "UTC") };
+};
+
 export function CalendarRangePicker({
   type: _type,
   value,
@@ -35,14 +46,13 @@ export function CalendarRangePicker({
 }: CalendarRangePickerProps) {
   const id = useId();
 
-  const start = fromDate(new Date(value?.start), "UTC");
-  const end = fromDate(new Date(value?.end), "UTC");
+  const { start, end } = toZonedDateTime(value);
 
   const change = (newValue: { start: ZonedDateTime; end: ZonedDateTime }) => {
     const start = new Date(
       newValue.start.year,
       newValue.start.month - 1,
-      newValue.start.day + 1,
+      newValue.start.day,
       0,
       0,
       0,
@@ -50,7 +60,7 @@ export function CalendarRangePicker({
     const end = new Date(
       newValue.end.year,
       newValue.end.month - 1,
-      newValue.end.day + 1,
+      newValue.end.day,
       23,
       59,
       59,
