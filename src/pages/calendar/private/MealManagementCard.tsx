@@ -109,7 +109,7 @@ export function MealManagementCard({
                     ...Object.keys(participants).map((participant) => ({
                       id: participant,
                       label: isCurrentUser(participants[participant])
-                        ? t("currentUser.anonymous.name")
+                        ? `${participants[participant].name} (${t("currentUser.you")})`
                         : participants[participant].name,
                       value: participant,
                     })),
@@ -164,7 +164,7 @@ export function MealManagementCard({
                     ...Object.keys(participants).map((participant) => ({
                       id: participant,
                       label: isCurrentUser(participants[participant])
-                        ? t("currentUser.anonymous.name")
+                        ? `${participants[participant].name} (${t("currentUser.you")})`
                         : participants[participant].name,
                       value: participant,
                     })),

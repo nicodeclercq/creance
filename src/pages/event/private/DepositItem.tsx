@@ -66,9 +66,11 @@ export function DepositItem({
           <Paragraph styles={{ font: "body-small" }}>
             {t("page.event.depositItem.participants", {
               from: isCurrentUser(from)
-                ? t("currentUser.anonymous.name")
+                ? `${from.name} (${t("currentUser.you")})`
                 : from.name,
-              to: isCurrentUser(to) ? t("currentUser.anonymous.name") : to.name,
+              to: isCurrentUser(to)
+                ? `${to.name} (${t("currentUser.you")})`
+                : to.name,
             })}
           </Paragraph>
         </Columns>

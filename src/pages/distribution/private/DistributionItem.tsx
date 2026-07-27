@@ -62,7 +62,7 @@ export function DistributionItem({
           />
           <Paragraph>
             {isCurrentParticipant
-              ? t("currentUser.anonymous.name")
+              ? `${participants[participantId].name} (${t("currentUser.you")})`
               : participants[participantId].name}
           </Paragraph>
         </Wrapper>
@@ -122,7 +122,7 @@ export function DistributionItem({
                                 participant: isCurrentUser(
                                   participants[participantId],
                                 )
-                                  ? t("currentUser.anonymous.name")
+                                  ? `${participants[participantId].name} (${t("currentUser.you")})`
                                   : participants[participantId].name,
                               }}
                               components={{

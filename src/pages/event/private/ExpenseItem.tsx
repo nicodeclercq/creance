@@ -61,7 +61,7 @@ export function ExpenseItem({
           />
           <Paragraph styles={{ font: "body-small" }}>
             {isCurrentUser(lender)
-              ? t("currentUser.anonymous.name")
+              ? `${lender.name} (${t("currentUser.you")})`
               : lender.name}
           </Paragraph>
         </Columns>

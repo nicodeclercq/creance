@@ -69,7 +69,7 @@ export function DepositsShare({ deposits, participants }: DepositsShareProps) {
                   <Paragraph styles={{ font: "body-small" }}>
                     {deposit.participantId in participants
                       ? isCurrentUser(participants[deposit.participantId])
-                        ? t("currentUser.anonymous.name")
+                        ? `${participants[deposit.participantId].name} (${t("currentUser.you")})`
                         : participants[deposit.participantId].name
                       : deposit.participantId}
                   </Paragraph>

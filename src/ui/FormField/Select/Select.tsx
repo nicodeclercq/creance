@@ -1,8 +1,5 @@
 import { useId, type ReactNode } from "react";
-import type {
-  ListBoxItemProps,
-  Key,
-} from "react-aria-components";
+import type { ListBoxItemProps, Key } from "react-aria-components";
 import {
   ListBox,
   Popover,
@@ -138,6 +135,7 @@ export function Select<T>({
                 option={option}
                 valueRenderer={valueRenderer ?? EmptyRenderer}
               />
+              {selectedOption === option && <Icon name="check" size="s" />}
             </Item>
           ))}
         </ListBox>

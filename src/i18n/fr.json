@@ -1,5 +1,5 @@
 {
-  "currentUser.anonymous.name": "Vous",
+  "currentUser.you": "Vous",
   "participant.unknown": "Participant supprimé",
   "categories.default": "Divers",
   "categories.shopping": "Courses",
@@ -427,7 +427,7 @@
   "JoinPage.welcome.action.login": "Me connecter",
   "JoinPage.welcome.action.signup": "Créer mon compte",
   "JoinPage.joinEvent.title": "Rejoignez la liste de créances: \"{eventName}\"",
-  "JoinPage.joinEvent.selectAParticipant.label": "Qui êtes-vous ?",
+  "JoinPage.joinEvent.selectAParticipant.label": "Je participe en tant que",
   "JoinPage.joinEvent.notInTheList": "Vous ne figurez pas dans la liste ?",
   "JoinPage.joinEvent.action.other": "Participer en tant que:",
   "JoinPage.joinEvent.action.next": "Continuer",

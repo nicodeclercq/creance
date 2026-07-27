@@ -307,10 +307,13 @@ export function TransactionForm({
             options={Object.keys(event.participants.collection).map(
               (participant, index) => ({
                 id: participant ?? index,
-                label: isCurrentUser(participants[participant])
-                  ? t("currentUser.anonymous.name")
-                  : (participants[participant].name ??
-                    t("participant.unknown")),
+                label: `${
+                  participants[participant].name ?? t("participant.unknown")
+                } ${
+                  isCurrentUser(participants[participant])
+                    ? `(${t("currentUser.you")})`
+                    : ""
+                }`,
                 value:
                   participants[participant]?._id ?? t("participant.unknown"),
               }),
@@ -370,10 +373,13 @@ export function TransactionForm({
               options={Object.keys(event.participants.collection).map(
                 (participant, index) => ({
                   id: participant ?? index,
-                  label: isCurrentUser(participants[participant])
-                    ? t("currentUser.anonymous.name")
-                    : (participants[participant].name ??
-                      t("participant.unknown")),
+                  label: `${
+                    participants[participant].name ?? t("participant.unknown")
+                  } ${
+                    isCurrentUser(participants[participant])
+                      ? `(${t("currentUser.you")})`
+                      : ""
+                  }`,
                   value:
                     participants[participant]?._id ?? t("participant.unknown"),
                 }),
@@ -494,7 +500,7 @@ export function TransactionForm({
                       />
                       <Paragraph>
                         {isCurrentUser(participant)
-                          ? t("currentUser.anonymous.name")
+                          ? `${participant.name} (${t("currentUser.you")})`
                           : participant.name}
                       </Paragraph>
                     </Columns>
@@ -536,7 +542,7 @@ export function TransactionForm({
                       />
                       <Paragraph>
                         {isCurrentUser(participant)
-                          ? t("currentUser.anonymous.name")
+                          ? `${participant.name} (${t("currentUser.you")})`
                           : participant.name}
                       </Paragraph>
                     </Columns>

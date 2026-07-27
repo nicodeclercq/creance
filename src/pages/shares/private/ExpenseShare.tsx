@@ -93,7 +93,7 @@ export function ExpenseShare({
                   />
                   <Paragraph styles={{ font: "body-small" }}>
                     {isCurrentUser(participants[expense.lender])
-                      ? t("currentUser.anonymous.name")
+                      ? `${participants[expense.lender].name} (${t("currentUser.you")})`
                       : participants[expense.lender].name}
                   </Paragraph>
                 </Columns>

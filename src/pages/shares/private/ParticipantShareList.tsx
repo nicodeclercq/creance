@@ -122,7 +122,7 @@ export function ParticipantShareList({
             options={Object.entries(participants).map(([id, participant]) => ({
               value: id,
               label: isCurrentUser(participant)
-                ? t("currentUser.anonymous.name")
+                ? `${participant.name} (${t("currentUser.you")})`
                 : participant.name,
               id: participant._id,
             }))}
