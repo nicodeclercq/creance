@@ -34,6 +34,7 @@ export function EditEventModal({
           arrival: event.period.arrival,
           departure: event.period.departure,
           isAutoClose: event.isAutoClose,
+          hasProgram: event.hasProgram,
         }}
         onSubmit={(data) => {
           onSubmit(data);
