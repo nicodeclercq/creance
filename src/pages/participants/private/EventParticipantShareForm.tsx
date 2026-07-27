@@ -3,7 +3,11 @@ import * as Either from "fp-ts/Either";
 import type { ButtonProps } from "../../../ui/Button/Button";
 import { Button } from "../../../ui/Button/Button";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import type { CustomShare, FormShare } from "./formParticipantShare";
+import type {
+  CustomShare,
+  FormShare,
+  ShareFormSubmitData,
+} from "./formParticipantShare";
 import { fromShare, getDaysInPeriod, toShare } from "./formParticipantShare";
 import { type Event } from "../../../models/Event";
 import { type ParticipantShare } from "../../../models/ParticipantShare";
@@ -31,13 +35,15 @@ import { Select } from "../../../ui/FormField/Select/Select";
 import { DailyParticipationItem } from "./DailyParticipationItem";
 import { Logger } from "../../../service/Logger";
 import { useCurrentUser } from "../../../store/useCurrentUser";
+import { Checkbox } from "../../../ui/FormField/Checkbox/Checkbox";
 
 type ShareFormProps = {
   event: Event;
   participant: Participant;
+  participantList: Record<string, Participant>;
   defaultValues: ParticipantShare;
   submitLabel: string;
-  onSubmit: (data: ParticipantShare) => void;
+  onSubmit: (data: ShareFormSubmitData) => void;
   cancel?: DistributiveOmit<ButtonProps, "variant">;
 };
 
@@ -324,18 +330,25 @@ function AddShareItemForm({ event, onAdd }: AddShareItemFormProps) {
 export function EventParticipantShareForm({
   event,
   participant,
+  participantList,
   defaultValues,
   submitLabel,
   onSubmit,
   cancel,
 }: ShareFormProps) {
   const { t } = useTranslation();
-  const { isCurrentUser } = useCurrentUser();
+  const { currentUser, isCurrentUser } = useCurrentUser();
 
   const { handleSubmit, control, formState, watch } = useForm<FormShare>({
-    defaultValues: fromShare(defaultValues, event, participant),
+    defaultValues: fromShare(
+      defaultValues,
+      event,
+      participant,
+      currentUser._id,
+    ),
     mode: "onChange",
   });
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "shares",
@@ -360,7 +373,7 @@ export function EventParticipantShareForm({
       Logger.error("Invalid share")(share.left);
       return;
     }
-    onSubmit(share.right);
+    onSubmit({ share: share.right, participationId: data.participationId });
   };
 
   const type = watch("type");
@@ -392,11 +405,45 @@ export function EventParticipantShareForm({
                 image={participant.avatar}
                 size="l"
               />
-              <Paragraph>
-                {isCurrentUser(participant)
-                  ? t("currentUser.anonymous.name")
-                  : participant.name}
-              </Paragraph>
+              {isCurrentUser(participant) ? (
+                <Controller
+                  name="participationId"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      label={t("JoinPage.joinEvent.selectAParticipant.label")}
+                      onChange={onChange}
+                      options={Object.values(participantList).map(
+                        ({ _id, name }) => ({
+                          id: _id,
+                          label: name,
+                          value: _id,
+                        }),
+                      )}
+                      value={value}
+                    />
+                  )}
+                />
+              ) : (
+                <>
+                  <Paragraph>{participant.name}</Paragraph>
+                  <Controller
+                    name="participationId"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <Checkbox
+                        label={t("EventParticipantShareForm.participant.hasMe")}
+                        onChange={(newValue) =>
+                          onChange(newValue ? participant._id : currentUser._id)
+                        }
+                        value={participant._id === value}
+                      />
+                    )}
+                  />
+                </>
+              )}
             </Stack>
           </Columns>
           <Controller

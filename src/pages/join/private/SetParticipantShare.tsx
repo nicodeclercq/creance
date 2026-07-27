@@ -4,6 +4,7 @@ import { Header } from "../../../shared/PageTemplate/Header";
 import { Paragraph } from "../../../ui/Paragraph/Paragraph";
 import type { Participant } from "../../../models/Participant";
 import type { ParticipantShare } from "../../../models/ParticipantShare";
+import type { ShareFormSubmitData } from "../../participants/private/formParticipantShare";
 import { Stack } from "../../../ui/Stack/Stack";
 import { useTranslation } from "react-i18next";
 
@@ -11,12 +12,9 @@ type Props = {
   event: Event;
   participantShare: ParticipantShare;
   participant: Participant;
+  participantList: Record<string, Participant>;
   onPrevious: () => void;
-  onNext: (
-    participantShare:
-      | ParticipantShare
-      | { type: "default"; shares: { adults: number; children: number } },
-  ) => void;
+  onNext: (data: ShareFormSubmitData) => void;
 };
 
 export function SetParticipantShare({
@@ -24,6 +22,7 @@ export function SetParticipantShare({
   onNext,
   onPrevious,
   participant,
+  participantList,
   participantShare,
 }: Props) {
   const { t } = useTranslation();
@@ -40,6 +39,7 @@ export function SetParticipantShare({
         }}
         onSubmit={onNext}
         participant={participant}
+        participantList={participantList}
         submitLabel={t("SetParticipantShare.action.submit.label")}
         defaultValues={participantShare}
       />

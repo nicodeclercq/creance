@@ -2,8 +2,8 @@ import { EventNotFoundPage } from "../event/private/EventNotFoundPage";
 import { EventParticipantNotFoundPage } from "../participants/private/EventParticipantNotFoundPage";
 import { EventParticipantShareForm } from "../participants/private/EventParticipantShareForm";
 import { PageTemplate } from "../../shared/PageTemplate/PageTemplate";
-import type { ParticipantShare } from "../../models/ParticipantShare";
 import { Redirect } from "../../router/Redirect";
+import type { ShareFormSubmitData } from "../participants/private/formParticipantShare";
 import { updateMergeableCollectionItem } from "../../models/mergeable";
 import { useData } from "../../store/useData";
 import { useEventParticipants } from "../../hooks/useEventParticipants";
@@ -16,6 +16,7 @@ export function ParticipantSharePage() {
   const { goTo } = useRoute();
   const { eventId, participantId } = useParams();
   const [currentEvent, setEvent] = useData(`events.collection.${eventId}`);
+  const [account, setAccount] = useData("account");
   const participants = useEventParticipants(eventId);
 
   if (!eventId || !currentEvent) {
@@ -35,11 +36,7 @@ export function ParticipantSharePage() {
   const share =
     currentEvent.participants.collection[participantId].participantShare;
 
-  const saveShare = (
-    data:
-      | ParticipantShare
-      | { type: "default"; shares: { adults: number; children: number } },
-  ) => {
+  const saveShare = ({ share: data, participationId }: ShareFormSubmitData) => {
     if (data.type === "default") {
       const newShare: { adults: number; children: number } | undefined =
         data.type === "default" && "shares" in data && data.shares
@@ -80,6 +77,27 @@ export function ParticipantSharePage() {
         ),
       }));
     }
+
+    const currentParticipationId =
+      account.events.collection[currentEvent._id]?.userId;
+    if (
+      participationId &&
+      currentParticipationId &&
+      participationId !== currentParticipationId
+    ) {
+      setAccount((account) => ({
+        ...account,
+        events: updateMergeableCollectionItem(
+          currentEvent._id,
+          {
+            ...account.events.collection[currentEvent._id],
+            userId: participationId,
+          },
+          account.events,
+        ),
+      }));
+    }
+
     goTo("EVENT_USERS", { eventId: currentEvent._id });
   };
 
@@ -99,6 +117,7 @@ export function ParticipantSharePage() {
       <EventParticipantShareForm
         event={currentEvent}
         participant={currentParticipant}
+        participantList={participants}
         defaultValues={share}
         submitLabel={t("page.share.form.actions.submit")}
         onSubmit={saveShare}

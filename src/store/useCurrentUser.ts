@@ -15,10 +15,11 @@ export function useCurrentUser() {
       return false;
     }
 
-    const isCurrentUserId = user._id === account.currentUser._id;
-    const isEventUserId = eventId && user._id === eventUserId;
+    const currentId = eventId
+      ? (eventUserId ?? account.currentUser._id)
+      : account.currentUser._id;
 
-    return isCurrentUserId || isEventUserId;
+    return user._id === currentId;
   };
 
   const setCurrentUser = (user: User | ((user: User) => User)) => {

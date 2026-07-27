@@ -21,8 +21,18 @@ export type CustomShare = {
   departure: "AM" | "PM";
 };
 
+export type ShareFormSubmit =
+  | ParticipantShare
+  | { type: "default"; shares: { adults: number; children: number } };
+
+export type ShareFormSubmitData = {
+  share: ShareFormSubmit;
+  participationId: string;
+};
+
 export type FormShare = {
   type: "default" | "custom" | "daily";
+  participationId: string;
   defaultShares: {
     adults: number;
     children: number;
@@ -141,9 +151,11 @@ export const fromShare = (
   data: ParticipantShare,
   event: Event,
   user: User,
+  participationId: string,
 ): FormShare => {
   return {
     type: data.type,
+    participationId,
     defaultShares: {
       adults: user.share.adults,
       children: user.share.children,

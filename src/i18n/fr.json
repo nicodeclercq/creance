@@ -1,6 +1,5 @@
 {
   "currentUser.anonymous.name": "Vous",
-  "currentUser.name": "Vous",
   "participant.unknown": "Participant supprimé",
   "categories.default": "Divers",
   "categories.shopping": "Courses",
@@ -439,5 +438,6 @@
   "SetParticipantShare.action.cancel.label": "Précédent",
   "SetParticipantShare.action.submit.label": "Valider",
   "UserMenu.editProfile.event.alert": "Les changements que vous effectuerez ici ne seront appliqués qu'à cette liste de créances.",
-  "UserMenu.editProfile.main.alert": "Les changements que vous effectuerez ici ne seront pas appliqués sur les listes de créances déjà existantes."
+  "UserMenu.editProfile.main.alert": "Les changements que vous effectuerez ici ne seront pas appliqués sur les listes de créances déjà existantes.",
+  "EventParticipantShareForm.participant.hasMe": "C'est moi !"
 }

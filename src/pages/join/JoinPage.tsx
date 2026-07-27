@@ -12,7 +12,7 @@ import type { Event } from "../../models/Event";
 import { JoinEvent } from "./private/JoinEvent";
 import { Logger } from "../../service/Logger";
 import type { Participant } from "../../models/Participant";
-import type { ParticipantShare } from "../../models/ParticipantShare";
+import type { ShareFormSubmitData } from "../participants/private/formParticipantShare";
 import { Redirect } from "../../router/Redirect";
 import { SetParticipantShare } from "./private/SetParticipantShare";
 import { Welcome } from "./private/Welcome";
@@ -67,11 +67,10 @@ export function JoinPage() {
     setStep((a) => a + 1);
   };
 
-  const storeDataAndContinue = (
-    participantShare:
-      | ParticipantShare
-      | { type: "default"; shares: { adults: number; children: number } },
-  ) => {
+  const storeDataAndContinue = ({
+    share: participantShare,
+    participationId,
+  }: ShareFormSubmitData) => {
     if (!tmpEvent) {
       throw new Error("Previous step was not complete");
     }
@@ -140,7 +139,7 @@ export function JoinPage() {
           decodedEventId,
           {
             eventId: decodedShareId,
-            userId: participant._id,
+            userId: participationId,
           },
           account.events,
         ),
@@ -188,6 +187,7 @@ export function JoinPage() {
         {step === 2 && tmpEvent != null && (
           <SetParticipantShare
             event={tmpEvent.event}
+            participantList={tmpEvent.event.participants.collection}
             onPrevious={() => setStep((a) => a - 1)}
             onNext={storeDataAndContinue}
             participant={tmpEvent.participation.participant}
