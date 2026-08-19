@@ -22,7 +22,7 @@
   align-items: center;
   gap: var(--ui-semantic-gap-s);
   background: var(--ui-background-default);
-  border: 0.1rem solid var(--ui-semantic-color-primary-strong);
+  border: 0.1rem solid currentColor;
   padding: var(--ui-semantic-padding-y-s) var(--ui-semantic-padding-x-m);
   font: var(--ui-semantic-font-input);
 

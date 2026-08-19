@@ -14,6 +14,7 @@ import styles from "./Select.module.css";
 import classNames from "classnames";
 import { Columns } from "../../Columns/Columns";
 import { Label } from "../Label/Label";
+import formFieldStyles from "../FormField.module.css";
 type Option<T> = { id: string; label: string; value: T };
 
 type SelectProps<T> = {
@@ -105,7 +106,11 @@ export function Select<T>({
     <RASelect
       data-component="Select"
       id={id}
-      className={classNames(styles.select, styles[`isVariant-${variant}`])}
+      className={classNames(
+        formFieldStyles.formField,
+        styles.select,
+        styles[`isVariant-${variant}`],
+      )}
       selectedKey={selectedOption?.label}
       onSelectionChange={onSelectionChange}
     >
